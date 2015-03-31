@@ -19,6 +19,9 @@ ValaBinding is a Vala language binding for MonoDevelop.
 ## Debugging
 ![debugging](docs/ide-monodevelop-debug.png)
 
+## Vala package management
+![packages](docs/ide-monodevelop-packages.png)
+
 # How to build 
 First we need to install [Mono for ubuntu](http://www.mono-project.com/docs/getting-started/install/linux/#debian-ubuntu-and-derivatives")
 ```
@@ -51,15 +54,4 @@ cd ValaBinding
 make
 sudo make install 
 ```
-
-# Screenshots
-
-## Standard
-![standard](docs/ide-monodevelop.png)
-
-## Debugging
-![debugging](docs/ide-monodevelop-debug.png)
-
-## Vala package management
-![packages](docs/ide-packages.png)
 
