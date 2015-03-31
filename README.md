@@ -36,8 +36,8 @@ sudo apt-get install monodevelop
 ```
 Then we build the vala plugin and its dependencies
 ```
-sudo apt-get install mono-complete monodevelop-nunit monodevelop-versioncontrol 
-sudo apt-get install  libmono-addins-cil-dev 	libmono-addins-gui-cil-dev 	libmono-addins-gui0.2-cil 	libmono-addins-msbuild-cil-dev 	libmono-addins-msbuild0.2-cil libmono-addins0.2-cil 	mono-addins-utils
+sudo apt-get install monodevelop-nunit monodevelop-versioncontrol 
+sudo apt-get install libmono-addins-cil-dev libmono-addins-gui-cil-dev libmono-addins-gui0.2-cil 	libmono-addins-msbuild-cil-dev libmono-addins-msbuild0.2-cil libmono-addins0.2-cil mono-addins-utils
 
 sudo apt-get install libvala-0.28-dev
 git clone https://github.com/inizan-yannick/afrodite
