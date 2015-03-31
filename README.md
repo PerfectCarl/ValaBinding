@@ -10,6 +10,14 @@ ValaBinding is a Vala language binding for MonoDevelop.
 * Breakpoints (via gdb)
 * Full completion (code and packages. Using [afrodite](https://github.com/inizan-yannick/afrodite))
 
+# Screenshots
+
+## Standard
+![standard](docs/ide-monodevelop.png)
+
+## Debugging
+![debugging](docs/ide-monodevelop-debug.png)
+
 # How to build 
 First we need to install [Mono for ubuntu](http://www.mono-project.com/docs/getting-started/install/linux/#debian-ubuntu-and-derivatives")
 ```
@@ -43,10 +51,3 @@ make
 sudo make install 
 ```
 
-# Screenshots
-
-## Standard
-![standard](docs/ide-monodevelop.png)
-
-## Debugging
-![debugging](docs/ide-monodevelop-debug.png)
