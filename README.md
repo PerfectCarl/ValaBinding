@@ -42,6 +42,7 @@ sudo apt-get install libmono-addins-cil-dev libmono-addins-gui-cil-dev libmono-a
 sudo apt-get install libvala-0.28-dev
 git clone https://github.com/inizan-yannick/afrodite
 cd afrodite
+chmod +x autogen.sh
 ./autogen.sh --prefix=/usr && ./configure --prefix=/usr
 make 
 sudo make install
@@ -49,7 +50,7 @@ sudo ln -s  /usr/lib/libafrodite-0.28.so /usr/lib/libafrodite.so
 ```
 And finally build the addin
 ```
-https://github.com/PerfectCarl/ValaBinding.git
+git clone https://github.com/PerfectCarl/ValaBinding.git
 cd ValaBinding
 ./configure --prefix=/usr 
 make
