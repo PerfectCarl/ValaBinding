@@ -45,6 +45,7 @@ cd afrodite
 ./autogen.sh --prefix=/usr && ./configure --prefix=/usr
 make 
 sudo make install
+sudo ln -s  /usr/lib/libafrodite-0.28.so /usr/lib/libafrodite.so
 ```
 And finally build the addin
 ```
