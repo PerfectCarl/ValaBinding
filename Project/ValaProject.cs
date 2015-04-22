@@ -77,6 +77,7 @@ namespace MonoDevelop.ValaBinding
 
         private void Init()
         {
+			MonoDevelop.Core.LoggingService.Log (MonoDevelop.Core.Logging.LogLevel.Warn, "BING");
             packages.Project = this;
             this.PackageAddedToProject += AddDependencies; // Special handling for project packages
             //IdeApp.ProjectOperations.EntryAddedToCombine += OnEntryAddedToCombine;

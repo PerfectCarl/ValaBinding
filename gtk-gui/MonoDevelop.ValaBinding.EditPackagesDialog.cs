@@ -28,6 +28,8 @@ namespace MonoDevelop.ValaBinding
 		
 		private global::Gtk.Button detailsButton;
 		
+		private global::Gtk.Button refreshButton;
+		
 		private global::Gtk.Table table1;
 		
 		private global::Gtk.Label label3;
@@ -137,14 +139,25 @@ namespace MonoDevelop.ValaBinding
 			w8.Position = 1;
 			w8.Expand = false;
 			w8.Fill = false;
-			this.hbox1.Add (this.vbox3);
-			global::Gtk.Box.BoxChild w9 = ((global::Gtk.Box.BoxChild)(this.hbox1 [this.vbox3]));
-			w9.Position = 1;
+			// Container child vbox3.Gtk.Box+BoxChild
+			this.refreshButton = new global::Gtk.Button ();
+			this.refreshButton.CanFocus = true;
+			this.refreshButton.Name = "refreshButton";
+			this.refreshButton.UseUnderline = true;
+			this.refreshButton.Label = global::Mono.Unix.Catalog.GetString ("!");
+			this.vbox3.Add (this.refreshButton);
+			global::Gtk.Box.BoxChild w9 = ((global::Gtk.Box.BoxChild)(this.vbox3 [this.refreshButton]));
+			w9.Position = 2;
 			w9.Expand = false;
 			w9.Fill = false;
+			this.hbox1.Add (this.vbox3);
+			global::Gtk.Box.BoxChild w10 = ((global::Gtk.Box.BoxChild)(this.hbox1 [this.vbox3]));
+			w10.Position = 1;
+			w10.Expand = false;
+			w10.Fill = false;
 			this.vpaned1.Add (this.hbox1);
-			global::Gtk.Paned.PanedChild w10 = ((global::Gtk.Paned.PanedChild)(this.vpaned1 [this.hbox1]));
-			w10.Resize = false;
+			global::Gtk.Paned.PanedChild w11 = ((global::Gtk.Paned.PanedChild)(this.vpaned1 [this.hbox1]));
+			w11.Resize = false;
 			// Container child vpaned1.Gtk.Paned+PanedChild
 			this.table1 = new global::Gtk.Table (((uint)(2)), ((uint)(2)), false);
 			this.table1.Name = "table1";
@@ -157,8 +170,8 @@ namespace MonoDevelop.ValaBinding
 			this.label3.Yalign = 0F;
 			this.label3.LabelProp = global::Mono.Unix.Catalog.GetString ("Selected packages:");
 			this.table1.Add (this.label3);
-			global::Gtk.Table.TableChild w11 = ((global::Gtk.Table.TableChild)(this.table1 [this.label3]));
-			w11.YOptions = ((global::Gtk.AttachOptions)(4));
+			global::Gtk.Table.TableChild w12 = ((global::Gtk.Table.TableChild)(this.table1 [this.label3]));
+			w12.YOptions = ((global::Gtk.AttachOptions)(4));
 			// Container child table1.Gtk.Table+TableChild
 			this.scrolledwindow2 = new global::Gtk.ScrolledWindow ();
 			this.scrolledwindow2.CanFocus = true;
@@ -170,10 +183,10 @@ namespace MonoDevelop.ValaBinding
 			this.selectedPackageTreeView.Name = "selectedPackageTreeView";
 			this.scrolledwindow2.Add (this.selectedPackageTreeView);
 			this.table1.Add (this.scrolledwindow2);
-			global::Gtk.Table.TableChild w13 = ((global::Gtk.Table.TableChild)(this.table1 [this.scrolledwindow2]));
-			w13.TopAttach = ((uint)(1));
-			w13.BottomAttach = ((uint)(2));
-			w13.XOptions = ((global::Gtk.AttachOptions)(4));
+			global::Gtk.Table.TableChild w14 = ((global::Gtk.Table.TableChild)(this.table1 [this.scrolledwindow2]));
+			w14.TopAttach = ((uint)(1));
+			w14.BottomAttach = ((uint)(2));
+			w14.XOptions = ((global::Gtk.AttachOptions)(4));
 			// Container child table1.Gtk.Table+TableChild
 			this.vbox2 = new global::Gtk.VBox ();
 			this.vbox2.Name = "vbox2";
@@ -187,32 +200,32 @@ namespace MonoDevelop.ValaBinding
 			this.removeButton.CanFocus = true;
 			this.removeButton.Name = "removeButton";
 			this.removeButton.UseUnderline = true;
-			global::Gtk.Image w14 = new global::Gtk.Image ();
-			w14.Pixbuf = global::Stetic.IconLoader.LoadIcon (this, "gtk-remove", global::Gtk.IconSize.Menu);
-			this.removeButton.Image = w14;
+			global::Gtk.Image w15 = new global::Gtk.Image ();
+			w15.Pixbuf = global::Stetic.IconLoader.LoadIcon (this, "gtk-remove", global::Gtk.IconSize.Menu);
+			this.removeButton.Image = w15;
 			this.vbox2.Add (this.removeButton);
-			global::Gtk.Box.BoxChild w15 = ((global::Gtk.Box.BoxChild)(this.vbox2 [this.removeButton]));
-			w15.Position = 0;
-			w15.Expand = false;
-			w15.Fill = false;
+			global::Gtk.Box.BoxChild w16 = ((global::Gtk.Box.BoxChild)(this.vbox2 [this.removeButton]));
+			w16.Position = 0;
+			w16.Expand = false;
+			w16.Fill = false;
 			this.table1.Add (this.vbox2);
-			global::Gtk.Table.TableChild w16 = ((global::Gtk.Table.TableChild)(this.table1 [this.vbox2]));
-			w16.TopAttach = ((uint)(1));
-			w16.BottomAttach = ((uint)(2));
-			w16.LeftAttach = ((uint)(1));
-			w16.RightAttach = ((uint)(2));
-			w16.XOptions = ((global::Gtk.AttachOptions)(4));
+			global::Gtk.Table.TableChild w17 = ((global::Gtk.Table.TableChild)(this.table1 [this.vbox2]));
+			w17.TopAttach = ((uint)(1));
+			w17.BottomAttach = ((uint)(2));
+			w17.LeftAttach = ((uint)(1));
+			w17.RightAttach = ((uint)(2));
+			w17.XOptions = ((global::Gtk.AttachOptions)(4));
 			this.vpaned1.Add (this.table1);
 			w1.Add (this.vpaned1);
-			global::Gtk.Box.BoxChild w18 = ((global::Gtk.Box.BoxChild)(w1 [this.vpaned1]));
-			w18.Position = 0;
-			w18.Padding = ((uint)(3));
+			global::Gtk.Box.BoxChild w19 = ((global::Gtk.Box.BoxChild)(w1 [this.vpaned1]));
+			w19.Position = 0;
+			w19.Padding = ((uint)(3));
 			// Internal child MonoDevelop.ValaBinding.EditPackagesDialog.ActionArea
-			global::Gtk.HButtonBox w19 = this.ActionArea;
-			w19.Name = "dialog1_ActionArea";
-			w19.Spacing = 6;
-			w19.BorderWidth = ((uint)(5));
-			w19.LayoutStyle = ((global::Gtk.ButtonBoxStyle)(4));
+			global::Gtk.HButtonBox w20 = this.ActionArea;
+			w20.Name = "dialog1_ActionArea";
+			w20.Spacing = 6;
+			w20.BorderWidth = ((uint)(5));
+			w20.LayoutStyle = ((global::Gtk.ButtonBoxStyle)(4));
 			// Container child dialog1_ActionArea.Gtk.ButtonBox+ButtonBoxChild
 			this.buttonCancel = new global::Gtk.Button ();
 			this.buttonCancel.CanDefault = true;
@@ -222,9 +235,9 @@ namespace MonoDevelop.ValaBinding
 			this.buttonCancel.UseUnderline = true;
 			this.buttonCancel.Label = "gtk-cancel";
 			this.AddActionWidget (this.buttonCancel, -6);
-			global::Gtk.ButtonBox.ButtonBoxChild w20 = ((global::Gtk.ButtonBox.ButtonBoxChild)(w19 [this.buttonCancel]));
-			w20.Expand = false;
-			w20.Fill = false;
+			global::Gtk.ButtonBox.ButtonBoxChild w21 = ((global::Gtk.ButtonBox.ButtonBoxChild)(w20 [this.buttonCancel]));
+			w21.Expand = false;
+			w21.Fill = false;
 			// Container child dialog1_ActionArea.Gtk.ButtonBox+ButtonBoxChild
 			this.buttonOk = new global::Gtk.Button ();
 			this.buttonOk.CanDefault = true;
@@ -234,10 +247,10 @@ namespace MonoDevelop.ValaBinding
 			this.buttonOk.UseUnderline = true;
 			this.buttonOk.Label = "gtk-ok";
 			this.AddActionWidget (this.buttonOk, -5);
-			global::Gtk.ButtonBox.ButtonBoxChild w21 = ((global::Gtk.ButtonBox.ButtonBoxChild)(w19 [this.buttonOk]));
-			w21.Position = 1;
-			w21.Expand = false;
-			w21.Fill = false;
+			global::Gtk.ButtonBox.ButtonBoxChild w22 = ((global::Gtk.ButtonBox.ButtonBoxChild)(w20 [this.buttonOk]));
+			w22.Position = 1;
+			w22.Expand = false;
+			w22.Fill = false;
 			if ((this.Child != null)) {
 				this.Child.ShowAll ();
 			}
@@ -247,6 +260,7 @@ namespace MonoDevelop.ValaBinding
 			this.normalPackageTreeView.CursorChanged += new global::System.EventHandler (this.OnNonSelectedPackageCursorChanged);
 			this.projectPackageTreeView.CursorChanged += new global::System.EventHandler (this.OnNonSelectedPackageCursorChanged);
 			this.detailsButton.Clicked += new global::System.EventHandler (this.OnDetailsButtonClicked);
+			this.refreshButton.Clicked += new global::System.EventHandler (this.OnRefreshButtonClicked);
 			this.removeButton.Clicked += new global::System.EventHandler (this.OnRemoveButtonClicked);
 			this.removeButton.Clicked += new global::System.EventHandler (this.OnRemoveButtonClick);
 			this.selectedPackageTreeView.CursorChanged += new global::System.EventHandler (this.OnSelectedPackagesTreeViewCursorChanged);

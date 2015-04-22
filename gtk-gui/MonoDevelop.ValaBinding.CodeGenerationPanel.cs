@@ -166,11 +166,11 @@ namespace MonoDevelop.ValaBinding
 			w4.XOptions = ((global::Gtk.AttachOptions)(4));
 			w4.YOptions = ((global::Gtk.AttachOptions)(4));
 			// Container child table1.Gtk.Table+TableChild
-			this.optimizationSpinButton = new global::Gtk.SpinButton (0D, 3D, 1D);
+			this.optimizationSpinButton = new global::Gtk.SpinButton (0, 3, 1);
 			this.optimizationSpinButton.CanFocus = true;
 			this.optimizationSpinButton.Name = "optimizationSpinButton";
-			this.optimizationSpinButton.Adjustment.PageIncrement = 10D;
-			this.optimizationSpinButton.ClimbRate = 1D;
+			this.optimizationSpinButton.Adjustment.PageIncrement = 10;
+			this.optimizationSpinButton.ClimbRate = 1;
 			this.optimizationSpinButton.Numeric = true;
 			this.table1.Add (this.optimizationSpinButton);
 			global::Gtk.Table.TableChild w5 = ((global::Gtk.Table.TableChild)(this.table1 [this.optimizationSpinButton]));
@@ -217,6 +217,7 @@ namespace MonoDevelop.ValaBinding
 			this.noWarningRadio = new global::Gtk.RadioButton (global::Mono.Unix.Catalog.GetString ("no warnings"));
 			this.noWarningRadio.CanFocus = true;
 			this.noWarningRadio.Name = "noWarningRadio";
+			this.noWarningRadio.Active = true;
 			this.noWarningRadio.DrawIndicator = true;
 			this.noWarningRadio.UseUnderline = true;
 			this.noWarningRadio.Group = new global::GLib.SList (global::System.IntPtr.Zero);
@@ -335,8 +336,7 @@ namespace MonoDevelop.ValaBinding
 			this.scrolledwindow4.ShadowType = ((global::Gtk.ShadowType)(1));
 			// Container child scrolledwindow4.Gtk.Container+ContainerChild
 			this.extraCompilerTextView = new global::Gtk.TextView ();
-			this.extraCompilerTextView.TooltipMarkup = "A newline-separated list of extra options to send to the compiler.\nOne option can" +
-			" be in more than one line.\nExample:\n\t`--pkg\n\tcairo`";
+			this.extraCompilerTextView.TooltipMarkup = "A newline-separated list of extra options to send to the compiler.\nOne option can be in more than one line.\nExample:\n\t`--pkg\n\tcairo`";
 			this.extraCompilerTextView.CanFocus = true;
 			this.extraCompilerTextView.Name = "extraCompilerTextView";
 			this.scrolledwindow4.Add (this.extraCompilerTextView);

@@ -46,7 +46,7 @@ sudo apt-get install libvala-0.28-dev
 git clone https://github.com/inizan-yannick/afrodite
 cd afrodite
 chmod +x autogen.sh
-./autogen.sh --prefix=/usr && ./configure --prefix=/usr
+./autogen.sh --prefix=/usr --enable-debug && ./configure --prefix=/usr
 make
 sudo make install
 sudo ln -s  /usr/lib/libafrodite-0.28.so /usr/lib/libafrodite.so

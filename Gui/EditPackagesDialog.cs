@@ -42,7 +42,9 @@ namespace MonoDevelop.ValaBinding
 {
     public partial class EditPackagesDialog : Gtk.Dialog
     {
-        private Gtk.ListStore normalPackageListStore = new Gtk.ListStore(typeof(bool), typeof(string), typeof(string));
+		static private Gtk.ListStore cachedNormalPackageListStore = new Gtk.ListStore(typeof(bool), typeof(string), typeof(string));
+
+		private Gtk.ListStore normalPackageListStore = new Gtk.ListStore(typeof(bool), typeof(string), typeof(string));
         private Gtk.ListStore projectPackageListStore = new Gtk.ListStore(typeof(bool), typeof(string), typeof(string));
         private Gtk.ListStore selectedPackageListStore = new Gtk.ListStore(typeof(string), typeof(string));
         private ValaProject project;
@@ -159,47 +161,57 @@ namespace MonoDevelop.ValaBinding
                         selectedPackageListStore.AppendValues(p.Name, version);
                 }
             }
-
-            // Fill up the normal tree view
-            foreach (string dir in ProjectPackage.PackagePaths)
-            {
-                if (Directory.Exists(dir))
-                {
-                    DirectoryInfo di = new DirectoryInfo(dir);
-                    FileInfo[] availablePackages = di.GetFiles("*.pc");
-
-                    foreach (FileInfo f in availablePackages)
-                    {
-                        if (!IsValidPackage(f.FullName))
-                        {
-                            continue;
-                        }
-
-                        string packagename = System.IO.Path.GetFileNameWithoutExtension(f.FullName);
-
-                        GLib.Idle.Add(delegate
-                        {
-                            ProjectPackage package = new ProjectPackage(packagename + ".pc", packagename, false);
-
-                            packages.Add(package);
-
-                            string name = package.Name;
-                            string version = package.Version;
-                            bool inProject = selectedPackages.Contains(package);
-
-                            if (!IsPackageInStore(normalPackageListStore, name, version, NormalPackageNameID, NormalPackageVersionID))
-                            {
-                                normalPackageListStore.AppendValues(inProject, name, version);
-
-                                if (inProject)
-                                    selectedPackageListStore.AppendValues(name, version);
-                            }
-                            return false;
-                        });
-                    }
-                }
-            }
+			loadCachedNormalPackages ();
         }
+
+		private void loadCachedNormalPackages () {
+			normalPackageTreeView.Model = cachedNormalPackageListStore;
+
+		}
+
+		private void reloadNormalPackages () {
+			selectedPackageListStore.Clear ();
+			cachedNormalPackageListStore.Clear ();
+			// Fill up the normal tree view
+			foreach (string dir in ProjectPackage.PackagePaths)
+			{
+				if (Directory.Exists(dir))
+				{
+					DirectoryInfo di = new DirectoryInfo(dir);
+					FileInfo[] availablePackages = di.GetFiles("*.pc");
+
+					foreach (FileInfo f in availablePackages)
+					{
+						if (!IsValidPackage(f.FullName))
+						{
+							continue;
+						}
+
+						string packagename = System.IO.Path.GetFileNameWithoutExtension(f.FullName);
+
+						GLib.Idle.Add(delegate
+							{
+								ProjectPackage package = new ProjectPackage(packagename + ".pc", packagename, false);
+
+								packages.Add(package);
+
+								string name = package.Name;
+								string version = package.Version;
+								bool inProject = selectedPackages.Contains(package);
+
+								if (!IsPackageInStore(normalPackageListStore, name, version, NormalPackageNameID, NormalPackageVersionID))
+								{
+									normalPackageListStore.AppendValues(inProject, name, version);
+									cachedNormalPackageListStore.AppendValues(inProject, name, version);
+									if (inProject)
+										selectedPackageListStore.AppendValues(name, version);
+								}
+								return false;
+							});
+					}
+				}
+			}
+		}
 
         private List<ProjectPackage> GetPackagesOfProjects(ValaProject project)
         {
@@ -397,7 +409,7 @@ namespace MonoDevelop.ValaBinding
         }
 
         private void OnProjectPackageToggled(object sender, Gtk.ToggledArgs args)
-        {
+		{
             Gtk.TreeIter iter;
             bool old = true;
             string name;
@@ -541,5 +553,12 @@ namespace MonoDevelop.ValaBinding
         {
             detailsButton.Sensitive = true;
         }
+			
+
+		protected void OnRefreshButtonClicked (object sender, EventArgs e)
+		{
+			reloadNormalPackages ();
+			normalPackageTreeView.Model = normalPackageListStore;
+		}
     }
 }

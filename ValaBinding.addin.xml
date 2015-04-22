@@ -115,6 +115,8 @@
 
 	<Extension path = "/MonoDevelop/Ide/TextEditorExtensions">
 		<Class fileExtensions = ".vala,.vapi" class = "MonoDevelop.ValaBinding.ValaTextEditorExtension" />
+		<!-- Document Outline Provider -->
+		<Class fileExtensions = ".vala,.vapi" class = "MonoDevelop.ValaBinding.ValaOutlineExtension" />
 	</Extension>
 
 	<Extension path = "/MonoDevelop/ProjectModel/ProjectServiceExtensions">
