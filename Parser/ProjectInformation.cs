@@ -98,7 +98,7 @@ namespace MonoDevelop.ValaBinding.Parser
 			string projectName = (null == project)? "NoExistingProject": project.Name;
 			
 			if (DepsInstalled) {
-				// engine = new Afrodite.CompletionEngine (projectName);
+				engine = new Afrodite.CompletionEngine (projectName);
 			}
 		}
 		
@@ -387,7 +387,7 @@ namespace MonoDevelop.ValaBinding.Parser
 		/// <param name="desiredTypes">
 		/// A <see cref="IEnumerable<System.String>"/>: The types of symbols to allow
 		/// </param>
-		List<Afrodite.Symbol> GetSymbolsForFile (string file, IEnumerable<string> desiredTypes)
+		internal List<Afrodite.Symbol> GetSymbolsForFile (string file, IEnumerable<string> desiredTypes)
 		{
 			List<Afrodite.Symbol> symbols = null;
 			List<Afrodite.Symbol> classes = new List<Afrodite.Symbol> ();

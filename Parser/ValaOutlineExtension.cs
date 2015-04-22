@@ -5,24 +5,7 @@
 //       cran <>
 //
 // Copyright (c) 2015 cran
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
+
 using System;
 using MonoDevelop.Ide.Gui.Content;
 using MonoDevelop.DesignerSupport;
@@ -30,6 +13,10 @@ using Gtk;
 using System.Collections.Generic;
 using MonoDevelop.Components;
 using MonoDevelop.Ide.Gui;
+using MonoDevelop.Ide;
+using MonoDevelop.Core;
+using MonoDevelop.ValaBinding.Parser.Afrodite;
+using MonoDevelop.ValaBinding.Parser;
 
 namespace MonoDevelop.ValaBinding
 {
@@ -43,6 +30,7 @@ namespace MonoDevelop.ValaBinding
 		TreeStore TreeStore;
 		MonoDevelop.Ide.Gui.Components.PadTreeView TreeView;
 		Widget[] toolbarWidgets;
+		bool outlineReady;
 
 		void IOutlinedDocument.ReleaseOutlineWidget()
 		{
@@ -71,13 +59,16 @@ namespace MonoDevelop.ValaBinding
 		{
 			return true;
 		}
-
+			
 		public override void Initialize()
 		{
 			base.Initialize();
-			MonoDevelop.Core.LoggingService.Log (MonoDevelop.Core.Logging.LogLevel.Warn, "MEMEME");
+			if (Document != null)
+			{
+				Document.DocumentParsed += UpdateDocumentOutline;
+				// CARL Document.Editor.Caret.PositionChanged += UpdateOutlineSelection;
+			}
 		}
-
 		public Widget GetOutlineWidget()
 		{
 			if (TreeView != null)
@@ -124,16 +115,246 @@ namespace MonoDevelop.ValaBinding
 			return sw;
 		}
 
+
+		uint refillOutlineStoreId;
+		void UpdateDocumentOutline(object sender, EventArgs args)
+		{
+			RefillOutlineStore();
+		}
+
+		void RemoveRefillOutlineStoreTimeout()
+		{
+			if (refillOutlineStoreId == 0)
+				return;
+			GLib.Source.Remove(refillOutlineStoreId);
+			refillOutlineStoreId = 0;
+		}
+
 		public bool RefillOutlineStore()
 		{
+			DispatchService.AssertGuiThread();
+			Gdk.Threads.Enter();
+
+			//refreshingOutline = false;
+			if (TreeStore == null || !TreeView.IsRealized)
+			{
+				refillOutlineStoreId = 0;
+				return false;
+			}
+
+			outlineReady = false;
+
+			// Save last selection
+			int[] lastSelectedItem;
+			TreeIter i;
+
+			if (TreeView.Selection.GetSelected(out i))
+				lastSelectedItem = TreeStore.GetPath(i).Indices;
+			else 
+				lastSelectedItem = null;
+
+			// Save previously expanded items if wanted
+			var lastExpanded = new List<int[]>();
+			if (/*DCompilerService.Instance.Outline.ExpansionBehaviour == DocOutlineCollapseBehaviour.ReopenPreviouslyExpanded && */
+				TreeStore.GetIterFirst(out i))
+			{
+				do{
+					var path = TreeStore.GetPath(i);
+					if(TreeView.GetRowExpanded(path))
+						lastExpanded.Add(path.Indices);
+				}
+				while(TreeStore.IterNext(ref i));
+			}
+
+			// Clear the tree
+			TreeStore.Clear();
+
+			try
+			{
+				// Build up new tree
+				var caretLocation = Document.Editor.Caret.Location;
+				BuildTreeChildren(TreeIter.Zero, /*SyntaxTree,*/ caretLocation.Column, caretLocation.Line);
+			}
+			catch (Exception ex)
+			{
+				LoggingService.LogError("Error while updating document outline panel", ex);
+			}
+			finally
+			{
+				// Re-Expand tree items
+				/*switch(DCompilerService.Instance.Outline.ExpansionBehaviour)
+				{
+				case DocOutlineCollapseBehaviour.ExpandAll:
+					TreeView.ExpandAll();
+					break;
+				case DocOutlineCollapseBehaviour.ReopenPreviouslyExpanded:
+					foreach (var path in lastExpanded)
+						TreeView.ExpandToPath(new TreePath(path));
+					break;
+				}*/
+
+				// Restore selection
+				if (lastSelectedItem != null)
+				{
+					try
+					{
+						TreeView.ExpandToPath(new TreePath(lastSelectedItem));
+					}
+					catch { }
+				}
+
+				outlineReady = true;
+			}
+			Gdk.Threads.Leave();
+
+			//stop timeout handler
+			refillOutlineStoreId = 0;
 			return false;
 		}
 
+		private ProjectInformation Parser
+		{
+			get
+			{
+				ValaProject project = Document.Project as ValaProject;
+				return (null == project) ? null : ProjectInformationManager.Instance.Get(project);
+			}
+		}
+
+		void BuildTreeChildren(TreeIter ParentTreeNode/*, IBlockNode ParentAstNode*/, int column, int line)
+		{
+
+			foreach (var symbol in Parser.GetSymbolsForFile (FileName.CanonicalPath, new string [] {"namespace", "class", "enum", "method"})) {
+				var childIter = TreeStore.AppendValues(symbol);
+			}
+			/* if (ParentAstNode == null)
+				return;
+
+			if (ParentAstNode is DMethod)
+			{
+				if (DCompilerService.Instance.Outline.ShowFuncParams)
+				{
+					var dm = ParentAstNode as DMethod;
+
+					if (dm.Parameters != null)
+						foreach (var p in dm.Parameters)
+							if (p.Name != "")
+							{
+								TreeIter childIter;
+								if (!ParentTreeNode.Equals(TreeIter.Zero))
+									childIter = TreeStore.AppendValues(ParentTreeNode, p);
+								else
+									childIter = TreeStore.AppendValues(p);
+
+								if (editorSelectionLocation >= p.Location &&
+									editorSelectionLocation < p.EndLocation)
+									TreeView.Selection.SelectIter(childIter);
+							}
+				}
+			}
+
+			foreach (var n in ParentAstNode)
+			{
+				if (n is DEnum && (n as DEnum).IsAnonymous)
+				{
+					BuildTreeChildren(ParentTreeNode, n as IBlockNode, editorSelectionLocation);
+					continue;
+				}
+
+				if (!DCompilerService.Instance.Outline.ShowFuncVariables && 
+					ParentAstNode is DMethod && 
+					n is DVariable)
+					continue;
+
+				if (n is DMethod && string.IsNullOrEmpty(n.Name)) // Check against delegates & unittests
+					continue;
+
+				TreeIter childIter;
+				if (!ParentTreeNode.Equals(TreeIter.Zero))
+					childIter = TreeStore.AppendValues(ParentTreeNode,n);
+				else
+					childIter = TreeStore.AppendValues(n);
+
+				if (editorSelectionLocation >= n.Location && 
+					editorSelectionLocation < n.EndLocation)
+					TreeView.Selection.SelectIter(childIter);
+
+				BuildTreeChildren(childIter, n as IBlockNode,editorSelectionLocation);
+			}*/
+		}
+
 		void OutlineTreeIconFunc(TreeViewColumn column, CellRenderer cell, TreeModel model, TreeIter iter)
-		{}
+		{
+			var pixRenderer = (CellRendererPixbuf)cell;
+			/*object o = model.GetValue(iter, 0);
+			string id = null;
+
+			if (o is DNode)
+			{
+				var icon = DIcons.GetNodeIcon(o as DNode);
+				if (!icon.IsNull)
+					id = icon.Name;
+			}
+			else if (o is StatementContainingStatement)
+				id = "gtk-add";
+*/
+			var symbol = model.GetValue (iter, 0) as Symbol;
+			var id = symbol.Icon;
+			if (id != null)
+			{
+				var img = ImageService.GetIcon(id);
+				if (img != null)
+					pixRenderer.Pixbuf = img.ToPixbuf(IconSize.Menu);
+			}
+
+		}
 
 		void OutlineTreeTextFunc (TreeViewColumn column, CellRenderer cell, TreeModel model, TreeIter iter)
-		{}
+		{
+			var symbol = model.GetValue (iter, 0) as Symbol;
+
+			string label;
+
+			/*var dm = n as DMethod;
+			if (dm != null) {
+				switch (dm.SpecialType) {
+				case DMethod.MethodType.Unittest:
+					label = "(Unittest)";
+					break;
+				case DMethod.MethodType.ClassInvariant:
+					label = "(Class Invariant)";
+					break;
+				case DMethod.MethodType.Allocator:
+					label = "(Class Allocator)";
+					break;
+				case DMethod.MethodType.Deallocator:
+					label = "(Class Deallocator)";
+					break;
+				default:
+					label = DCompilerService.Instance.Outline.ShowFuncParams ? dm.ToString (false, false) : n.Name;
+					break;
+				}
+			} else*/
+				label = symbol.Name ?? string.Empty;
+
+			/*if (DCompilerService.Instance.Outline.ShowBaseTypes)
+				label = String.Format ("{0} {1}", (n as DNode).Type, label);*/
+
+			// if (DCompilerService.Instance.Outline.GrayOutNonPublic)
+			{
+				// symbol.Accessibility
+				//var dn = n as DNode;
+				//if (dn != null)
+				{
+					if (symbol.Accessibility != SymbolAccessibility.Public)
+						(cell as CellRendererText).Foreground = "#606060";
+					else
+						(cell as CellRendererText).Foreground = "black";
+				}
+			}
+
+			(cell as CellRendererText).Text = label;
+		}
 	}
 
 }
