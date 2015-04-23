@@ -43,6 +43,7 @@ using MonoDevelop.Core;
 using MonoDevelop.Ide;
 using MonoDevelop.Core.Execution;
 using MonoDevelop.Ide.CodeCompletion;
+using MonoDevelop.ValaBinding.Parser.Afrodite;
 
 namespace MonoDevelop.ValaBinding.Parser
 {
@@ -57,6 +58,7 @@ namespace MonoDevelop.ValaBinding.Parser
 		private Afrodite.CompletionEngine engine;
 		
 		static readonly string[] containerTypes = new string[]{ "class", "struct", "interface" };
+		static readonly string[] topContainers = new string[]{ "namespace", "enum", "class", "struct", "interface" };
 
 		public Project Project{ get; set; }
 		
@@ -377,7 +379,18 @@ namespace MonoDevelop.ValaBinding.Parser
 		{
 			return GetSymbolsForFile (file, new string[]{ "namespace" });
 		}
-		
+
+		internal List<Afrodite.Symbol> GetRootSymbolsForFile (string file)
+		{
+			var symbols = GetSymbolsForFile (file /*topContainers*/);
+			var result = new List<Symbol>();
+			foreach (var symbol in symbols) {
+				if (symbol.IsRoot)
+					result.Add (symbol);
+			}
+			return result;
+		}
+
 		/// <summary>
 		/// Get a list of symbols declared in a given file
 		/// </summary>
@@ -385,9 +398,9 @@ namespace MonoDevelop.ValaBinding.Parser
 		/// A <see cref="System.String"/>: The file to check
 		/// </param>
 		/// <param name="desiredTypes">
-		/// A <see cref="IEnumerable<System.String>"/>: The types of symbols to allow
+		/// A <see cref="IEnumerable<System.String>"/>: The types of symbols to allow. If null or missing all the symbols are allowed
 		/// </param>
-		internal List<Afrodite.Symbol> GetSymbolsForFile (string file, IEnumerable<string> desiredTypes)
+		internal List<Afrodite.Symbol> GetSymbolsForFile (string file, IEnumerable<string> desiredTypes = null )
 		{
 			List<Afrodite.Symbol> symbols = null;
 			List<Afrodite.Symbol> classes = new List<Afrodite.Symbol> ();
@@ -401,9 +414,13 @@ namespace MonoDevelop.ValaBinding.Parser
 						symbols = sourceFile.Symbols;
 						if (null != symbols) {
 							foreach (Afrodite.Symbol symbol in symbols) {
-								foreach (string containerType in desiredTypes) {
-									if (containerType.Equals (symbol.MemberType, StringComparison.OrdinalIgnoreCase))
-										classes.Add (symbol);
+									if (desiredTypes == null )
+									classes.Add (symbol);
+								else {
+									foreach (string containerType in desiredTypes) {
+										if (containerType.Equals (symbol.MemberType, StringComparison.OrdinalIgnoreCase))
+											classes.Add (symbol);
+									}
 								}
 							}
 						}

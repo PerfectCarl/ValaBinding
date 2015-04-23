@@ -81,14 +81,26 @@ namespace MonoDevelop.ValaBinding.Navigation
 			Symbol thisSymbol = (Symbol)dataObject;
 
 			foreach (Symbol child in thisSymbol.Children) {
-				treeBuilder.AddChild (child);
+				// We don't display code blocks like if/then/else in the ClassPad
+				if( child.MemberType != "Block" && child.MemberType != "Creation Method")
+					treeBuilder.AddChild (child);
 			}
 		}
 
 		public override bool HasChildNodes (ITreeBuilder builder, object dataObject)
 		{
 			Symbol symbol = (Symbol)dataObject;
-			return (null != symbol.Children && 0 < symbol.Children.Count);
+			if (symbol.Children == null)
+				return false; 
+			if (symbol.Children.Count == 0)
+				return false; 
+			// We check that the children are not simple code blocks that we 
+			// don't want to display in the ClassPad
+			foreach (var child in symbol.Children) {
+				if (child.MemberType != "Block" && child.MemberType != "Creation Method")
+					return true;
+			}
+			return false;
 		}
 		
 		public override int CompareObjects (ITreeNavigator thisNode, ITreeNavigator otherNode)

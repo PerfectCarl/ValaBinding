@@ -206,6 +206,7 @@
     <Compile Include="Parser\Afrodite\CompletionEngine.cs" />
     <Compile Include="Parser\Afrodite\ValaEnumerator.cs" />
     <Compile Include="Parser\Afrodite\CodeDomDumper.cs" />
+    <Compile Include="Compiler\FastValaCompiler.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

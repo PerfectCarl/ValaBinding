@@ -93,6 +93,13 @@ namespace MonoDevelop.ValaBinding.Parser.Afrodite
 			get{ return Marshal.PtrToStringAuto (afrodite_symbol_get_display_name (instance)); }
 		}
 
+		public bool IsRoot { 
+			get { 
+				if (Parent == null)
+					return true;
+				return Parent.Name == null ; 
+			}
+		}
 		/// <summary>
 		/// The fully qualified name of this symbol
 		/// </summary>

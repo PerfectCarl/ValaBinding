@@ -47,6 +47,7 @@ using MonoDevelop.Ide;
 using MonoDevelop.ValaBinding;
 using MonoDevelop.ValaBinding.Parser;
 using MonoDevelop.ValaBinding.Parser.Afrodite;
+using System.Collections.Generic;
 
 namespace MonoDevelop.ValaBinding.Navigation
 {
@@ -103,11 +104,15 @@ namespace MonoDevelop.ValaBinding.Navigation
 			// bool nestedNamespaces = builder.Options["NestedNamespaces"];
 			
 			ProjectInformation info = ProjectInformationManager.Instance.Get (p);
-			
+			var added = new List<String> () ;
 			// Namespaces
 			foreach (ProjectFile file in p.Files) {
-				foreach (Symbol child in info.GetNamespacesForFile (file.FilePath.FullPath)) {
-					builder.AddChild (child);
+				foreach (Symbol child in info.GetRootSymbolsForFile (file.FilePath.FullPath)) {
+					var name = child.Name ;
+					if( added.IndexOf (name) == -1 /*&& child.Parent.Name == null*/ ) { 
+						builder.AddChild (child);
+						added.Add(name) ;
+					}
 				}
 			}
 		}

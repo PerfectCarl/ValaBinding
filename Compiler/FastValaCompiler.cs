@@ -50,20 +50,20 @@ using MonoDevelop.Core.ProgressMonitoring;
 namespace MonoDevelop.ValaBinding
 {
 	[Extension ("/ValaBinding/Compilers")]
-	public class ValaCompiler : ICompiler
+	public class FastValaCompiler : ICompiler
 	{
 		protected string compilerCommand;
 				
 		bool compilerFound;
 		bool appsChecked;
 		
-		public ValaCompiler ()
+		public FastValaCompiler ()
 		{
 			compilerCommand = "valac";
 		}
 		
 		public string Name {
-			get{ return "valac"; }
+			get{ return "fast valac"; }
 		}
 			
 		public string CompilerCommand {
@@ -413,12 +413,7 @@ namespace MonoDevelop.ValaBinding
             if (exitCode != 0 && cr.Errors.Count == 0)
             {
                 // error isn't recognized but cannot ignore it because exitCode != 0
-				var errMsg = "";
-				if( errorOutput == null || errorOutput == "" ) 
-					errMsg = string.Format("Return code {0}. No error message provided", exitCode) ;
-				else
-					errMsg = errorOutput ;
-				cr.Errors.Add (new CompilerError () { ErrorText = errMsg });
+                cr.Errors.Add(new CompilerError() { ErrorText = errorOutput });
             }
 
 			return exitCode == 0;

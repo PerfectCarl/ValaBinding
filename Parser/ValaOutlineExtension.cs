@@ -65,7 +65,7 @@ namespace MonoDevelop.ValaBinding
 			base.Initialize();
 			if (Document != null)
 			{
-				Document.DocumentParsed += UpdateDocumentOutline;
+				// Document.DocumentParsed += UpdateDocumentOutline;
 				// CARL Document.Editor.Caret.PositionChanged += UpdateOutlineSelection;
 			}
 		}
