@@ -413,7 +413,12 @@ namespace MonoDevelop.ValaBinding
             if (exitCode != 0 && cr.Errors.Count == 0)
             {
                 // error isn't recognized but cannot ignore it because exitCode != 0
-                cr.Errors.Add(new CompilerError() { ErrorText = errorOutput });
+				var errMsg = "";
+				if( errorOutput == null || errorOutput == "" ) 
+					errMsg = string.Format("Return code {0}. No error message provided", exitCode) ;
+				else
+					errMsg = errorOutput ;
+				cr.Errors.Add (new CompilerError () { ErrorText = errMsg });
             }
 
 			return exitCode == 0;

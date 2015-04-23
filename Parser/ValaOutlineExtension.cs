@@ -224,15 +224,22 @@ namespace MonoDevelop.ValaBinding
 			}
 		}
 
+		private SourceReference GetFirstReference (Symbol symbol) {
+			if (symbol.SourceReferences.Count == 0)
+				return null;
+			return symbol.SourceReferences[0] ;
+		}
+
 		void BuildTreeChildren(TreeIter ParentTreeNode, Symbol symbol, int column, int line)
 		{
-			TreeIter childIter; 
-
-			if (!ParentTreeNode.Equals(TreeIter.Zero))
-				childIter = TreeStore.AppendValues(ParentTreeNode, symbol);
-			else
-				childIter = TreeStore.AppendValues(symbol);
-
+			TreeIter childIter=ParentTreeNode; 
+			var source = GetFirstReference (symbol);
+			if (source.File == FileName.CanonicalPath) {
+				if (!ParentTreeNode.Equals (TreeIter.Zero))
+					childIter = TreeStore.AppendValues (ParentTreeNode, symbol);
+				else
+					childIter = TreeStore.AppendValues (symbol);
+			}
 			foreach (var child in symbol.Children) {
 				BuildTreeChildren (childIter, child, column, line);
 
@@ -339,15 +346,11 @@ namespace MonoDevelop.ValaBinding
 			int line = 0; 
 			int column = 0; 
 			string filename = "";
-			foreach (var source in symbol.SourceReferences) {
-				if( source != null )
-				{
-					filename = source.File; 
-					line = source.FirstLine; 
-					column = source.FirstColumn;
-					break; 
-				}
-			}
+			var source = GetFirstReference (symbol);
+			filename = source.File; 
+			line = source.FirstLine; 
+			column = source.FirstColumn;
+
 			var openedDoc=IdeApp.Workbench.GetDocument(filename);
 
 			if (openedDoc == null)
