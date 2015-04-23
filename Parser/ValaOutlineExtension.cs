@@ -31,7 +31,8 @@ namespace MonoDevelop.ValaBinding
 		MonoDevelop.Ide.Gui.Components.PadTreeView TreeView;
 		Widget[] toolbarWidgets;
 		bool outlineReady;
-
+		bool dontJumpToDeclaration;
+		bool clickedOnOutlineItem; 
 		void IOutlinedDocument.ReleaseOutlineWidget()
 		{
 			if (TreeView == null)
@@ -65,7 +66,7 @@ namespace MonoDevelop.ValaBinding
 			base.Initialize();
 			if (Document != null)
 			{
-				// Document.DocumentParsed += UpdateDocumentOutline;
+				Document.DocumentParsed += UpdateDocumentOutline;
 				// CARL Document.Editor.Caret.PositionChanged += UpdateOutlineSelection;
 			}
 		}
@@ -98,14 +99,14 @@ namespace MonoDevelop.ValaBinding
 
 			TreeView.HeadersVisible = false;
 
-			/*TreeView.Selection.Changed += delegate {
+			TreeView.Selection.Changed += delegate {
 				if (dontJumpToDeclaration || !outlineReady)
 					return;
 
 				clickedOnOutlineItem = true;
 				JumpToDeclaration (true);
 				clickedOnOutlineItem = false;
-			};*/
+			};
 
 			TreeView.Realized += delegate { RefillOutlineStore(); };
 
@@ -173,7 +174,9 @@ namespace MonoDevelop.ValaBinding
 			{
 				// Build up new tree
 				var caretLocation = Document.Editor.Caret.Location;
-				BuildTreeChildren(TreeIter.Zero, /*SyntaxTree,*/ caretLocation.Column, caretLocation.Line);
+				foreach (var symbol in Parser.GetRootSymbolsForFile (FileName.CanonicalPath)) {
+					BuildTreeChildren(TreeIter.Zero, symbol, caretLocation.Column, caretLocation.Line);
+				}
 			}
 			catch (Exception ex)
 			{
@@ -221,11 +224,21 @@ namespace MonoDevelop.ValaBinding
 			}
 		}
 
-		void BuildTreeChildren(TreeIter ParentTreeNode/*, IBlockNode ParentAstNode*/, int column, int line)
+		void BuildTreeChildren(TreeIter ParentTreeNode, Symbol symbol, int column, int line)
 		{
+			TreeIter childIter; 
 
-			foreach (var symbol in Parser.GetSymbolsForFile (FileName.CanonicalPath, new string [] {"namespace", "class", "enum", "method"})) {
-				var childIter = TreeStore.AppendValues(symbol);
+			if (!ParentTreeNode.Equals(TreeIter.Zero))
+				childIter = TreeStore.AppendValues(ParentTreeNode, symbol);
+			else
+				childIter = TreeStore.AppendValues(symbol);
+
+			foreach (var child in symbol.Children) {
+				BuildTreeChildren (childIter, child, column, line);
+
+				/*if (editorSelectionLocation >= symbol.Location &&
+					editorSelectionLocation < symbol.EndLocation)
+					TreeView.Selection.SelectIter(childIter);*/
 			}
 			/* if (ParentAstNode == null)
 				return;
@@ -309,6 +322,53 @@ namespace MonoDevelop.ValaBinding
 
 		}
 
+		void JumpToDeclaration(bool focusEditor)
+		{
+			if (!outlineReady)
+				return;
+
+			TreeIter iter;
+			if (!TreeView.Selection.GetSelected(out iter))
+				return;
+
+			var symbol = TreeStore.GetValue(iter, 0) as Symbol;
+
+			if(symbol==null)
+				return;
+
+			int line = 0; 
+			int column = 0; 
+			string filename = "";
+			foreach (var source in symbol.SourceReferences) {
+				if( source != null )
+				{
+					filename = source.File; 
+					line = source.FirstLine; 
+					column = source.FirstColumn;
+					break; 
+				}
+			}
+			var openedDoc=IdeApp.Workbench.GetDocument(filename);
+
+			if (openedDoc == null)
+				return;
+
+
+			openedDoc.Editor.SetCaretTo(line, column);
+			openedDoc.Editor.ScrollToCaret();
+
+			if (focusEditor)
+			{
+				IdeApp.Workbench.ActiveDocument.Select();
+			}
+
+			openedDoc.Editor.Document.EnsureOffsetIsUnfolded(
+				openedDoc.Editor.LocationToOffset(
+					line,
+					column
+				));
+		}
+
 		void OutlineTreeTextFunc (TreeViewColumn column, CellRenderer cell, TreeModel model, TreeIter iter)
 		{
 			var symbol = model.GetValue (iter, 0) as Symbol;
@@ -335,7 +395,7 @@ namespace MonoDevelop.ValaBinding
 					break;
 				}
 			} else*/
-				label = symbol.Name ?? string.Empty;
+			label = symbol.DisplayText ?? string.Empty;
 
 			/*if (DCompilerService.Instance.Outline.ShowBaseTypes)
 				label = String.Format ("{0} {1}", (n as DNode).Type, label);*/
