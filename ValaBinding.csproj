@@ -10,6 +10,8 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <RootNamespace>MonoDevelop.ValaBinding</RootNamespace>
     <AssemblyOriginatorKeyFile>.</AssemblyOriginatorKeyFile>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -205,6 +207,11 @@
     <Compile Include="Parser\Afrodite\ValaEnumerator.cs" />
     <Compile Include="Parser\Afrodite\CodeDomDumper.cs" />
     <Compile Include="Compiler\FastValaCompiler.cs" />
+    <Compile Include="Parser\Echo\Symbol.cs" />
+    <Compile Include="Parser\Echo\DataType.cs" />
+    <Compile Include="Parser\Echo\ValaList.cs" />
+    <Compile Include="Parser\Echo\ValaEnumerator.cs" />
+    <Compile Include="Parser\Echo\Utils.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
@@ -225,5 +232,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Parser\Afrodite\" />
+    <Folder Include="Parser\Echo\" />
   </ItemGroup>
 </Project>
