@@ -55,8 +55,9 @@ namespace MonoDevelop.ValaBinding
             templateEngine.Variables["BUILD_DIR"] = ".";
             templateEngine.Variables["INSTALL_DIR"] = "$(DESTDIR)" + dir;
             templateEngine.Variables["ALL_TARGET"] = string.Format("all-{0}", conf.Name);
-            templateEngine.Variables["VFLAGS"] = string.Format("{0} {1}", ValaCompiler.GetCompilerFlags(conf),
-                ValaCompiler.GeneratePkgCompilerArgs(project.Packages, conf.Selector));
+			// FIXME CARL 
+            templateEngine.Variables["VFLAGS"] = string.Format("{0} {1}", SlowValaCompiler.GetCompilerFlags(conf),
+                SlowValaCompiler.GeneratePkgCompilerArgs(project.Packages, conf.Selector));
             templateEngine.Variables["VTARGET"] = conf.CompiledOutputName;
 
             StringWriter sw = new StringWriter();

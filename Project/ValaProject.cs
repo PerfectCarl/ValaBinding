@@ -67,8 +67,8 @@ namespace MonoDevelop.ValaBinding
     [DataInclude(typeof(ValaProjectConfiguration))]
     public class ValaProject : Project, IDeployable
     {
-        [ItemProperty("compiler", ValueType = typeof(ValaCompiler))]
-        private ICompiler compiler_manager;
+        [ItemProperty("compiler", ValueType = typeof(ValaCompiler))]        
+		private ICompiler compiler_manager;
 
         private ProjectPackageCollection packages = new ProjectPackageCollection();
 
@@ -77,7 +77,6 @@ namespace MonoDevelop.ValaBinding
 
         private void Init()
         {
-			MonoDevelop.Core.LoggingService.Log (MonoDevelop.Core.Logging.LogLevel.Warn, "BING");
             packages.Project = this;
             this.PackageAddedToProject += AddDependencies; // Special handling for project packages
             //IdeApp.ProjectOperations.EntryAddedToCombine += OnEntryAddedToCombine;

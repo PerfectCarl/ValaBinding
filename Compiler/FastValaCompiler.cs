@@ -1,33 +1,11 @@
 //
-// ValaCompiler.cs: abstract class that provides some basic implementation for ICompiler
+// 
 //
 // Authors:
 //  Levi Bard <taktaktaktaktaktaktaktaktaktak@gmail.com> 
+//  Marcos David Marin Amador <MarcosMarin@gmail.com>
 //
-// Copyright (C) 2008 Levi Bard
-// Based on CBinding by Marcos David Marin Amador <MarcosMarin@gmail.com>
-//
-// This source code is licenced under The MIT License:
-//
-// Permission is hereby granted, free of charge, to any person obtaining
-// a copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to
-// permit persons to whom the Software is furnished to do so, subject to
-// the following conditions:
-// 
-// The above copyright notice and this permission notice shall be
-// included in all copies or substantial portions of the Software.
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-// LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-// OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-// WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-//
+
 
 
 using System;
@@ -50,20 +28,28 @@ using MonoDevelop.Core.ProgressMonitoring;
 namespace MonoDevelop.ValaBinding
 {
 	[Extension ("/ValaBinding/Compilers")]
-	public class FastValaCompiler : ICompiler
+	public class ValaCompiler : ICompiler
 	{
 		protected string compilerCommand;
-				
+		protected string gccCompilerCommand;		
+
 		bool compilerFound;
 		bool appsChecked;
-		
-		public FastValaCompiler ()
+		List<string> gccArgs = new List<string>();
+		ValaProject project ; 
+		ValaProjectConfiguration projectConfiguration ;
+
+		string gccLibs = "" ; 
+		string gccPkgConfig = "" ;
+
+		public ValaCompiler ()
 		{
 			compilerCommand = "valac";
+			gccCompilerCommand = "gcc";
 		}
 		
 		public string Name {
-			get{ return "fast valac"; }
+			get{ return "valac"; }
 		}
 			
 		public string CompilerCommand {
@@ -79,8 +65,8 @@ namespace MonoDevelop.ValaBinding
 		{
             var projectFiles = project.Files;
             var packages = project.Packages;
-            var projectConfiguration = (ValaProjectConfiguration)project.GetConfiguration(solutionConfiguration);
-
+            this.projectConfiguration = (ValaProjectConfiguration)project.GetConfiguration(solutionConfiguration);
+			this.project = project; 
 			if (!appsChecked)
             {
                 // Check for compiler
@@ -123,7 +109,7 @@ namespace MonoDevelop.ValaBinding
 		
 		string ICompiler.GetCompilerFlags(ValaProjectConfiguration configuration)
 		{
-			return ValaCompiler.GetCompilerFlags(configuration);
+			return GetCompilerFlags(configuration);
 		}
 		
 		/// <summary>
@@ -137,9 +123,10 @@ namespace MonoDevelop.ValaBinding
 		/// A compiler-interpretable string
 		/// <see cref="System.String"/>
 		/// </returns>
-        public static string GetCompilerFlags(ValaProjectConfiguration configuration)
+        public string GetCompilerFlags(ValaProjectConfiguration configuration)
         {
             List<string> args = new List<string>();
+			gccArgs.Clear ();
 
             ValaCompilationParameters cp =
                 (ValaCompilationParameters)configuration.CompilationParameters;
@@ -164,11 +151,13 @@ namespace MonoDevelop.ValaBinding
                 case ValaBinding.CompileTarget.SharedLibrary:
                     if (Platform.IsWindows)
                     {
-                        args.Add(string.Format("--Xcc=\"-shared\" --Xcc=-I\"{0}\" -H \"{1}.h\" --library \"{1}\"", outputDir, outputNameWithoutExt));
+						args.Add(string.Format("--Xcc=\"-shared\" --Xcc=-I\"{0}\" -H \"{1}.h\" --library \"{1}\"", outputDir, outputNameWithoutExt));
+						gccArgs.Add(string.Format("-shared\" -I\"{0}\" ", outputDir));
                     }
                     else
                     {
-                        args.Add(string.Format("--Xcc=\"-shared\" --Xcc=\"-fPIC\" --Xcc=\"-I'{0}'\" -H \"{1}.h\" --library \"{1}\"", outputDir, outputNameWithoutExt));
+						args.Add(string.Format("--Xcc=\"-shared\" --Xcc=\"-fPIC\" --Xcc=\"-I'{0}'\" -H \"{1}.h\" --library \"{1}\"", outputDir, outputNameWithoutExt));    
+						gccArgs.Add(string.Format("\"-shared\" \"-fPIC\" \"-I'{0}'\"", outputDir));
                     }
                     break;
             }
@@ -193,6 +182,8 @@ namespace MonoDevelop.ValaBinding
             if (0 < cp.OptimizationLevel)
             {
                 args.Add("--Xcc=\"-O" + cp.OptimizationLevel + "\"");
+				gccArgs.Add("\"-O" + cp.OptimizationLevel + "\"");
+
             }
 
             // global extra compiler arguments
@@ -210,7 +201,7 @@ namespace MonoDevelop.ValaBinding
 
             if (cp.DefineSymbols != null && cp.DefineSymbols.Length > 0)
             {
-                args.Add(ProcessDefineSymbols(cp.DefineSymbols));
+				args.Add(ProcessDefineSymbols(cp.DefineSymbols));
             }
 
             if (configuration.Includes != null)
@@ -222,10 +213,12 @@ namespace MonoDevelop.ValaBinding
                 }
             }
 
-            if (configuration.Libs != null)
-                foreach (string lib in configuration.Libs)
-                    args.Add("--pkg \"" + lib + "\"");
-
+			if (configuration.Libs != null) {
+				foreach (string lib in configuration.Libs) {
+					args.Add ("--pkg \"" + lib + "\"");
+					gccPkgConfig += " " + lib;
+				}
+			}
             return string.Join(" ", args.ToArray());
         }
 
@@ -240,13 +233,16 @@ namespace MonoDevelop.ValaBinding
         /// The string needed by the compiler to reference the necessary packages
         /// <see cref="System.String"/>
         /// </returns>
-        public static string GeneratePkgCompilerArgs(ProjectPackageCollection packages,
+        public string GeneratePkgCompilerArgs(ProjectPackageCollection packages,
             ConfigurationSelector solutionConfiguration)
         {
+			gccLibs = ""; 
             if (packages == null || packages.Count < 1)
                 return string.Empty;
 
             StringBuilder libs = new StringBuilder();
+			StringBuilder gccProjectlibs = new StringBuilder();
+			StringBuilder gccPackagelibs = new StringBuilder();
 
             foreach (ProjectPackage p in packages)
             {
@@ -260,14 +256,20 @@ namespace MonoDevelop.ValaBinding
                     var vapifile = Path.Combine(outputDir, outputNameWithoutExt + ".vapi");
                     libs.AppendFormat(" --Xcc=-I\"{0}\" --Xcc=-L\"{0}\" --Xcc=-l\"{1}\" \"{2}\" ",
                         outputDir, outputNameWithoutExt, vapifile);
+					gccProjectlibs.AppendFormat(" -I\"{0}\" -L\"{0}\" -l\"{1}\" \"{2}\" ",
+						outputDir, outputNameWithoutExt, vapifile);
                 }
                 else
                 {
                     libs.AppendFormat(" --pkg \"{0}\" ", p.Name);
+					gccPackagelibs.Append(" " + p.Name);
+
                 }
             }
-
-            return libs.ToString();
+			gccLibs = gccProjectlibs.ToString();
+			gccPkgConfig = gccPackagelibs.ToString();
+            
+			return libs.ToString();
         }
 		
 		/// <summary>
@@ -367,7 +369,76 @@ namespace MonoDevelop.ValaBinding
 			
 			return exitCode;
 		}
-		
+
+		int ExecuteCommandForOutputZ (string command, string args, string baseDirectory, IProgressMonitor monitor, out string output, out string errorOutput)
+		{
+			monitor.Log.WriteLine ("{0} {1}", command, args);
+
+			Process cmd = new Process();
+			cmd.StartInfo.FileName = command ;
+			cmd.StartInfo.Arguments = args;
+			cmd.StartInfo.UseShellExecute = false;
+			cmd.StartInfo.RedirectStandardOutput = true;
+			cmd.StartInfo.RedirectStandardError = true;
+			cmd.Start();
+			//* Read the output (or the error)
+			output = cmd.StandardOutput.ReadToEnd();
+			monitor.Log.WriteLine(output) ;
+			errorOutput = cmd.StandardError.ReadToEnd();
+			var result = cmd.ExitCode;
+			if (errorOutput != "" && errorOutput != null) {
+				monitor.Log.WriteLine(errorOutput) ;
+			}
+			//Console.WriteLine(err);
+			cmd.WaitForExit();
+			return result ;
+		}
+
+		int ExecuteCommandForOutput (string command, string args, string baseDirectory, IProgressMonitor monitor, out string output, out string errorOutput)
+		{
+			errorOutput = string.Empty;
+			int exitCode = -1;
+
+			StringWriter swError = new StringWriter ();
+			StringWriter swOuput = new StringWriter ();
+			LogTextWriter chainedError = new LogTextWriter ();
+			chainedError.ChainWriter (monitor.Log);
+			chainedError.ChainWriter (swError);
+
+			monitor.Log.WriteLine ("{0} {1}", command, args);
+
+			AggregatedOperationMonitor operationMonitor = new AggregatedOperationMonitor (monitor);
+
+			try {
+				// Runtime.ProcessService.EnvironmentVariableOverrides.Add("PKG_CONFIG_DEBUG_SPEW", "true") ;
+				var paths="/usr/lib/x86_64-linux-gnu/pkgconfig:/usr/local/pkgconfig" ;
+				//Runtime.ProcessService.EnvironmentVariableOverrides.Add("PKG_CONFIG_DEBUG_SPEW", "true") ;
+				Runtime.ProcessService.EnvironmentVariableOverrides.Add("PKG_CONFIG_PATH", paths) ;
+				ProcessWrapper p = Runtime.ProcessService.StartProcess (command, args, baseDirectory, swOuput, chainedError, null);
+
+				operationMonitor.AddOperation (p); //handles cancellation
+
+				p.WaitForOutput ();
+				errorOutput = swError.ToString ();
+				output = swOuput.ToString() ;
+				monitor.Log.WriteLine(output) ;
+				exitCode = p.ExitCode;
+				p.Dispose ();
+
+				if (monitor.IsCancelRequested) {
+					monitor.Log.WriteLine (GettextCatalog.GetString ("Build cancelled"));
+					monitor.ReportError (GettextCatalog.GetString ("Build cancelled"), null);
+					if (exitCode == 0)
+						exitCode = -1;
+				}
+			} finally {
+				chainedError.Close ();
+				swError.Close ();
+				operationMonitor.Dispose ();
+			}
+
+			return exitCode;
+		}
 		/// <summary>
 		/// Transforms a whitespace-delimited string of 
 		/// symbols into a set of compiler flags
@@ -395,6 +466,92 @@ namespace MonoDevelop.ValaBinding
 									IProgressMonitor monitor,
 									CompilerResults cr)
 		{
+			var buildDate = new DateTime ();
+			var result = GenerateCFiles (projectFiles, args, outputName, monitor, cr);
+			if( result)
+				// Only if files get generated properly
+				CompileCFiles (projectFiles, buildDate, outputName, monitor, cr);
+			return result;
+		}
+
+		private string ProcessPkgConfig (string outputName,
+			IProgressMonitor monitor,
+			CompilerResults cr) {
+			var config = gccPkgConfig.Trim() ; 
+
+			if (config == "")
+				return ""; 
+
+			var args = "--cflags --libs " + gccPkgConfig; 
+			string errorOutput = string.Empty;
+			string output = string.Empty;
+
+			int exitCode = ExecuteCommandForOutput ("pkg-config", args, Path.GetDirectoryName (outputName), monitor, out output, out errorOutput);
+
+			if (exitCode != 0 && cr.Errors.Count == 0)
+			{
+				// error isn't recognized but cannot ignore it because exitCode != 0
+				var errMsg = "";
+				if( errorOutput == null || errorOutput == "" ) 
+					errMsg = string.Format("Return code {0}. No error message provided", exitCode) ;
+				else
+					errMsg = errorOutput ;
+				cr.Errors.Add (new CompilerError () { ErrorText = errMsg });
+			}
+
+			return output;
+		}
+
+		// Handle: 
+		//  - application
+		//  - libraries
+		//  - project depending on other projects
+		private bool CompileCFiles (ProjectFileCollection projectFiles, DateTime buildDate, string outputName,
+			IProgressMonitor monitor,
+			CompilerResults cr) {
+			StringBuilder filelist = new StringBuilder ();
+			// Only compile files that have been modified
+			foreach (ProjectFile f in projectFiles) { 
+				if (f.Subtype != Subtype.Directory && f.BuildAction == BuildAction.Compile) {
+					var outputDir = projectConfiguration.OutputDirectory;
+					var filePath = f.FilePath.ChangeExtension ("c");
+					var prefixPath =  f.FilePath.ToString().Substring(project.BaseIntermediateOutputPath.ToString().Length - 3 + f.FilePath.FileName.Length) ;
+					var listFilePath = outputDir + prefixPath + "/" + filePath.FileName;
+					if( File.GetCreationTime (listFilePath) > buildDate ) 
+						filelist.AppendFormat ("\"{0}\" ", listFilePath);
+				}
+			}
+			var pkgargs = ProcessPkgConfig (outputName, monitor, cr);
+			monitor.Log.WriteLine ("Building C files: " + filelist.ToString ());
+			// Just generate the c code.
+			string args = string.Join(" ", gccArgs.ToArray());
+			string compiler_args = string.Format ("{0} {1} {2} {3} -o \"{4}\"",
+				args, gccLibs, filelist.ToString (), pkgargs, Path.GetFileName (outputName));
+
+			string errorOutput = string.Empty;
+			int exitCode = ExecuteCommand (gccCompilerCommand, compiler_args, Path.GetDirectoryName (outputName), monitor, out errorOutput);
+
+			ParseCompilerOutput(errorOutput, cr, projectFiles);
+
+			if (exitCode != 0 && cr.Errors.Count == 0)
+			{
+				// error isn't recognized but cannot ignore it because exitCode != 0
+				var errMsg = "";
+				if( errorOutput == null || errorOutput == "" ) 
+					errMsg = string.Format("Return code {0}. No error message provided", exitCode) ;
+				else
+					errMsg = errorOutput ;
+				cr.Errors.Add (new CompilerError () { ErrorText = errMsg });
+			}
+
+			return exitCode == 0;
+		}
+
+		private bool GenerateCFiles (ProjectFileCollection projectFiles, string args,
+			string outputName,
+			IProgressMonitor monitor,
+			CompilerResults cr)
+		{
 			StringBuilder filelist = new StringBuilder ();
 			foreach (ProjectFile f in projectFiles) { 
 				if (f.Subtype != Subtype.Directory && f.BuildAction == BuildAction.Compile) {
@@ -402,8 +559,9 @@ namespace MonoDevelop.ValaBinding
 				}
 			}/// Build file list
 
-			string compiler_args = string.Format ("{0} {1} -o \"{2}\"",
-				args, filelist.ToString (), Path.GetFileName (outputName));
+			// Just generate the c code.
+			string compiler_args = string.Format ("{0} {1} --ccode",
+				args, filelist.ToString ());
 			
 			string errorOutput = string.Empty;
 			int exitCode = ExecuteCommand (compilerCommand, compiler_args, Path.GetDirectoryName (outputName), monitor, out errorOutput);

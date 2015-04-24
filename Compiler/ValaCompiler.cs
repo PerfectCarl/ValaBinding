@@ -50,20 +50,20 @@ using MonoDevelop.Core.ProgressMonitoring;
 namespace MonoDevelop.ValaBinding
 {
 	[Extension ("/ValaBinding/Compilers")]
-	public class ValaCompiler : ICompiler
+	public class SlowValaCompiler : ICompiler
 	{
 		protected string compilerCommand;
 				
 		bool compilerFound;
 		bool appsChecked;
 		
-		public ValaCompiler ()
+		public SlowValaCompiler ()
 		{
 			compilerCommand = "valac";
 		}
 		
 		public string Name {
-			get{ return "valac"; }
+			get{ return "slowvalac"; }
 		}
 			
 		public string CompilerCommand {
@@ -123,7 +123,8 @@ namespace MonoDevelop.ValaBinding
 		
 		string ICompiler.GetCompilerFlags(ValaProjectConfiguration configuration)
 		{
-			return ValaCompiler.GetCompilerFlags(configuration);
+			// FIXME : really slow here?
+			return SlowValaCompiler.GetCompilerFlags(configuration);
 		}
 		
 		/// <summary>
