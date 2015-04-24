@@ -56,7 +56,9 @@ namespace MonoDevelop.ValaBinding.Parser
 		private bool checkedVtgInstalled = false;
 		
 		private Afrodite.CompletionEngine engine;
-		
+
+		private Echo.Project echoProject;
+
 		static readonly string[] containerTypes = new string[]{ "class", "struct", "interface" };
 		static readonly string[] topContainers = new string[]{ "namespace", "enum", "class", "struct", "interface" };
 
@@ -98,7 +100,8 @@ namespace MonoDevelop.ValaBinding.Parser
 		{
 			this.Project = project;
 			string projectName = (null == project)? "NoExistingProject": project.Name;
-			
+
+			echoProject = new Echo.Project ();
 			if (DepsInstalled) {
 				engine = new Afrodite.CompletionEngine (projectName);
 			}
@@ -137,6 +140,8 @@ namespace MonoDevelop.ValaBinding.Parser
 				LoggingService.LogDebug ("Adding file {0}", filename);
 				if( engine != null )
 					engine.QueueSourcefile (filename, filename.EndsWith (".vapi", StringComparison.OrdinalIgnoreCase), false);
+				if (echoProject != null)
+					echoProject.AddFile (filename);
 			}
 		}// AddFile
 
@@ -166,6 +171,8 @@ namespace MonoDevelop.ValaBinding.Parser
 				LoggingService.LogDebug ("AddPackage: Queueing {0} for package {1}", path, packagename);
 				if( engine != null )
 					engine.QueueSourcefile (path, true, false);
+				if (echoProject != null)
+					echoProject.AddExternalPackage (path);
 			}
 		}// AddPackage
 
@@ -218,20 +225,21 @@ namespace MonoDevelop.ValaBinding.Parser
 		/// </summary>
 		public string GetExpressionType (string symbol, string filename, int line, int column)
 		{
+
 			if (!DepsInstalled){ return symbol; }
 			if( engine != null )
-			using (Afrodite.CodeDom parseTree = engine.TryAcquireCodeDom ()) {
-				if (null != parseTree) {
-					LoggingService.LogDebug ("GetExpressionType: Looking up symbol at {0}:{1}:{2}", filename, line, column);
-					Afrodite.Symbol sym = parseTree.LookupSymbolAt (filename, line, column);
-					if (null != sym) {
-						LoggingService.LogDebug ("Got {0}", sym.SymbolType.TypeName);
-						return sym.SymbolType.TypeName;
+				using (Afrodite.CodeDom parseTree = engine.TryAcquireCodeDom ()) {
+					if (null != parseTree) {
+						LoggingService.LogDebug ("GetExpressionType: Looking up symbol at {0}:{1}:{2}", filename, line, column);
+						Afrodite.Symbol sym = parseTree.LookupSymbolAt (filename, line, column);
+						if (null != sym) {
+							LoggingService.LogDebug ("Got {0}", sym.SymbolType.TypeName);
+							return sym.SymbolType.TypeName;
+						}
+					} else {
+						LoggingService.LogDebug ("GetExpressionType: Unable to acquire codedom");
 					}
-				} else {
-					LoggingService.LogDebug ("GetExpressionType: Unable to acquire codedom");
 				}
-			}
 
 			return symbol;
 		}// GetExpressionType
@@ -244,14 +252,14 @@ namespace MonoDevelop.ValaBinding.Parser
 			List<Afrodite.Symbol> overloads = new List<Afrodite.Symbol> ();
 			if (!DepsInstalled){ return overloads; }
 			if( engine != null )
-			using (Afrodite.CodeDom parseTree = engine.TryAcquireCodeDom ()) {
-				if (null != parseTree) {
-					Afrodite.Symbol symbol = parseTree.GetSymbolForNameAndPath (name, filename, line, column);
-					overloads = new List<Afrodite.Symbol> (){ symbol };
-				} else {
-					LoggingService.LogDebug ("GetOverloads: Unable to acquire codedom");
+				using (Afrodite.CodeDom parseTree = engine.TryAcquireCodeDom ()) {
+					if (null != parseTree) {
+						Afrodite.Symbol symbol = parseTree.GetSymbolForNameAndPath (name, filename, line, column);
+						overloads = new List<Afrodite.Symbol> (){ symbol };
+					} else {
+						LoggingService.LogDebug ("GetOverloads: Unable to acquire codedom");
+					}
 				}
-			}
 			
 			return overloads;
 		}// GetOverloads

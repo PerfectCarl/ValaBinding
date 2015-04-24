@@ -212,6 +212,8 @@
     <Compile Include="Parser\Echo\ValaList.cs" />
     <Compile Include="Parser\Echo\ValaEnumerator.cs" />
     <Compile Include="Parser\Echo\Utils.cs" />
+    <Compile Include="Parser\Echo\Project.cs" />
+    <Compile Include="Parser\BaseSymbol.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
