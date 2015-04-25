@@ -1,12 +1,17 @@
 //
-// 
+// Author:
+//       cran <>
 //
 // Authors:
 //  Levi Bard <taktaktaktaktaktaktaktaktaktak@gmail.com> 
 //  Marcos David Marin Amador <MarcosMarin@gmail.com>
 //
 
-
+// TODO -g 
+// library types
+// Warnings
+// extra parameters
+// remove compiler in project file
 
 using System;
 using System.IO;
@@ -263,7 +268,6 @@ namespace MonoDevelop.ValaBinding
                 {
                     libs.AppendFormat(" --pkg \"{0}\" ", p.Name);
 					gccPackagelibs.Append(" " + p.Name);
-
                 }
             }
 			gccLibs = gccProjectlibs.ToString();
@@ -410,7 +414,6 @@ namespace MonoDevelop.ValaBinding
 			AggregatedOperationMonitor operationMonitor = new AggregatedOperationMonitor (monitor);
 
 			try {
-				// Runtime.ProcessService.EnvironmentVariableOverrides.Add("PKG_CONFIG_DEBUG_SPEW", "true") ;
 				var paths="/usr/lib/x86_64-linux-gnu/pkgconfig:/usr/local/pkgconfig" ;
 				//Runtime.ProcessService.EnvironmentVariableOverrides.Add("PKG_CONFIG_DEBUG_SPEW", "true") ;
 				Runtime.ProcessService.EnvironmentVariableOverrides.Add("PKG_CONFIG_PATH", paths) ;
@@ -523,9 +526,11 @@ namespace MonoDevelop.ValaBinding
 			}
 			var pkgargs = ProcessPkgConfig (outputName, monitor, cr);
 			monitor.Log.WriteLine ("Building C files: " + filelist.ToString ());
-			// Just generate the c code.
+			// *
+			// * Build only the recently modified files
+			// * 
 			string args = string.Join(" ", gccArgs.ToArray());
-			string compiler_args = string.Format ("{0} {1} {2} {3} -o \"{4}\"",
+			string compiler_args = string.Format ("{0} {1} {2} {3} -c -o \"{4}\"",
 				args, gccLibs, filelist.ToString (), pkgargs, Path.GetFileName (outputName));
 
 			string errorOutput = string.Empty;
@@ -544,7 +549,13 @@ namespace MonoDevelop.ValaBinding
 				cr.Errors.Add (new CompilerError () { ErrorText = errMsg });
 			}
 
-			return exitCode == 0;
+			var compilationSuccess =  exitCode == 0;
+
+			// * 
+			// *  Link all the .o files if needed
+			// * 
+
+			return compilationSuccess;
 		}
 
 		private bool GenerateCFiles (ProjectFileCollection projectFiles, string args,

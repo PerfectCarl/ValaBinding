@@ -48,13 +48,14 @@ namespace MonoDevelop.ValaBinding.Parser
         {
             DefaultParsedDocument defaultParsedDocument = new DefaultParsedDocument(fileName);
             defaultParsedDocument.Flags |= ParsedDocumentFlags.NonSerializable;
-            ProjectInformation projectInformation = ProjectInformationManager.Instance.Get(project);
-            string text = reader.ReadToEnd();
-            string[] array = text.Split(new string[]
+            //ProjectInformation projectInformation = ProjectInformationManager.Instance.Get(project);
+            //string text = reader.ReadToEnd();
+            /*string[] array = text.Split(new string[]
 			{
 				Environment.NewLine
 			}, StringSplitOptions.None);
-            return defaultParsedDocument;
+*/
+			return defaultParsedDocument;
         }
         public override ParsedDocument Parse(bool storeAst, string fileName, TextReader reader, Project project = null)
         {
@@ -69,7 +70,7 @@ namespace MonoDevelop.ValaBinding.Parser
             {
                 if (current != null)
                 {
-                    List<IMember> list = new List<IMember>();
+                    //List<IMember> list = new List<IMember>();
                     //int val = current.SourceReferences[0].LastLine;
 					int val = current.Declaration.LastLine;
            

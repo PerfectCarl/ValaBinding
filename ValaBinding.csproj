@@ -168,7 +168,6 @@
     <Compile Include="Gui\GeneralOptionsPanel.cs" />
     <Compile Include="Parser\ProjectInformation.cs" />
     <Compile Include="Parser\ProjectInformationManager.cs" />
-    <Compile Include="Gui\ValaTextEditorExtension.cs" />
     <Compile Include="gtk-gui\MonoDevelop.ValaBinding.AddLibraryDialog.cs" />
     <Compile Include="gtk-gui\MonoDevelop.ValaBinding.CodeGenerationPanel.cs" />
     <Compile Include="gtk-gui\MonoDevelop.ValaBinding.AddPathDialog.cs" />
@@ -190,7 +189,6 @@
     <Compile Include="Navigation\LanguageItemNodeBuilder.cs" />
     <Compile Include="Navigation\ProjectNodeBuilderExtension.cs" />
     <Compile Include="Parser\ValaDocumentParser.cs" />
-    <Compile Include="Gui\ParameterDataProvider.cs" />
     <Compile Include="Gui\CompilationUnitDataProvider.cs" />
     <Compile Include="Gui\DataProvider.cs" />
     <Compile Include="AddinInfo.cs" />
@@ -215,6 +213,8 @@
     <Compile Include="Parser\Echo\Project.cs" />
     <Compile Include="Parser\Echo\SourceReference.cs" />
     <Compile Include="Parser\TextCompletion.cs" />
+    <Compile Include="Parser\ValaTextEditorExtension.cs" />
+    <Compile Include="Parser\ParameterDataProvider.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

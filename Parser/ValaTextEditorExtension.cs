@@ -31,26 +31,17 @@
 
 
 using System;
-using System.IO;
-using System.Text;
-using System.Linq;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Threading;
 
-using MonoDevelop.Ide;
-using MonoDevelop.Ide.Gui;
 using MonoDevelop.Ide.Gui.Content;
 using MonoDevelop.Ide.CodeCompletion;
 
-using MonoDevelop.Core;
 using MonoDevelop.Components;
-
-using Gtk;
 
 using MonoDevelop.ValaBinding.Parser;
 using Mono.TextEditor;
-using Xwt;
 using MonoDevelop.Ide.TypeSystem;
 
 namespace MonoDevelop.ValaBinding
@@ -75,7 +66,7 @@ namespace MonoDevelop.ValaBinding
                 ValaProject project = Document.Project as ValaProject;
                 return (null == project) ? null : ProjectInformationManager.Instance.Get(project);
             }
-        }// Parser
+        }
 
 		private TextCompletion Completion {
 			get {
@@ -124,7 +115,7 @@ namespace MonoDevelop.ValaBinding
         public override ICompletionDataList HandleCodeCompletion(CodeCompletionContext completionContext, char completionChar, ref int triggerWordLength)
         {
             string lineText = null;
-            ProjectInformation parser = ProjectInfo;
+            //ProjectInformation parser = ProjectInfo;
             var loc = Editor.Document.OffsetToLocation(completionContext.TriggerOffset);
             int line = loc.Line, column = loc.Column;
             switch (completionChar)
@@ -197,9 +188,9 @@ namespace MonoDevelop.ValaBinding
         /// </summary>
         private ValaCompletionDataList CompleteConstructor(string lineText, int line, int column)
         {
-            ProjectInformation parser = ProjectInfo;
+            //ProjectInformation parser = ProjectInfo;
             Match match = initializationRegex.Match(lineText);
-            ValaCompletionDataList list = new ValaCompletionDataList();
+            var list = new ValaCompletionDataList();
 
             ThreadPool.QueueUserWorkItem(delegate
             {
@@ -248,13 +239,13 @@ namespace MonoDevelop.ValaBinding
         /// </summary>
         private ValaCompletionDataList GetMembersOfItem(string itemFullName, int line, int column)
         {
-            ProjectInformation info = ProjectInfo;
-            if (null == info) { return null; }
+            //ProjectInformation info = ProjectInfo;
+			if (null == ProjectInfo) { return null; }
 
             ValaCompletionDataList list = new ValaCompletionDataList();
             ThreadPool.QueueUserWorkItem(delegate
             {
-                info.Completion.Complete(itemFullName, Document.FileName, line, column, list);
+				ProjectInfo.Completion.Complete(itemFullName, Document.FileName, line, column, list);
             });
             return list;
         }
@@ -264,14 +255,14 @@ namespace MonoDevelop.ValaBinding
         /// </summary>
         private ValaCompletionDataList GlobalComplete(CodeCompletionContext context)
         {
-            ProjectInformation info = ProjectInfo;
-            if (null == info) { return null; }
+            //ProjectInformation info = ProjectInfo;
+			if (null == ProjectInfo) { return null; }
 
             ValaCompletionDataList list = new ValaCompletionDataList();
             var loc = Editor.Document.OffsetToLocation(context.TriggerOffset);
             ThreadPool.QueueUserWorkItem(delegate
             {
-                info.Completion.GetSymbolsVisibleFrom(Document.FileName, loc.Line + 1, loc.Column + 1, list);
+				ProjectInfo.Completion.GetSymbolsVisibleFrom(Document.FileName, loc.Line + 1, loc.Column + 1, list);
             });
             return list;
         }
@@ -282,8 +273,8 @@ namespace MonoDevelop.ValaBinding
             if (completionChar != '(')
                 return null;
 
-            ProjectInformation info = ProjectInfo;
-            if (null == info) { return null; }
+            //ProjectInformation info = ProjectInfo;
+			if (null == ProjectInfo) { return null; }
 
             int position = Editor.Document.GetLine(Editor.Caret.Line).Offset;
             string lineText = Editor.GetTextBetween(position, Editor.Caret.Offset - 1).TrimEnd();
@@ -337,12 +328,12 @@ namespace MonoDevelop.ValaBinding
                 }
 
                 // Console.WriteLine ("Constructor: type {0}, overload {1}", typename, overload);
-                return new ParameterDataProvider(Document, info, typename, overload);
+				return new ParameterDataProvider(Document, ProjectInfo, typename, overload);
             }
 
             int nameStart = lineText.LastIndexOfAny(allowedChars) + 1;
             functionName = lineText.Substring(nameStart).Trim();
-            return (string.IsNullOrEmpty(functionName) ? null : new ParameterDataProvider(Document, info, functionName));
+			return (string.IsNullOrEmpty(functionName) ? null : new ParameterDataProvider(Document, ProjectInfo, functionName));
         }
 
         private bool AllWhiteSpace(string lineText)

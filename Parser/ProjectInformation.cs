@@ -48,7 +48,7 @@ namespace MonoDevelop.ValaBinding.Parser
 
 		private Echo.Project echoProject;
 
-		static readonly string[] topContainers = new string[]{ "namespace", "enum", "class", "struct", "interface" };
+		//static readonly string[] topContainers = new string[]{ "namespace", "enum", "class", "struct", "interface" };
 
 		public Project Project{ get; set; }
 
@@ -57,7 +57,7 @@ namespace MonoDevelop.ValaBinding.Parser
 		public ProjectInformation (Project project)
 		{
 			this.Project = project;
-			string projectName = (null == project)? "NoExistingProject": project.Name;
+			//string projectName = (null == project)? "NoExistingProject": project.Name;
 
 			echoProject = new Echo.Project ();
 			/*if (CompletionEngine.DepsInstalled) {

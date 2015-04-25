@@ -31,10 +31,7 @@
 
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
-using System.Threading;
 
 using MonoDevelop.Core;
  
@@ -42,7 +39,6 @@ using MonoDevelop.Ide.Gui;
 using MonoDevelop.Ide.CodeCompletion;
 
 using MonoDevelop.ValaBinding.Parser;
-//using MonoDevelop.ValaBinding.Parser.Afrodite;
 using Symbol=MonoDevelop.ValaBinding.Parser.Echo.Symbol;
 using ICSharpCode.NRefactory.Completion;
 

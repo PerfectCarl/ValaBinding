@@ -33,15 +33,17 @@ namespace MonoDevelop.ValaBinding.Parser
 		/// <summary>
 		/// Get constructors for a given expression
 		/// </summary>
-		internal List<Afrodite.Symbol> GetConstructorsForExpression (string expression, string filename, int line, int column, ValaCompletionDataList results)
+		[Obsolete]
+		internal /*List<Afrodite.Symbol>*/ void GetConstructorsForExpression (string expression, string filename, int line, int column, ValaCompletionDataList results)
 		{
 			string typename = projectInfo.GetExpressionType (expression, filename, line, column);
-			return GetConstructorsForType (typename, filename, line, column, results);
+			/*return*/ GetConstructorsForType (typename, filename, line, column, results);
 		}// GetConstructorsForExpression
 
 		/// <summary>
 		/// Get a list of classes declared in a given file
 		/// </summary>
+		[Obsolete]
 		internal List<Afrodite.Symbol> GetClassesForFile (string file)
 		{
 			return projectInfo.GetSymbolsForFile (file, containerTypes);
@@ -57,6 +59,7 @@ namespace MonoDevelop.ValaBinding.Parser
 		/// <summary>
 		/// Get a list of namespaces declared in a given file
 		/// </summary>
+		[Obsolete]
 		internal List<Afrodite.Symbol> GetNamespacesForFile (string file)
 		{
 			return projectInfo.GetSymbolsForFile (file, new string[]{ "namespace" });
@@ -123,6 +126,7 @@ namespace MonoDevelop.ValaBinding.Parser
 		/// <summary>
 		/// Add results to a ValaCompletionDataList on the GUI thread
 		/// </summary>
+		[Obsolete]
 		private static void AddResults (IEnumerable<Afrodite.Symbol> list, ValaCompletionDataList results) 
 		{
 			if (null == list || null == results)
@@ -146,6 +150,7 @@ namespace MonoDevelop.ValaBinding.Parser
 		/// <summary>
 		/// Gets the completion list for a given type name in a given file
 		/// </summary>
+		[Obsolete]
 		internal List<Afrodite.Symbol> CompleteType (string typename, string filename, int linenum, int column, ValaCompletionDataList results)
 		{
 			List<Afrodite.Symbol> nodes = new List<Afrodite.Symbol> ();
@@ -172,7 +177,7 @@ namespace MonoDevelop.ValaBinding.Parser
 		/// Get constructors for a given type
 		/// </summary>
 		[Obsolete]
-		internal List<Afrodite.Symbol> GetConstructorsForType (string typename, string filename, int line, int column, ValaCompletionDataList results)
+		internal /*List<Afrodite.Symbol>*/ void GetConstructorsForType (string typename, string filename, int line, int column, ValaCompletionDataList results)
 		{
 			List<Afrodite.Symbol> functions = new List<Afrodite.Symbol> ();
 			foreach (Afrodite.Symbol node in CompleteType (typename, filename, line, column, null)) {
@@ -184,7 +189,7 @@ namespace MonoDevelop.ValaBinding.Parser
 
 			AddResults ((IList<Afrodite.Symbol>)functions, results);
 
-			return functions;
+			//return functions;
 		}// GetConstructorsForType
 
 		internal List<Echo.Symbol> GetConstructorsForTypeEcho (string typename, string filename, int line, int column, ValaCompletionDataList results)
@@ -205,10 +210,11 @@ namespace MonoDevelop.ValaBinding.Parser
 		/// <summary>
 		/// Gets the completion list for a given symbol at a given location
 		/// </summary>
-		internal List<Afrodite.Symbol> Complete (string symbol, string filename, int line, int column, ValaCompletionDataList results)
+		[Obsolete]
+		internal /*List<Afrodite.Symbol>*/ void Complete (string symbol, string filename, int line, int column, ValaCompletionDataList results)
 		{
 			List<Afrodite.Symbol> nodes = new List<Afrodite.Symbol> ();
-			if (afroditeEngine == null){ return nodes; }
+			if (afroditeEngine == null){ return /*nodes*/; }
 
 			//if( afroditeEngine != null )
 			using (Afrodite.CodeDom parseTree = afroditeEngine.TryAcquireCodeDom ()) {
@@ -225,7 +231,7 @@ namespace MonoDevelop.ValaBinding.Parser
 					}
 				}
 
-			return nodes;
+			//return nodes;
 		}// Complete
 
 	}
