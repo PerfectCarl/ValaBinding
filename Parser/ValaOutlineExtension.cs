@@ -15,7 +15,8 @@ using MonoDevelop.Components;
 using MonoDevelop.Ide.Gui;
 using MonoDevelop.Ide;
 using MonoDevelop.Core;
-using MonoDevelop.ValaBinding.Parser.Afrodite;
+// using MonoDevelop.ValaBinding.Parser.Afrodite;
+using MonoDevelop.ValaBinding.Parser.Echo;
 using MonoDevelop.ValaBinding.Parser;
 
 namespace MonoDevelop.ValaBinding
@@ -174,7 +175,7 @@ namespace MonoDevelop.ValaBinding
 			{
 				// Build up new tree
 				var caretLocation = Document.Editor.Caret.Location;
-				foreach (var symbol in Parser.GetRootSymbolsForFile (FileName.CanonicalPath)) {
+				foreach (var symbol in ProjectInfo.GetRootSymbolsForFileEcho (FileName.CanonicalPath)) {
 					BuildTreeChildren(TreeIter.Zero, symbol, caretLocation.Column, caretLocation.Line);
 				}
 			}
@@ -215,7 +216,7 @@ namespace MonoDevelop.ValaBinding
 			return false;
 		}
 
-		private ProjectInformation Parser
+		private ProjectInformation ProjectInfo
 		{
 			get
 			{
@@ -224,22 +225,22 @@ namespace MonoDevelop.ValaBinding
 			}
 		}
 
-		private SourceReference GetFirstReference (Symbol symbol) {
+		/*private SourceReference GetFirstReference (Symbol symbol) {
 			if (symbol.SourceReferences.Count == 0)
 				return null;
 			return symbol.SourceReferences[0] ;
-		}
+		}*/
 
 		void BuildTreeChildren(TreeIter ParentTreeNode, Symbol symbol, int column, int line)
 		{
 			TreeIter childIter=ParentTreeNode; 
-			var source = GetFirstReference (symbol);
-			if (source.File == FileName.CanonicalPath) {
+			// var source = GetFirstReference (symbol);
+			//if (source.File == FileName.CanonicalPath) {
 				if (!ParentTreeNode.Equals (TreeIter.Zero))
 					childIter = TreeStore.AppendValues (ParentTreeNode, symbol);
 				else
 					childIter = TreeStore.AppendValues (symbol);
-			}
+			//}
 			foreach (var child in symbol.Children) {
 				BuildTreeChildren (childIter, child, column, line);
 
@@ -346,11 +347,11 @@ namespace MonoDevelop.ValaBinding
 			int line = 0; 
 			int column = 0; 
 			string filename = "";
-			var source = GetFirstReference (symbol);
+			var source = symbol.Declaration; // GetFirstReference (symbol);
 			filename = source.File; 
 			line = source.FirstLine; 
 			column = source.FirstColumn;
-
+			//line = symbol.
 			var openedDoc=IdeApp.Workbench.GetDocument(filename);
 
 			if (openedDoc == null)

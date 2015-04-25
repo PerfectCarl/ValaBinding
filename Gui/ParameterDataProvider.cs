@@ -76,7 +76,7 @@ namespace MonoDevelop.ValaBinding
             this.functionName = constructorOverload;
             this.document = document;
 
-            List<Symbol> myfunctions = info.GetConstructorsForType(typename, document.FileName, document.Editor.Caret.Line + 1, document.Editor.Caret.Column + 1, null); // bottleneck
+            List<Symbol> myfunctions = info.Completion.GetConstructorsForType(typename, document.FileName, document.Editor.Caret.Line + 1, document.Editor.Caret.Column + 1, null); // bottleneck
             if (1 < myfunctions.Count)
             {
                 foreach (Symbol function in myfunctions)

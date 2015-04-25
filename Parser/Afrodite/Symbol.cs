@@ -43,7 +43,7 @@ namespace MonoDevelop.ValaBinding.Parser.Afrodite
 	/// <summary>
 	/// Represents a Vala symbol
 	/// </summary>
-	internal class Symbol: BaseSymbol
+	internal class Symbol
 	{
 		public Symbol (IntPtr instance)
 		{

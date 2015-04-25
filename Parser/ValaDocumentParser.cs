@@ -58,7 +58,7 @@ namespace MonoDevelop.ValaBinding.Parser
         {
             ParsedDocument result = new DefaultParsedDocument(fileName);
             ProjectInformation projectInformation = ProjectInformationManager.Instance.Get(project);
-            ICollection<Symbol> classesForFile = projectInformation.GetClassesForFile(fileName);
+            ICollection<Symbol> classesForFile = projectInformation.Completion.GetClassesForFile(fileName);
             if (classesForFile == null || classesForFile.Count == 0)
             {
                 return result;

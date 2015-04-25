@@ -68,7 +68,7 @@ namespace MonoDevelop.ValaBinding
 			'^', '[', '!', '?', '<', '>', ':'
 		};
 
-        private ProjectInformation Parser
+        private ProjectInformation ProjectInfo
         {
             get
             {
@@ -76,6 +76,12 @@ namespace MonoDevelop.ValaBinding
                 return (null == project) ? null : ProjectInformationManager.Instance.Get(project);
             }
         }// Parser
+
+		private TextCompletion Completion {
+			get {
+				return ProjectInfo.Completion; 
+			}
+		}
 
         protected Mono.TextEditor.TextEditorData textEditorData { get; set; }
 
@@ -118,7 +124,7 @@ namespace MonoDevelop.ValaBinding
         public override ICompletionDataList HandleCodeCompletion(CodeCompletionContext completionContext, char completionChar, ref int triggerWordLength)
         {
             string lineText = null;
-            ProjectInformation parser = Parser;
+            ProjectInformation parser = ProjectInfo;
             var loc = Editor.Document.OffsetToLocation(completionContext.TriggerOffset);
             int line = loc.Line, column = loc.Column;
             switch (completionChar)
@@ -150,7 +156,7 @@ namespace MonoDevelop.ValaBinding
                         ValaCompletionDataList list = new ValaCompletionDataList();
                         ThreadPool.QueueUserWorkItem(delegate
                         {
-                            parser.GetTypesVisibleFrom(Document.FileName, line, column, list);
+                            Completion.GetTypesVisibleFrom(Document.FileName, line, column, list);
                         });
                         return list;
                     }
@@ -191,7 +197,7 @@ namespace MonoDevelop.ValaBinding
         /// </summary>
         private ValaCompletionDataList CompleteConstructor(string lineText, int line, int column)
         {
-            ProjectInformation parser = Parser;
+            ProjectInformation parser = ProjectInfo;
             Match match = initializationRegex.Match(lineText);
             ValaCompletionDataList list = new ValaCompletionDataList();
 
@@ -203,17 +209,17 @@ namespace MonoDevelop.ValaBinding
                     if (match.Groups["typename"].Success || "var" != match.Groups["typename"].Value)
                     {
                         // simultaneous declaration and initialization
-                        parser.GetConstructorsForType(match.Groups["typename"].Value, Document.FileName, line, column, list);
+							Completion.GetConstructorsForType(match.Groups["typename"].Value, Document.FileName, line, column, list);
                     }
                     else if (match.Groups["variable"].Success)
                     {
                         // initialization of previously declared variable
-                        parser.GetConstructorsForExpression(match.Groups["variable"].Value, Document.FileName, line, column, list);
+							Completion.GetConstructorsForExpression(match.Groups["variable"].Value, Document.FileName, line, column, list);
                     }
                     if (0 == list.Count)
                     {
                         // Fallback to known types
-                        parser.GetTypesVisibleFrom(Document.FileName, line, column, list);
+							Completion.GetTypesVisibleFrom(Document.FileName, line, column, list);
                     }
                 }
             });
@@ -242,13 +248,13 @@ namespace MonoDevelop.ValaBinding
         /// </summary>
         private ValaCompletionDataList GetMembersOfItem(string itemFullName, int line, int column)
         {
-            ProjectInformation info = Parser;
+            ProjectInformation info = ProjectInfo;
             if (null == info) { return null; }
 
             ValaCompletionDataList list = new ValaCompletionDataList();
             ThreadPool.QueueUserWorkItem(delegate
             {
-                info.Complete(itemFullName, Document.FileName, line, column, list);
+                info.Completion.Complete(itemFullName, Document.FileName, line, column, list);
             });
             return list;
         }
@@ -258,14 +264,14 @@ namespace MonoDevelop.ValaBinding
         /// </summary>
         private ValaCompletionDataList GlobalComplete(CodeCompletionContext context)
         {
-            ProjectInformation info = Parser;
+            ProjectInformation info = ProjectInfo;
             if (null == info) { return null; }
 
             ValaCompletionDataList list = new ValaCompletionDataList();
             var loc = Editor.Document.OffsetToLocation(context.TriggerOffset);
             ThreadPool.QueueUserWorkItem(delegate
             {
-                info.GetSymbolsVisibleFrom(Document.FileName, loc.Line + 1, loc.Column + 1, list);
+                info.Completion.GetSymbolsVisibleFrom(Document.FileName, loc.Line + 1, loc.Column + 1, list);
             });
             return list;
         }
@@ -276,7 +282,7 @@ namespace MonoDevelop.ValaBinding
             if (completionChar != '(')
                 return null;
 
-            ProjectInformation info = Parser;
+            ProjectInformation info = ProjectInfo;
             if (null == info) { return null; }
 
             int position = Editor.Document.GetLine(Editor.Caret.Line).Offset;

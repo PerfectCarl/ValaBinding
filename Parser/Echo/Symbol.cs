@@ -41,7 +41,7 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 	/// <summary>
 	/// Represents a Vala symbol
 	/// </summary>
-	internal class Symbol: BaseSymbol
+	internal class Symbol
 	{
 		public Symbol (IntPtr instance)
 		{
@@ -61,6 +61,13 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 				}
 
 				return list;
+			}
+		}
+
+		public SourceReference Declaration {
+			get {
+				IntPtr ptr = echo_symbol_get_declaration (instance);
+				return (IntPtr.Zero == ptr)? null: new SourceReference (ptr);
 			}
 		}
 
@@ -294,6 +301,9 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 
 		[DllImport("libecho")]
 		static extern IntPtr echo_symbol_get_parameters (IntPtr instance);
+
+		[DllImport("libecho")]
+		static extern IntPtr echo_symbol_get_declaration (IntPtr instance);
 
 		//[DllImport("libecho")]
 		//static extern int echo_symbol_get_member_type (IntPtr instance);

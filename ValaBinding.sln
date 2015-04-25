@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ValaBinding", "ValaBinding.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoDevelop.D", "..\Mono-D-master\MonoDevelop.DBinding\MonoDevelop.D.csproj", "{5867254F-6B1C-4A4C-BF98-C283740A0470}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ControlClickGotoDeclaration", "..\..\..\net\ControlClickGotoDeclarationAddin\ControlClickGotoDeclaration.csproj", "{9C2695D4-482E-4F0A-AC48-0DE438C68D17}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{5867254F-6B1C-4A4C-BF98-C283740A0470}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5867254F-6B1C-4A4C-BF98-C283740A0470}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5867254F-6B1C-4A4C-BF98-C283740A0470}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9C2695D4-482E-4F0A-AC48-0DE438C68D17}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C2695D4-482E-4F0A-AC48-0DE438C68D17}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C2695D4-482E-4F0A-AC48-0DE438C68D17}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C2695D4-482E-4F0A-AC48-0DE438C68D17}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B94D7749-EA5C-48DD-8849-B3924A860DDC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B94D7749-EA5C-48DD-8849-B3924A860DDC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B94D7749-EA5C-48DD-8849-B3924A860DDC}.Release|Any CPU.ActiveCfg = Release|Any CPU

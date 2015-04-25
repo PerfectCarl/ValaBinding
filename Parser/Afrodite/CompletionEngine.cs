@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
+using MonoDevelop.Core;
 
 namespace MonoDevelop.ValaBinding.Parser.Afrodite
 {
@@ -18,9 +19,44 @@ namespace MonoDevelop.ValaBinding.Parser.Afrodite
 	/// </summary>
 	internal class CompletionEngine
 	{
+		static private bool vtgInstalled = false;
+		static private bool checkedVtgInstalled = false;
+
 		public CompletionEngine (string id)
 		{
 			instance = afrodite_completion_engine_new (id);
+		}
+
+		//// <value>
+		/// Checks whether <see cref="http://code.google.com/p/vtg/">Vala Toys for GEdit</see> 
+		/// is installed.
+		/// </value>
+		static internal bool DepsInstalled {
+			get {
+				if (!checkedVtgInstalled) {
+					checkedVtgInstalled = true;
+					vtgInstalled = false;
+					try {
+						Afrodite.Utils.GetPackagePaths ("glib-2.0");
+						return (vtgInstalled = true);
+					} catch (DllNotFoundException e) {
+						LoggingService.LogWarning ("Cannot update Vala parser database because libafrodite (VTG) is not installed: {0}{1}{2}{3}", 
+							Environment.NewLine, "http://code.google.com/p/vtg/",
+							Environment.NewLine, "Note: If you're using Vala 0.10 or higher, you may need to symlink libvala-YOUR_VERSION.so to libvala.so");
+						LoggingService.LogError ("Cannot load libafrodite", e);
+					} catch (Exception ex) {
+						LoggingService.LogError ("ValaBinding: Error while checking for libafrodite", ex);
+					}
+				}
+				return vtgInstalled;
+			}
+			set {
+				//don't assume that the caller is correct :-)
+				if (value)
+					checkedVtgInstalled = false; //will re-determine on next getting
+				else
+					vtgInstalled = false;
+			}
 		}
 
 		/// <summary>

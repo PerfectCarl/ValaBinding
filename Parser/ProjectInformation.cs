@@ -52,49 +52,15 @@ namespace MonoDevelop.ValaBinding.Parser
 	/// </summary>
 	public class ProjectInformation
 	{
-		private bool vtgInstalled = false;
-		private bool checkedVtgInstalled = false;
-		
 		private Afrodite.CompletionEngine engine;
 
 		private Echo.Project echoProject;
 
-		static readonly string[] containerTypes = new string[]{ "class", "struct", "interface" };
 		static readonly string[] topContainers = new string[]{ "namespace", "enum", "class", "struct", "interface" };
 
 		public Project Project{ get; set; }
-		
-		//// <value>
-		/// Checks whether <see cref="http://code.google.com/p/vtg/">Vala Toys for GEdit</see> 
-		/// is installed.
-		/// </value>
-		bool DepsInstalled {
-			get {
-				if (!checkedVtgInstalled) {
-					checkedVtgInstalled = true;
-					vtgInstalled = false;
-					try {
-						Afrodite.Utils.GetPackagePaths ("glib-2.0");
-						return (vtgInstalled = true);
-					} catch (DllNotFoundException e) {
-						LoggingService.LogWarning ("Cannot update Vala parser database because libafrodite (VTG) is not installed: {0}{1}{2}{3}", 
-						                           Environment.NewLine, "http://code.google.com/p/vtg/",
-						                           Environment.NewLine, "Note: If you're using Vala 0.10 or higher, you may need to symlink libvala-YOUR_VERSION.so to libvala.so");
-						LoggingService.LogError ("Cannot load libafrodite", e);
-					} catch (Exception ex) {
-						LoggingService.LogError ("ValaBinding: Error while checking for libafrodite", ex);
-					}
-				}
-				return vtgInstalled;
-			}
-			set {
-				//don't assume that the caller is correct :-)
-				if (value)
-					checkedVtgInstalled = false; //will re-determine on next getting
-				else
-					vtgInstalled = false;
-			}
-		}
+
+		public TextCompletion Completion { get; private set ; }
 
 		public ProjectInformation (Project project)
 		{
@@ -102,47 +68,24 @@ namespace MonoDevelop.ValaBinding.Parser
 			string projectName = (null == project)? "NoExistingProject": project.Name;
 
 			echoProject = new Echo.Project ();
-			if (DepsInstalled) {
-				engine = new Afrodite.CompletionEngine (projectName);
+			if (CompletionEngine.DepsInstalled) {
+				engine = new CompletionEngine (projectName);
 			}
+			Completion = new TextCompletion (this, engine); 
 		}
 		
-		/// <summary>
-		/// Gets the completion list for a given type name in a given file
-		/// </summary>
-		internal List<Afrodite.Symbol> CompleteType (string typename, string filename, int linenum, int column, ValaCompletionDataList results)
-		{
-			List<Afrodite.Symbol> nodes = new List<Afrodite.Symbol> ();
-			if (!DepsInstalled){ return nodes; }
-			if (engine != null) { 
-				using (Afrodite.CodeDom parseTree = engine.TryAcquireCodeDom ()) {
-					if (null != parseTree) {
-						Afrodite.Symbol symbol = parseTree.GetSymbolForNameAndPath (typename, filename, linenum, column);
-						if (null == symbol) {
-							LoggingService.LogDebug ("CompleteType: Unable to lookup {0} in {1} at {2}:{3}", typename, filename, linenum, column);
-						} else {
-							nodes = symbol.Children;
-						}
-					} else {
-						LoggingService.LogDebug ("CompleteType: Unable to acquire codedom");
-					}
-				}
-			}
-			return nodes;
-		}
 
 		/// <summary>
 		/// Adds a file to be parsed
 		/// </summary>
 		public void AddFile (string filename)
 		{
-			if (vtgInstalled) {
-				LoggingService.LogDebug ("Adding file {0}", filename);
-				if( engine != null )
-					engine.QueueSourcefile (filename, filename.EndsWith (".vapi", StringComparison.OrdinalIgnoreCase), false);
-				if (echoProject != null)
-					echoProject.AddFile (filename);
-			}
+
+			LoggingService.LogDebug ("Adding file {0}", filename);
+			if( engine != null )
+				engine.QueueSourcefile (filename, filename.EndsWith (".vapi", StringComparison.OrdinalIgnoreCase), false);
+			if (echoProject != null)
+				echoProject.AddFile (filename);
 		}// AddFile
 
 		/// <summary>
@@ -158,7 +101,7 @@ namespace MonoDevelop.ValaBinding.Parser
 		/// </summary>
 		public void AddPackage (string packagename)
 		{
-			if (!DepsInstalled){ return; }
+			// if (!CompletionEngine.DepsInstalled){ return; }
 			
 			if ("glib-2.0".Equals (packagename, StringComparison.Ordinal)) {
 				LoggingService.LogDebug ("AddPackage: Skipping {0}", packagename);
@@ -176,35 +119,10 @@ namespace MonoDevelop.ValaBinding.Parser
 			}
 		}// AddPackage
 
-		/// <summary>
-		/// Gets the completion list for a given symbol at a given location
-		/// </summary>
-		internal List<Afrodite.Symbol> Complete (string symbol, string filename, int line, int column, ValaCompletionDataList results)
-		{
-			List<Afrodite.Symbol> nodes = new List<Afrodite.Symbol> ();
-			if (!DepsInstalled){ return nodes; }
-			
-			if( engine != null )
-			using (Afrodite.CodeDom parseTree = engine.TryAcquireCodeDom ()) {
-				if (null != parseTree) {
-					LoggingService.LogDebug ("Complete: Looking up symbol at {0}:{1}:{2}", filename, line, column);
-					Afrodite.Symbol sym = parseTree.GetSymbolForNameAndPath (symbol, filename, line, column);
-					LoggingService.LogDebug ("Complete: Got {0}", (null == sym)? "null": sym.Name);
-					if (null != sym) {
-						nodes = sym.Children;
-						AddResults (nodes, results);
-					}
-				} else {
-					LoggingService.LogDebug ("Complete: Unable to acquire codedom");
-				}
-			}
-			
-			return nodes;
-		}// Complete
-		
+
 		internal Afrodite.Symbol GetFunction (string name, string filename, int line, int column)
 		{
-			if (!DepsInstalled){ return null; }
+			// if (!DepsInstalled){ return null; }
 			if( engine != null )
 			using (Afrodite.CodeDom parseTree = engine.TryAcquireCodeDom ()) {
 				if (null != parseTree) {
@@ -226,7 +144,7 @@ namespace MonoDevelop.ValaBinding.Parser
 		public string GetExpressionType (string symbol, string filename, int line, int column)
 		{
 
-			if (!DepsInstalled){ return symbol; }
+			// if (!DepsInstalled){ return symbol; }
 			if( engine != null )
 				using (Afrodite.CodeDom parseTree = engine.TryAcquireCodeDom ()) {
 					if (null != parseTree) {
@@ -250,7 +168,7 @@ namespace MonoDevelop.ValaBinding.Parser
 		internal List<Afrodite.Symbol> GetOverloads (string name, string filename, int line, int column)
 		{
 			List<Afrodite.Symbol> overloads = new List<Afrodite.Symbol> ();
-			if (!DepsInstalled){ return overloads; }
+			// if (!DepsInstalled){ return overloads; }
 			if( engine != null )
 				using (Afrodite.CodeDom parseTree = engine.TryAcquireCodeDom ()) {
 					if (null != parseTree) {
@@ -263,130 +181,6 @@ namespace MonoDevelop.ValaBinding.Parser
 			
 			return overloads;
 		}// GetOverloads
-		
-		/// <summary>
-		/// Get constructors for a given type
-		/// </summary>
-		internal List<Afrodite.Symbol> GetConstructorsForType (string typename, string filename, int line, int column, ValaCompletionDataList results)
-		{
-			List<Afrodite.Symbol> functions = new List<Afrodite.Symbol> ();
-			foreach (Afrodite.Symbol node in CompleteType (typename, filename, line, column, null)) {
-				if ("constructor".Equals (node.MemberType, StringComparison.OrdinalIgnoreCase) || 
-				      "creationmethod".Equals (node.MemberType, StringComparison.OrdinalIgnoreCase)) {
-					functions.Add (node);
-				}
-			}
-			
-			AddResults ((IList<Afrodite.Symbol>)functions, results);
-			
-			return functions;
-		}// GetConstructorsForType
-		
-		/// <summary>
-		/// Get constructors for a given expression
-		/// </summary>
-		internal List<Afrodite.Symbol> GetConstructorsForExpression (string expression, string filename, int line, int column, ValaCompletionDataList results)
-		{
-			string typename = GetExpressionType (expression, filename, line, column);
-			return GetConstructorsForType (typename, filename, line, column, results);
-		}// GetConstructorsForExpression
-		
-		/// <summary>
-		/// Get types visible from a given source location
-		/// </summary>
-		internal void GetTypesVisibleFrom (string filename, int line, int column, ValaCompletionDataList results)
-		{
-			if (!DepsInstalled){ return; }
-			
-			// Add contents of parents
-			ICollection<Afrodite.Symbol> containers = GetClassesForFile (filename);
-			AddResults (containers, results);
-			foreach (Afrodite.Symbol klass in containers) {
-				// TODO: check source references once afrodite reliably captures the entire range
-				for (Afrodite.Symbol parent = klass.Parent;
-				     parent != null;
-				     parent = parent.Parent)
-				{
-					AddResults (parent.Children.FindAll (delegate (Afrodite.Symbol sym){
-						return 0 <= Array.IndexOf (containerTypes, sym.MemberType.ToLower ());
-					}), results);
-				}
-			}
-			if( engine != null )
-			using (Afrodite.CodeDom parseTree = engine.TryAcquireCodeDom ()) {
-				if (null == parseTree){ return; }
-				
-				AddResults (GetNamespacesForFile (filename), results);
-				AddResults (GetClassesForFile (filename), results);
-				Afrodite.SourceFile file = parseTree.LookupSourceFile (filename);
-				if (null != file) {
-					Afrodite.Symbol parent;
-					foreach (Afrodite.DataType directive in file.UsingDirectives) {
-						if (directive.Symbol == null) { continue; }
-						Afrodite.Symbol ns = parseTree.Lookup (directive.Symbol.FullyQualifiedName, out parent);
-						if (null != ns) {
-							containers = new List<Afrodite.Symbol> ();
-							AddResults (new Afrodite.Symbol[]{ ns }, results);
-							foreach (Afrodite.Symbol child in ns.Children) {
-								foreach (string containerType in containerTypes) {
-									if (containerType.Equals (child.MemberType, StringComparison.OrdinalIgnoreCase))
-										containers.Add (child);
-								}
-							}
-							AddResults (containers, results);
-						}
-					}
-				}
-			}
-		}// GetTypesVisibleFrom
-		
-		/// <summary>
-		/// Get symbols visible from a given source location
-		/// </summary>
-		internal void GetSymbolsVisibleFrom (string filename, int line, int column, ValaCompletionDataList results) 
-		{
-			GetTypesVisibleFrom (filename, line, column, results);
-			Complete ("this", filename, line, column, results);
-		}// GetSymbolsVisibleFrom
-		
-		/// <summary>
-		/// Add results to a ValaCompletionDataList on the GUI thread
-		/// </summary>
-		private static void AddResults (IEnumerable<Afrodite.Symbol> list, ValaCompletionDataList results) 
-		{
-			if (null == list || null == results)
-			{
-				LoggingService.LogDebug ("AddResults: null list or results!");
-				return;
-			}
-			
-			List<CompletionData> data = new List<CompletionData> ();
-			foreach (Afrodite.Symbol symbol in list) {
-				data.Add (new CompletionData (symbol));
-			}
-			
-			DispatchService.GuiDispatch (delegate {
-				results.IsChanging = true;
-				results.AddRange (data);
-				results.IsChanging = false;
-			});
-		}// AddResults
-		
-		/// <summary>
-		/// Get a list of classes declared in a given file
-		/// </summary>
-		internal List<Afrodite.Symbol> GetClassesForFile (string file)
-		{
-			return GetSymbolsForFile (file, containerTypes);
-		}// GetClassesForFile
-		
-		/// <summary>
-		/// Get a list of namespaces declared in a given file
-		/// </summary>
-		internal List<Afrodite.Symbol> GetNamespacesForFile (string file)
-		{
-			return GetSymbolsForFile (file, new string[]{ "namespace" });
-		}
 
 		internal List<Afrodite.Symbol> GetRootSymbolsForFile (string file)
 		{
@@ -395,6 +189,16 @@ namespace MonoDevelop.ValaBinding.Parser
 			foreach (var symbol in symbols) {
 				if (symbol.IsRoot)
 					result.Add (symbol);
+			}
+			return result;
+		}
+
+		internal List<Echo.Symbol> GetRootSymbolsForFileEcho (string file)
+		{
+			var symbols = echoProject.GetSymbolsForFile (file);
+			var result = new List<Echo.Symbol>();
+			foreach (var symbol in symbols) {
+				result.Add (symbol);
 			}
 			return result;
 		}
@@ -413,8 +217,8 @@ namespace MonoDevelop.ValaBinding.Parser
 			List<Afrodite.Symbol> symbols = null;
 			List<Afrodite.Symbol> classes = new List<Afrodite.Symbol> ();
 			
-			if (!DepsInstalled){ return classes; }
-			if( engine != null )
+			if (engine == null){ return classes; }
+
 			using (Afrodite.CodeDom parseTree = engine.TryAcquireCodeDom ()) {
 				if (null != parseTree){
 					Afrodite.SourceFile sourceFile = parseTree.LookupSourceFile (file);
