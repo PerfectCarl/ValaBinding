@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<Template
+	Originator="Carl P."
+	Language="Vala"
+	Created="25/04/2015"
+	LastModified="25/04/2015">
+	
+	<TemplateConfiguration>
+		<_Name>New Class</_Name>
+		<Icon>md-class</Icon>
+		<_Category>Gtk</_Category>
+		<LanguageName>Vala</LanguageName>
+		<_Description>Creates a new Vala class.</_Description>
+	</TemplateConfiguration>
+	
+	<TemplateFiles>
+		<File DefaultExtension=".vala" DefaultName="NewClass">
+		<![CDATA[namespace ${ProjectName} {
+	/** 
+     * Purpose of the class
+     **/ 
+	public class ${Name}: Object {
+		public ${Name} () {
+		}
+		
+	}
+}]]></File>
+	</TemplateFiles>
+	
+	<FileOptions/>
+	
+</Template>

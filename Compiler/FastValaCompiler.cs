@@ -359,7 +359,15 @@ namespace MonoDevelop.ValaBinding
 				errorOutput = swError.ToString ();
 				exitCode = p.ExitCode;
 				p.Dispose ();
-				
+				// Log error in the output
+				if( exitCode != 0 ) {
+					var errMsg = "";
+					if( string.IsNullOrEmpty(errorOutput)) 
+						errMsg = string.Format("Return code {0}. No error message provided", exitCode) ;
+					else
+						errMsg = errorOutput ;
+					monitor.Log.WriteLine(errMsg);
+				}
 				if (monitor.IsCancelRequested) {
 					monitor.Log.WriteLine (GettextCatalog.GetString ("Build cancelled"));
 					monitor.ReportError (GettextCatalog.GetString ("Build cancelled"), null);
@@ -373,30 +381,6 @@ namespace MonoDevelop.ValaBinding
 			}
 			
 			return exitCode;
-		}
-
-		int ExecuteCommandForOutputZ (string command, string args, string baseDirectory, IProgressMonitor monitor, out string output, out string errorOutput)
-		{
-			monitor.Log.WriteLine ("{0} {1}", command, args);
-
-			Process cmd = new Process();
-			cmd.StartInfo.FileName = command ;
-			cmd.StartInfo.Arguments = args;
-			cmd.StartInfo.UseShellExecute = false;
-			cmd.StartInfo.RedirectStandardOutput = true;
-			cmd.StartInfo.RedirectStandardError = true;
-			cmd.Start();
-			//* Read the output (or the error)
-			output = cmd.StandardOutput.ReadToEnd();
-			monitor.Log.WriteLine(output) ;
-			errorOutput = cmd.StandardError.ReadToEnd();
-			var result = cmd.ExitCode;
-			if (errorOutput != "" && errorOutput != null) {
-				monitor.Log.WriteLine(errorOutput) ;
-			}
-			//Console.WriteLine(err);
-			cmd.WaitForExit();
-			return result ;
 		}
 
 		int ExecuteCommandForOutput (string command, string args, string baseDirectory, IProgressMonitor monitor, out string output, out string errorOutput)
@@ -429,7 +413,15 @@ namespace MonoDevelop.ValaBinding
 				monitor.Log.WriteLine(output) ;
 				exitCode = p.ExitCode;
 				p.Dispose ();
-
+				// Log error in the output
+				if( exitCode != 0 ) {
+					var errMsg = "";
+					if( string.IsNullOrEmpty(errorOutput)) 
+						errMsg = string.Format("Return code {0}. No error message provided", exitCode) ;
+					else
+						errMsg = errorOutput ;
+					monitor.Log.WriteLine(errMsg);
+				}
 				if (monitor.IsCancelRequested) {
 					monitor.Log.WriteLine (GettextCatalog.GetString ("Build cancelled"));
 					monitor.ReportError (GettextCatalog.GetString ("Build cancelled"), null);
@@ -498,7 +490,7 @@ namespace MonoDevelop.ValaBinding
 			{
 				// error isn't recognized but cannot ignore it because exitCode != 0
 				var errMsg = "";
-				if( errorOutput == null || errorOutput == "" ) 
+				if( string.IsNullOrEmpty(errorOutput)) 
 					errMsg = string.Format("Return code {0}. No error message provided", exitCode) ;
 				else
 					errMsg = errorOutput ;

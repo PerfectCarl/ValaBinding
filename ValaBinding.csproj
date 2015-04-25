@@ -166,6 +166,12 @@
     <EmbeddedResource Include="templates\NewValaErrorDomain.xft.xml">
       <LogicalName>NewValaErrorDomain.xft.xml</LogicalName>
     </EmbeddedResource>
+    <EmbeddedResource Include="templates\NewGtkDialog.xft.xml">
+      <LogicalName>NewGtkDialog.xft.xml</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="templates\NewElementaryPlug.xft.xml">
+      <LogicalName>NewElementaryPlug.xft.xml</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Project\ValaCompilationParameters.cs" />

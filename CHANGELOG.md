@@ -14,7 +14,6 @@
   - use AddinMaker project structure
   - revert icons to the default
   - add new templates: 
-    - new Class, new Struct, new Interface 
-
+    - new Class, Struct, ErrorDomain, Interface, etc.
 * 5.7 
   - initial release. See [Old changelog](ChangeLog) for more info
