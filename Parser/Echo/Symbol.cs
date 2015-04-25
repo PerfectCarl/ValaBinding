@@ -151,7 +151,7 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 		/// The accessibility (public, private, ...) of this symbol
 		/// </summary>
 		public SymbolAccessibility Accessibility {
-			get{ return (SymbolAccessibility)echo_symbol_get_access (instance); }
+			get{ return (SymbolAccessibility)echo_symbol_get_access_type (instance); }
 		}
 
 		/// <summary>
@@ -271,7 +271,11 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 		public static string GetIconForType (string nodeType, SymbolAccessibility visibility)
 		{
 			string icon = null;
-			iconTable[visibility].TryGetValue (nodeType.ToLower (), out icon);
+			// FIXME sometime visibility can be internal|private
+			var table = publicIcons;
+			if (iconTable.ContainsKey (visibility))
+				table = iconTable [visibility];
+			table.TryGetValue (nodeType.ToLower (), out icon);
 			return icon;
 		}
 
@@ -297,7 +301,7 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 		static extern IntPtr echo_symbol_get_fully_qualified_name (IntPtr instance);
 
 		[DllImport("libecho")]
-		static extern int echo_symbol_get_access (IntPtr instance);
+		static extern int echo_symbol_get_access_type (IntPtr instance);
 
 		[DllImport("libecho")]
 		static extern IntPtr echo_symbol_get_parameters (IntPtr instance);

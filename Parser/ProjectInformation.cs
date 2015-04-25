@@ -104,7 +104,10 @@ namespace MonoDevelop.ValaBinding.Parser
 			// if (!CompletionEngine.DepsInstalled){ return; }
 			
 			if ("glib-2.0".Equals (packagename, StringComparison.Ordinal)) {
-				LoggingService.LogDebug ("AddPackage: Skipping {0}", packagename);
+				LoggingService.LogDebug ("AddPackage: Skipping {0} for afrodite", packagename);
+				// Echo needs all the packages
+				if (echoProject != null)
+					echoProject.AddExternalPackage (packagename);
 				return;
 			} else {
 				LoggingService.LogDebug ("AddPackage: Adding package {0}", packagename);
@@ -112,7 +115,7 @@ namespace MonoDevelop.ValaBinding.Parser
 			
 			foreach (string path in Afrodite.Utils.GetPackagePaths (packagename)) {
 				LoggingService.LogDebug ("AddPackage: Queueing {0} for package {1}", path, packagename);
-				if( engine != null )
+				if( engine != null ) 
 					engine.QueueSourcefile (path, true, false);
 				if (echoProject != null)
 					echoProject.AddExternalPackage (path);
@@ -193,8 +196,15 @@ namespace MonoDevelop.ValaBinding.Parser
 			return result;
 		}
 
+		bool projectUpdated = false ; 
+
 		internal List<Echo.Symbol> GetRootSymbolsForFileEcho (string file)
 		{
+			// HACK: be smarter, threaded thing
+			if (!projectUpdated) {
+				echoProject.UpdateSync ();
+				projectUpdated = true; 
+			}
 			var symbols = echoProject.GetSymbolsForFile (file);
 			var result = new List<Echo.Symbol>();
 			foreach (var symbol in symbols) {
