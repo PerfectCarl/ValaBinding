@@ -110,7 +110,7 @@ namespace MonoDevelop.ValaBinding.Parser
 				if( engine != null ) 
 					engine.QueueSourcefile (path, true, false);
 				if (echoProject != null)
-					echoProject.AddExternalPackage (path);
+					echoProject.AddExternalPackage (packagename);
 			}
 		}// AddPackage
 

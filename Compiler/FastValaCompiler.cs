@@ -415,6 +415,7 @@ namespace MonoDevelop.ValaBinding
 			AggregatedOperationMonitor operationMonitor = new AggregatedOperationMonitor (monitor);
 
 			try {
+				// See http://stackoverflow.com/q/29848761/740464
 				var paths="/usr/lib/x86_64-linux-gnu/pkgconfig:/usr/local/pkgconfig" ;
 				//Runtime.ProcessService.EnvironmentVariableOverrides.Add("PKG_CONFIG_DEBUG_SPEW", "true") ;
 				Runtime.ProcessService.EnvironmentVariableOverrides["PKG_CONFIG_PATH"]= paths ;
@@ -548,7 +549,7 @@ namespace MonoDevelop.ValaBinding
 							monitor.Log.WriteLine ("Build .c files" );
 							monitor.Log.WriteLine ("---" );
 						}
-						monitor.Log.WriteLine ("Building {0}", +"."+prefixPath + "/" + filename );
+						monitor.Log.WriteLine ("Building {0}", "."+prefixPath + "/" + filename );
 						string args = string.Join(" ", gccArgs.ToArray());
 						string compilerArgs = string.Format ("{0} -c {1} {2} {3} ", /*-o \"{4}\"",*/
 							args, gccLibs, cFilePath, pkgargs);
