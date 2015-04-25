@@ -21,11 +21,13 @@ namespace MonoDevelop.ValaBinding.Parser
 
 		ProjectInformation projectInfo ; 
 		private CompletionEngine afroditeEngine;
+		private Echo.Project echoProject ; 
 
-		internal TextCompletion (ProjectInformation projectInfo, CompletionEngine afroditeEngine )
+		internal TextCompletion (ProjectInformation projectInfo, CompletionEngine afroditeEngine, Echo.Project echoProject)
 		{
 			this.projectInfo = projectInfo; 
 			this.afroditeEngine = afroditeEngine;
+			this.echoProject = echoProject;
 		}
 
 		/// <summary>
@@ -45,6 +47,13 @@ namespace MonoDevelop.ValaBinding.Parser
 			return projectInfo.GetSymbolsForFile (file, containerTypes);
 		}// GetClassesForFile
 
+		internal List<Echo.Symbol> GetClassesForFileEcho (string file)
+		{
+			//return projectInfo.GetSymbolsForFile (file, containerTypes);
+
+			return echoProject.GetAllSymbolsForFile (file, Echo.SymbolType.CLASS); 
+		
+		}
 		/// <summary>
 		/// Get a list of namespaces declared in a given file
 		/// </summary>
@@ -124,7 +133,7 @@ namespace MonoDevelop.ValaBinding.Parser
 
 			List<CompletionData> data = new List<CompletionData> ();
 			foreach (Afrodite.Symbol symbol in list) {
-				data.Add (new CompletionData (symbol));
+				// FIXME CARL data.Add (new CompletionData (symbol));
 			}
 
 			DispatchService.GuiDispatch (delegate {
@@ -162,6 +171,7 @@ namespace MonoDevelop.ValaBinding.Parser
 		/// <summary>
 		/// Get constructors for a given type
 		/// </summary>
+		[Obsolete]
 		internal List<Afrodite.Symbol> GetConstructorsForType (string typename, string filename, int line, int column, ValaCompletionDataList results)
 		{
 			List<Afrodite.Symbol> functions = new List<Afrodite.Symbol> ();
@@ -176,6 +186,21 @@ namespace MonoDevelop.ValaBinding.Parser
 
 			return functions;
 		}// GetConstructorsForType
+
+		internal List<Echo.Symbol> GetConstructorsForTypeEcho (string typename, string filename, int line, int column, ValaCompletionDataList results)
+		{
+			List<Echo.Symbol> functions = new List<Echo.Symbol> ();
+			/*foreach (Afrodite.Symbol node in CompleteType (typename, filename, line, column, null)) {
+				if ("constructor".Equals (node.MemberType, StringComparison.OrdinalIgnoreCase) || 
+					"creationmethod".Equals (node.MemberType, StringComparison.OrdinalIgnoreCase)) {
+					functions.Add (node);
+				}
+			}
+
+			AddResults ((IList<Echo.Symbol>)functions, results);
+			*/
+			return functions;
+		}
 
 		/// <summary>
 		/// Gets the completion list for a given symbol at a given location

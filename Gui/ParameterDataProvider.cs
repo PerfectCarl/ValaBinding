@@ -42,7 +42,8 @@ using MonoDevelop.Ide.Gui;
 using MonoDevelop.Ide.CodeCompletion;
 
 using MonoDevelop.ValaBinding.Parser;
-using MonoDevelop.ValaBinding.Parser.Afrodite;
+//using MonoDevelop.ValaBinding.Parser.Afrodite;
+using Symbol=MonoDevelop.ValaBinding.Parser.Echo.Symbol;
 using ICSharpCode.NRefactory.Completion;
 
 namespace MonoDevelop.ValaBinding
@@ -60,7 +61,7 @@ namespace MonoDevelop.ValaBinding
             this.functionName = functionName;
 
             functions = new List<Symbol>();
-            Symbol function = info.GetFunction(functionName, document.FileName, document.Editor.Caret.Line + 1, document.Editor.Caret.Column + 1);
+			Symbol function = info.GetSymbolAtPosition(functionName, document.FileName, document.Editor.Caret.Line + 1, document.Editor.Caret.Column + 1);
             if (null != function) { functions.Add(function); }
         }// member function constructor
 
@@ -76,7 +77,7 @@ namespace MonoDevelop.ValaBinding
             this.functionName = constructorOverload;
             this.document = document;
 
-            List<Symbol> myfunctions = info.Completion.GetConstructorsForType(typename, document.FileName, document.Editor.Caret.Line + 1, document.Editor.Caret.Column + 1, null); // bottleneck
+            List<Symbol> myfunctions = info.Completion.GetConstructorsForTypeEcho(typename, document.FileName, document.Editor.Caret.Line + 1, document.Editor.Caret.Column + 1, null); // bottleneck
             if (1 < myfunctions.Count)
             {
                 foreach (Symbol function in myfunctions)

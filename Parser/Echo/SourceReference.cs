@@ -14,7 +14,7 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 	/// <summary>
 	/// Class to represent a reference area in a source file
 	/// </summary>
-	internal class SourceReference
+	public class SourceReference
 	{
 		public SourceReference (IntPtr instance)
 		{
@@ -31,9 +31,9 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 			get{ return echo_source_reference_get_line (instance); }
 		}
 
-		/*public int LastLine {
-			get{ return afrodite_source_reference_get_last_line (instance); }
-		}*/
+		public int LastLine {
+			get{ return echo_source_reference_get_last_line (instance); }
+		}
 
 		public int FirstColumn {
 			get{ return echo_source_reference_get_column (instance); }
@@ -52,6 +52,9 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 
 		[DllImport("libecho")]
 		static extern int echo_source_reference_get_line (IntPtr instance);
+
+		[DllImport("libecho")]
+		static extern int echo_source_reference_get_last_line (IntPtr instance);
 
 		[DllImport("libecho")]
 		static extern int echo_source_reference_get_column (IntPtr instance);

@@ -32,7 +32,8 @@
 using System;
 
 using MonoDevelop.ValaBinding.Parser;
-using MonoDevelop.ValaBinding.Parser.Afrodite;
+//using MonoDevelop.ValaBinding.Parser.Afrodite;
+using MonoDevelop.ValaBinding.Parser.Echo;
 
 namespace MonoDevelop.ValaBinding.Navigation
 {

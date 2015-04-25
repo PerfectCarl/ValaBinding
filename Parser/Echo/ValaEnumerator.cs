@@ -16,7 +16,7 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 	/// <summary>
 	/// IEnumerator wrapper for (Gee|Vala).Iterator
 	/// </summary>
-	internal class ValaEnumerator: IEnumerator<IntPtr>
+	public class ValaEnumerator: IEnumerator<IntPtr>
 	{
 		public ValaEnumerator (IntPtr instance)
 		{

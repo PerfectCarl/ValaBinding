@@ -18,7 +18,7 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 	/// <summary>
 	/// IList wrapper for (Gee|Vala).List
 	/// </summary>
-	internal class ValaList: IList<IntPtr>
+	public class ValaList: IList<IntPtr>
 	{
 		public ValaList (IntPtr instance)
 		{

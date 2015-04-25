@@ -16,7 +16,7 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 	/// <summary>
 	/// Represents an Echo symbol data type
 	/// </summary>
-	internal class DataType
+	public class DataType
 	{
 		public DataType (IntPtr instance)
 		{

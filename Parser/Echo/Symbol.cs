@@ -41,7 +41,7 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 	/// <summary>
 	/// Represents a Vala symbol
 	/// </summary>
-	internal class Symbol
+	public class Symbol
 	{
 		public Symbol (IntPtr instance)
 		{

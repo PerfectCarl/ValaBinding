@@ -29,11 +29,13 @@ using System.IO;
 using System.Collections.Generic;
 using System.Threading;
 
-using MonoDevelop.ValaBinding.Parser.Afrodite;
+//using MonoDevelop.ValaBinding.Parser.Afrodite;
+//using MonoDevelop.ValaBinding.Parser.Echo;
 using MonoDevelop.Ide.TypeSystem;
 using MonoDevelop.Projects;
 using MonoDevelop.Core;
 using ICSharpCode.NRefactory.TypeSystem;
+using Symbol=MonoDevelop.ValaBinding.Parser.Echo.Symbol;
 
 namespace MonoDevelop.ValaBinding.Parser
 {
@@ -58,7 +60,7 @@ namespace MonoDevelop.ValaBinding.Parser
         {
             ParsedDocument result = new DefaultParsedDocument(fileName);
             ProjectInformation projectInformation = ProjectInformationManager.Instance.Get(project);
-            ICollection<Symbol> classesForFile = projectInformation.Completion.GetClassesForFile(fileName);
+            ICollection<Symbol> classesForFile = projectInformation.Completion.GetClassesForFileEcho(fileName);
             if (classesForFile == null || classesForFile.Count == 0)
             {
                 return result;
@@ -68,13 +70,16 @@ namespace MonoDevelop.ValaBinding.Parser
                 if (current != null)
                 {
                     List<IMember> list = new List<IMember>();
-                    int val = current.SourceReferences[0].LastLine;
-                    foreach (Symbol current2 in current.Children)
+                    //int val = current.SourceReferences[0].LastLine;
+					int val = current.Declaration.LastLine;
+           
+					foreach (Symbol current2 in current.Children)
                     {
-                        if (1 <= current2.SourceReferences.Count && !(current2.SourceReferences[0].File != current.SourceReferences[0].File))
+						//if (1 <= current2.SourceReferences.Count && !(current2.SourceReferences[0].File != current.SourceReferences[0].File))
+						if ( !(current2.Declaration.File != current.Declaration.File))
                         {
-                            val = Math.Max(val, current2.SourceReferences[0].LastLine + 1);
-                            LoggingService.LogWarning("ILAP: " + current2.MemberType.ToLower());
+							val = Math.Max(val, current2.Declaration.LastLine + 1);
+                            LoggingService.LogWarning("ValaDocumentParser: " + current2.MemberType.ToLower());
                         }
                     }
                 }

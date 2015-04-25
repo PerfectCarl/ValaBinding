@@ -60,10 +60,10 @@ namespace MonoDevelop.ValaBinding.Parser
 			string projectName = (null == project)? "NoExistingProject": project.Name;
 
 			echoProject = new Echo.Project ();
-			if (CompletionEngine.DepsInstalled) {
+			/*if (CompletionEngine.DepsInstalled) {
 				engine = new CompletionEngine (projectName);
-			}
-			Completion = new TextCompletion (this, engine); 
+			}*/
+			Completion = new TextCompletion (this, engine, echoProject); 
 		}
 		
 
@@ -114,7 +114,7 @@ namespace MonoDevelop.ValaBinding.Parser
 			}
 		}// AddPackage
 
-
+		[Obsolete]
 		internal Afrodite.Symbol GetFunction (string name, string filename, int line, int column)
 		{
 			// if (!DepsInstalled){ return null; }
@@ -133,9 +133,28 @@ namespace MonoDevelop.ValaBinding.Parser
 			return null;
 		}
 
+		internal Echo.Symbol GetSymbolAtPosition (string symbolName, string fileFullPath, int line, int column)
+		{
+			/*if( engine != null )
+				using (Afrodite.CodeDom parseTree = engine.TryAcquireCodeDom ()) {
+					if (null != parseTree) {
+						LoggingService.LogDebug ("GetFunction: Looking up symbol at {0}:{1}:{2}", filename, line, column);
+						Afrodite.Symbol symbol = parseTree.GetSymbolForNameAndPath (name, filename, line, column);
+						LoggingService.LogDebug ("GetFunction: Got {0}", (null == symbol)? "null": symbol.Name);
+						return symbol;
+					} else {
+						LoggingService.LogDebug ("GetFunction: Unable to acquire codedom");
+					}
+				}*/
+			return echoProject.GetSymbolAtPosition (symbolName, fileFullPath, line, column);
+
+			//return null;
+		}
+
 		/// <summary>
 		/// Get the type of a given expression
 		/// </summary>
+		[Obsolete]
 		public string GetExpressionType (string symbol, string filename, int line, int column)
 		{
 
@@ -160,6 +179,7 @@ namespace MonoDevelop.ValaBinding.Parser
 		/// <summary>
 		/// Get overloads for a method
 		/// </summary>
+		[Obsolete]
 		internal List<Afrodite.Symbol> GetOverloads (string name, string filename, int line, int column)
 		{
 			List<Afrodite.Symbol> overloads = new List<Afrodite.Symbol> ();
@@ -215,6 +235,7 @@ namespace MonoDevelop.ValaBinding.Parser
 		/// <param name="desiredTypes">
 		/// A <see cref="IEnumerable<System.String>"/>: The types of symbols to allow. If null or missing all the symbols are allowed
 		/// </param>
+		[Obsolete]
 		internal List<Afrodite.Symbol> GetSymbolsForFile (string file, IEnumerable<string> desiredTypes = null )
 		{
 			List<Afrodite.Symbol> symbols = null;

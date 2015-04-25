@@ -40,8 +40,8 @@ using MonoDevelop.Projects;
 using MonoDevelop.Ide.Gui.Components;
 
 using MonoDevelop.ValaBinding.Parser;
-using MonoDevelop.ValaBinding.Parser.Afrodite;
-
+//using MonoDevelop.ValaBinding.Parser.Afrodite;
+using MonoDevelop.ValaBinding.Parser.Echo;
 namespace MonoDevelop.ValaBinding.Navigation
 {
     public class LanguageItemCommandHandler : NodeCommandHandler
@@ -53,10 +53,10 @@ namespace MonoDevelop.ValaBinding.Navigation
         {
             Symbol item = (Symbol)CurrentNode.DataItem;
 
-            if (null != item && 0 < item.SourceReferences.Count)
+            if (null != item /*&& 0 < item.SourceReferences.Count*/)
             {
-                SourceReference reference = item.SourceReferences[0];
-
+                //SourceReference reference = item.SourceReferences[0];
+				var reference = item.Declaration;
                 IdeApp.Workbench.OpenDocument(reference.File, reference.FirstLine, reference.FirstColumn, Ide.Gui.OpenDocumentOptions.Default);
             }
         }
