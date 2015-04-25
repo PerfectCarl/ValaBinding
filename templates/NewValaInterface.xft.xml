@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<Template
+	Originator="Carl P."
+	Language="Vala"
+	Created="25/04/2015"
+	LastModified="25/04/2015">
+	
+	<TemplateConfiguration>
+		<_Name>New Interface</_Name>
+		<Icon>md-interface</Icon>
+		<_Category>General</_Category>
+		<LanguageName>Vala</LanguageName>
+		<_Description>Creates a new Vala interface.</_Description>
+	</TemplateConfiguration>
+	
+	<TemplateFiles>
+		<File DefaultExtension=".vala" DefaultName="NewClass">
+		<![CDATA[namespace ${ProjectName} {
+	/** 
+     * Purpose of the interface
+     **/ 
+	public interface ${Name} {
+		
+	}
+}]]></File>
+	</TemplateFiles>
+	
+	<FileOptions/>
+	
+</Template>

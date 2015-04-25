@@ -18,6 +18,11 @@
 
 	<Extension path = "/MonoDevelop/Ide/FileTemplates">
 		<FileTemplate id = "EmptyValaSourceFile" resource = "EmptyValaSourceFile.xft.xml"/>
+		<FileTemplate id = "NewValaClass" resource = "NewValaClass.xft.xml"/>
+		<FileTemplate id = "NewValaInterface" resource = "NewValaInterface.xft.xml"/>
+		<FileTemplate id = "NewValaStruct" resource = "NewValaStruct.xft.xml"/>
+		<FileTemplate id = "NewValaSingleton" resource = "NewValaSingleton.xft.xml"/>
+		<FileTemplate id = "NewValaErrorDomain" resource = "NewValaErrorDomain.xft.xml"/>
 	</Extension>
 
 	<Extension path = "/MonoDevelop/Ide/ProjectTemplates">
@@ -28,7 +33,7 @@
 	</Extension>
 	
 	<Extension path = "/MonoDevelop/Core/MimeTypes">
-		<MimeType id="text/x-vala" _description="Vala source code" icon="md-vala-file" isText="true">
+		<MimeType id="text/x-vala" _description="Vala source code" icon="md-file-source" isText="true">
 			<File pattern="*.vala" />
 			<File pattern="*.vapi" />
 		</MimeType>

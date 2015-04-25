@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<Template
+	Originator="Carl P."
+	Language="Vala"
+	Created="25/04/2015"
+	LastModified="25/04/2015">
+	
+	<TemplateConfiguration>
+		<_Name>New Struct</_Name>
+		<Icon>md-struct</Icon>
+		<_Category>General</_Category>
+		<LanguageName>Vala</LanguageName>
+		<_Description>Creates a new Vala struct.</_Description>
+	</TemplateConfiguration>
+	
+	<TemplateFiles>
+		<File DefaultExtension=".vala" DefaultName="NewClass">
+		<![CDATA[namespace ${ProjectName} {
+	/** 
+     * Purpose of the struct
+     **/ 
+	public struct ${Name} {
+		ONE=1,
+		TWO,
+		THREE
+	}
+}]]></File>
+	</TemplateFiles>
+	
+	<FileOptions/>
+	
+</Template>

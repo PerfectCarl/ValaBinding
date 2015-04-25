@@ -157,12 +157,12 @@ namespace MonoDevelop.ValaBinding
                 case ValaBinding.CompileTarget.SharedLibrary:
                     if (Platform.IsWindows)
                     {
-						args.Add(string.Format("--Xcc=\"-shared\" --Xcc=-I\"{0}\" -H \"{1}.h\" --library \"{1}\"", outputDir, outputNameWithoutExt));
+					args.Add(string.Format("--Xcc=\"-shared\" --Xcc=-I\"{0}\" --header \"{1}.h\" --vapi \"{1}.vapi\" --library \"{1}\"", outputDir, outputDir + "/" + outputNameWithoutExt));
 						gccArgs.Add(string.Format("-shared\" -I\"{0}\" ", outputDir));
                     }
                     else
                     {
-						args.Add(string.Format("--Xcc=\"-shared\" --Xcc=\"-fPIC\" --Xcc=\"-I'{0}'\" -H \"{1}.h\" --library \"{1}\"", outputDir, outputNameWithoutExt));    
+					args.Add(string.Format("--Xcc=\"-shared\" --Xcc=\"-fPIC\" --Xcc=\"-I'{0}'\" --header \"{1}.h\" --vapi \"{1}.vapi\" --library \"{1}\"", outputDir, outputDir + "/" + outputNameWithoutExt));    
 						gccArgs.Add(string.Format("\"-shared\" \"-fPIC\" \"-I'{0}'\"", outputDir));
                     }
                     break;
@@ -693,7 +693,7 @@ namespace MonoDevelop.ValaBinding
                 configuration.Output + ".vapi");
             if (File.Exists(vapiFile)) { File.Delete(vapiFile); }
 
-			var output = projectConfiguration.IntermediateOutputDirectory;
+			var output = configuration.IntermediateOutputDirectory;
 			if (Directory.Exists (output))
 				Directory.Delete (output, true);
         }

@@ -151,6 +151,21 @@
     <EmbeddedResource Include="templates\Makefile.template">
       <LogicalName>Makefile.template</LogicalName>
     </EmbeddedResource>
+    <EmbeddedResource Include="templates\NewValaSingleton.xft.xml">
+      <LogicalName>NewValaSingleton.xft.xml</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="templates\NewValaInterface.xft.xml">
+      <LogicalName>NewValaInterface.xft.xml</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="templates\NewValaStruct.xft.xml">
+      <LogicalName>NewValaStruct.xft.xml</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="templates\NewValaClass.xft.xml">
+      <LogicalName>NewValaClass.xft.xml</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="templates\NewValaErrorDomain.xft.xml">
+      <LogicalName>NewValaErrorDomain.xft.xml</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Project\ValaCompilationParameters.cs" />

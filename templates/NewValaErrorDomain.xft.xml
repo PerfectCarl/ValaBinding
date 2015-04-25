@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<Template
+	Originator="Carl P."
+	Language="Vala"
+	Created="25/04/2015"
+	LastModified="25/04/2015">
+	
+	<TemplateConfiguration>
+		<_Name>New ErrorDomain</_Name>
+		<Icon>md-warning</Icon>
+		<_Category>General</_Category>
+		<LanguageName>Vala</LanguageName>
+		<_Description>Creates a new error handler.<![CDATA[ <a href="www.google.com>google</a>]]></_Description>
+	</TemplateConfiguration>
+	
+	<TemplateFiles>
+		<File DefaultExtension=".vala" DefaultName="NewClass">
+		<![CDATA[namespace ${ProjectName} {
+	/** 
+     * Purpose of the errors
+     **/ 
+	public errordomain ${Name} {
+		MISSING_FILE,
+		BAD_INPUT
+	}
+}]]></File>
+	</TemplateFiles>
+	
+	<FileOptions/>
+	
+</Template>

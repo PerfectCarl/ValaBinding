@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<Template
+	Originator="Carl P."
+	Language="Vala"
+	Created="25/04/2015"
+	LastModified="25/04/2015">
+	
+	<TemplateConfiguration>
+		<_Name>New Singleton</_Name>
+		<Icon>md-file-source</Icon>
+		<_Category>General</_Category>
+		<LanguageName>Vala</LanguageName>
+		<_Description>Creates a new thread-safe singleton.</_Description>
+	</TemplateConfiguration>
+	
+	<TemplateFiles>
+		<File DefaultExtension=".vala" DefaultName="NewClass">
+		<![CDATA[namespace ${ProjectName} {
+	/** 
+     * Purpose of the class
+     **/ 
+	public class ${Name}: Object {
+	    private static Once<${Name}> _instance;
+
+	    public static unowned ${Name} instance () {
+	        return _instance.once (() => { return new ${Name} (); });
+	    }
+
+		private ${Name} () {
+		}
+		
+	}
+}]]></File>
+	</TemplateFiles>
+	
+	<FileOptions/>
+	
+</Template>

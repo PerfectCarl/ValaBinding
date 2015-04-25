@@ -12,6 +12,9 @@
     - add an option to set GETTEXT   
   - fix error when package are not found by `pkg-config` on some platforms
   - use AddinMaker project structure
+  - revert icons to the default
+  - add new templates: 
+    - new Class, new Struct, new Interface 
 
 * 5.7 
   - initial release. See [Old changelog](ChangeLog) for more info
