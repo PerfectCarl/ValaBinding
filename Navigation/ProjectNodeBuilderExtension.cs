@@ -31,23 +31,16 @@
 
 using System;
 using System.IO;
-using System.Threading;
-
-using Mono.Addins;
+using System.Collections.Generic;
 
 using MonoDevelop.Projects;
-using MonoDevelop.Ide.Gui;
-using MonoDevelop.Ide.Gui.Pads;
-using MonoDevelop.Core.Execution;
-using MonoDevelop.Core;
 using MonoDevelop.Components.Commands;
 using MonoDevelop.Ide.Gui.Components;
 using MonoDevelop.Ide;
 
 using MonoDevelop.ValaBinding;
 using MonoDevelop.ValaBinding.Parser;
-using MonoDevelop.ValaBinding.Parser.Afrodite;
-using System.Collections.Generic;
+
 
 namespace MonoDevelop.ValaBinding.Navigation
 {
@@ -95,8 +88,30 @@ namespace MonoDevelop.ValaBinding.Navigation
         public override void BuildNode(ITreeBuilder treeBuilder, object dataObject, NodeInfo nodeInfo)
         {
         }
-		
+		// Used for ClassPad
 		public override void BuildChildNodes (ITreeBuilder builder, object dataObject)
+		{			
+			ValaProject p = dataObject as ValaProject;
+			if (p == null) return;
+			
+			// bool nestedNamespaces = builder.Options["NestedNamespaces"];
+			
+			ProjectInformation info = ProjectInformationManager.Instance.Get (p);
+			var added = new List<String> () ;
+			// Namespaces
+			foreach (ProjectFile file in p.Files) {
+				foreach (var child in info.GetRootSymbolsForFileEcho (file.FilePath.FullPath)) {
+					var name = child.Name ;
+					if( added.IndexOf (name) == -1 /*&& child.Parent.Name == null*/ ) { 
+						builder.AddChild (child);
+						added.Add(name) ;
+					}
+				}
+			}
+		}
+
+		/*
+		 * public override void BuildChildNodes (ITreeBuilder builder, object dataObject)
 		{			
 			ValaProject p = dataObject as ValaProject;
 			if (p == null) return;
@@ -109,14 +124,13 @@ namespace MonoDevelop.ValaBinding.Navigation
 			foreach (ProjectFile file in p.Files) {
 				foreach (Symbol child in info.GetRootSymbolsForFile (file.FilePath.FullPath)) {
 					var name = child.Name ;
-					if( added.IndexOf (name) == -1 /*&& child.Parent.Name == null*/ ) { 
-						builder.AddChild (child);
-						added.Add(name) ;
-					}
-				}
-			}
+					if( added.IndexOf (name) == -1 /*&& child.Parent.Name == null*/ /*) { 
+			builder.AddChild (child);
+			added.Add(name) ;
 		}
-		
+	}
+}
+}*/
 		public override bool HasChildNodes (ITreeBuilder builder, object dataObject)
 		{
 			return true;

@@ -29,19 +29,8 @@
 //
 
 using System;
-using System.Collections.Generic;
-using System.Threading;
-
-using Mono.Addins;
-
-using MonoDevelop.Ide.Gui;
-using MonoDevelop.Ide.Gui.Pads;
- 
-using MonoDevelop.Projects;
 using MonoDevelop.Ide.Gui.Components;
-
-using MonoDevelop.ValaBinding.Parser;
-using MonoDevelop.ValaBinding.Parser.Afrodite;
+using MonoDevelop.ValaBinding.Parser.Echo;
 
 namespace MonoDevelop.ValaBinding.Navigation
 {

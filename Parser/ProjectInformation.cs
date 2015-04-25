@@ -32,17 +32,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Threading;
-using System.Text;
-using System.Text.RegularExpressions;
 
 using MonoDevelop.Projects;
 using MonoDevelop.Core;
-using MonoDevelop.Ide;
-using MonoDevelop.Core.Execution;
-using MonoDevelop.Ide.CodeCompletion;
 using MonoDevelop.ValaBinding.Parser.Afrodite;
 
 namespace MonoDevelop.ValaBinding.Parser
@@ -185,6 +177,7 @@ namespace MonoDevelop.ValaBinding.Parser
 			return overloads;
 		}// GetOverloads
 
+		[Obsolete]
 		internal List<Afrodite.Symbol> GetRootSymbolsForFile (string file)
 		{
 			var symbols = GetSymbolsForFile (file /*topContainers*/);
