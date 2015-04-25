@@ -81,6 +81,9 @@
       <HintPath>dlls\Xwt.dll</HintPath>
       <Package>monodevelop</Package>
     </Reference>
+    <Reference Include="System.Threading">
+      <HintPath>packages\TaskParallelLibrary.1.0.2856.0\lib\Net35\System.Threading.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <None Include="ChangeLog" />
@@ -89,6 +92,8 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />
+    <None Include="CHANGELOG.md" />
+    <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="ValaBinding.addin.xml" />

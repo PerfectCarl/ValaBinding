@@ -12,6 +12,7 @@
 // Warnings
 // extra parameters
 // remove compiler in project file
+// build included c files
 
 using System;
 using System.IO;
@@ -140,7 +141,7 @@ namespace MonoDevelop.ValaBinding
                         configuration.OutputDirectory);
             var outputNameWithoutExt = Path.GetFileNameWithoutExtension(configuration.Output);
 
-            args.Add(string.Format("-d \"{0}\"", outputDir));
+            // args.Add(string.Format("-d \"{0}\"", outputDir));
 
             if (configuration.DebugMode)
                 args.Add("-g");
@@ -416,7 +417,7 @@ namespace MonoDevelop.ValaBinding
 			try {
 				var paths="/usr/lib/x86_64-linux-gnu/pkgconfig:/usr/local/pkgconfig" ;
 				//Runtime.ProcessService.EnvironmentVariableOverrides.Add("PKG_CONFIG_DEBUG_SPEW", "true") ;
-				Runtime.ProcessService.EnvironmentVariableOverrides.Add("PKG_CONFIG_PATH", paths) ;
+				Runtime.ProcessService.EnvironmentVariableOverrides["PKG_CONFIG_PATH"]= paths ;
 				ProcessWrapper p = Runtime.ProcessService.StartProcess (command, args, baseDirectory, swOuput, chainedError, null);
 
 				operationMonitor.AddOperation (p); //handles cancellation
@@ -456,7 +457,7 @@ namespace MonoDevelop.ValaBinding
 		/// </returns>
 		private static string ProcessDefineSymbols (string symbols)
 		{
-			return ((null == symbols) || (0 == symbols.Length))?
+			return (string.IsNullOrEmpty (symbols))?
 				string.Empty:
 				"-D " + Regex.Replace (symbols, " +", " -D ");
 		}
@@ -469,15 +470,16 @@ namespace MonoDevelop.ValaBinding
 									IProgressMonitor monitor,
 									CompilerResults cr)
 		{
-			var buildDate = new DateTime ();
-			var result = GenerateCFiles (projectFiles, args, outputName, monitor, cr);
+			Directory.CreateDirectory (projectConfiguration.IntermediateOutputDirectory);
+			//var buildDate = new DateTime ();
+			var result = GenerateCFiles (projectFiles, args, monitor, cr);
 			if( result)
 				// Only if files get generated properly
-				CompileCFiles (projectFiles, buildDate, outputName, monitor, cr);
+				CompileCFiles (projectFiles, outputName, monitor, cr);
 			return result;
 		}
 
-		private string ProcessPkgConfig (string outputName,
+		private string ProcessPkgConfig (
 			IProgressMonitor monitor,
 			CompilerResults cr) {
 			var config = gccPkgConfig.Trim() ; 
@@ -489,7 +491,7 @@ namespace MonoDevelop.ValaBinding
 			string errorOutput = string.Empty;
 			string output = string.Empty;
 
-			int exitCode = ExecuteCommandForOutput ("pkg-config", args, Path.GetDirectoryName (outputName), monitor, out output, out errorOutput);
+			int exitCode = ExecuteCommandForOutput ("pkg-config", args, project.BaseIntermediateOutputPath, monitor, out output, out errorOutput);
 
 			if (exitCode != 0 && cr.Errors.Count == 0)
 			{
@@ -509,47 +511,103 @@ namespace MonoDevelop.ValaBinding
 		//  - application
 		//  - libraries
 		//  - project depending on other projects
-		private bool CompileCFiles (ProjectFileCollection projectFiles, DateTime buildDate, string outputName,
+		private bool CompileCFiles (ProjectFileCollection projectFiles, string outputName,
 			IProgressMonitor monitor,
 			CompilerResults cr) {
 			StringBuilder filelist = new StringBuilder ();
-			// Only compile files that have been modified
+
+			string pkgargs = null;
+
+			var globalExitCode = 0; 
+			var compiledFileCount = 0; 
+
 			foreach (ProjectFile f in projectFiles) { 
 				if (f.Subtype != Subtype.Directory && f.BuildAction == BuildAction.Compile) {
-					var outputDir = projectConfiguration.OutputDirectory;
-					var filePath = f.FilePath.ChangeExtension ("c");
-					var prefixPath =  f.FilePath.ToString().Substring(project.BaseIntermediateOutputPath.ToString().Length - 3 + f.FilePath.FileName.Length) ;
-					var listFilePath = outputDir + prefixPath + "/" + filePath.FileName;
-					if( File.GetCreationTime (listFilePath) > buildDate ) 
-						filelist.AppendFormat ("\"{0}\" ", listFilePath);
+					var outputDir = projectConfiguration.IntermediateOutputDirectory;
+					//var filePath = f.FilePath.ChangeExtension ("c");
+					var prefixPath =  f.FilePath.ToString().Substring(project.BaseDirectory.ToString().Length) ;
+					prefixPath = prefixPath.Substring (0, prefixPath.Length - f.FilePath.FileName.Length-1);
+					var filename = f.FilePath.FileNameWithoutExtension + ".c";
+					var cFilePath = outputDir + prefixPath + "/" + filename;
+					var oFilePath = outputDir + prefixPath + "/" + f.FilePath.FileNameWithoutExtension + ".o";
+					filelist.AppendFormat ("\"{0}\" ", oFilePath);
+					if (File.GetCreationTime (cFilePath) <= File.GetCreationTime (oFilePath)) { 
+						//monitor.Log.WriteLine ("Skipping {0}", filename );
+					}
+					else
+					{
+						// filelist.AppendFormat ("\"{0}\" ", listFilePath);
+
+						// *
+						// * Build only the recently modified files
+						// * 
+						// .o files are generated in obj/
+
+						if (pkgargs == null) {
+							pkgargs = ProcessPkgConfig (monitor, cr);
+							monitor.Log.WriteLine ("Build .c files" );
+							monitor.Log.WriteLine ("---" );
+						}
+						monitor.Log.WriteLine ("Building {0}", +"."+prefixPath + "/" + filename );
+						string args = string.Join(" ", gccArgs.ToArray());
+						string compilerArgs = string.Format ("{0} -c {1} {2} {3} ", /*-o \"{4}\"",*/
+							args, gccLibs, cFilePath, pkgargs);
+
+						string errorOutput = string.Empty;
+						int exitCode = ExecuteCommand (gccCompilerCommand, compilerArgs, outputDir+"/"+prefixPath, monitor, out errorOutput);
+						globalExitCode += exitCode;
+						compiledFileCount++;
+						ParseCompilerOutput(errorOutput, cr, projectFiles);
+
+						if (exitCode != 0 && cr.Errors.Count == 0)
+						{
+							// error isn't recognized but cannot ignore it because exitCode != 0
+							var errMsg = "";
+							if (string.IsNullOrEmpty (errorOutput))
+								errMsg = string.Format ("Return code {0}. No error message provided", exitCode);
+							else
+								errMsg = errorOutput;
+							cr.Errors.Add (new CompilerError () { ErrorText = errMsg });
+						}
+					}
 				}
 			}
-			var pkgargs = ProcessPkgConfig (outputName, monitor, cr);
-			monitor.Log.WriteLine ("Building C files: " + filelist.ToString ());
+
 			// *
 			// * Build only the recently modified files
 			// * 
-			string args = string.Join(" ", gccArgs.ToArray());
-			string compiler_args = string.Format ("{0} {1} {2} {3} -c -o \"{4}\"",
-				args, gccLibs, filelist.ToString (), pkgargs, Path.GetFileName (outputName));
+			// .o files are generated in obj/
+			if (globalExitCode == 0) {
+				if (compiledFileCount == 0) {
+					monitor.Log.WriteLine ("Everything is up to date");
+				} else {
+					monitor.Log.WriteLine ("Linking .o files");
+					monitor.Log.WriteLine ("---" );
+					if (pkgargs == null)
+						pkgargs = ProcessPkgConfig (monitor, cr);
+					var linkArgs = string.Join (" ", gccArgs.ToArray ());
+					string linkingArgs = string.Format ("{0} {1} {2} {3} -o \"{4}\"",
+						                     linkArgs, gccLibs, filelist.ToString (), pkgargs, Path.GetFileName (outputName));
 
-			string errorOutput = string.Empty;
-			int exitCode = ExecuteCommand (gccCompilerCommand, compiler_args, Path.GetDirectoryName (outputName), monitor, out errorOutput);
+					string linkErrorOutput = string.Empty;
+					int linkExitCode = ExecuteCommand (gccCompilerCommand, linkingArgs, Path.GetDirectoryName (outputName), 
+						                   monitor, out linkErrorOutput);
 
-			ParseCompilerOutput(errorOutput, cr, projectFiles);
+					ParseCompilerOutput (linkErrorOutput, cr, projectFiles);
 
-			if (exitCode != 0 && cr.Errors.Count == 0)
-			{
-				// error isn't recognized but cannot ignore it because exitCode != 0
-				var errMsg = "";
-				if( errorOutput == null || errorOutput == "" ) 
-					errMsg = string.Format("Return code {0}. No error message provided", exitCode) ;
-				else
-					errMsg = errorOutput ;
-				cr.Errors.Add (new CompilerError () { ErrorText = errMsg });
+					if (linkExitCode != 0 && cr.Errors.Count == 0) {
+						// error isn't recognized but cannot ignore it because exitCode != 0
+						var errMsg = "";
+						if (string.IsNullOrEmpty (linkErrorOutput))
+							errMsg = string.Format ("Return code {0}. No error message provided", linkExitCode);
+						else
+							errMsg = linkErrorOutput;
+						cr.Errors.Add (new CompilerError () { ErrorText = errMsg });
+					}
+					globalExitCode += linkExitCode;
+				}
 			}
-
-			var compilationSuccess =  exitCode == 0;
+			var compilationSuccess =  globalExitCode == 0;
 
 			// * 
 			// *  Link all the .o files if needed
@@ -559,10 +617,11 @@ namespace MonoDevelop.ValaBinding
 		}
 
 		private bool GenerateCFiles (ProjectFileCollection projectFiles, string args,
-			string outputName,
 			IProgressMonitor monitor,
 			CompilerResults cr)
 		{
+			monitor.Log.WriteLine ("Compiling vala files into .c" );
+			monitor.Log.WriteLine ("---" );
 			StringBuilder filelist = new StringBuilder ();
 			foreach (ProjectFile f in projectFiles) { 
 				if (f.Subtype != Subtype.Directory && f.BuildAction == BuildAction.Compile) {
@@ -571,11 +630,11 @@ namespace MonoDevelop.ValaBinding
 			}/// Build file list
 
 			// Just generate the c code.
-			string compiler_args = string.Format ("{0} {1} --ccode",
-				args, filelist.ToString ());
+			string compiler_args = string.Format ("{0} {1} --ccode --basedir {2} --directory {3} ",
+				args, filelist.ToString (), project.BaseDirectory, projectConfiguration.IntermediateOutputDirectory);
 			
 			string errorOutput = string.Empty;
-			int exitCode = ExecuteCommand (compilerCommand, compiler_args, Path.GetDirectoryName (outputName), monitor, out errorOutput);
+			int exitCode = ExecuteCommand (compilerCommand, compiler_args, projectConfiguration.IntermediateOutputDirectory, monitor, out errorOutput);
 			
 			ParseCompilerOutput(errorOutput, cr, projectFiles);
 
@@ -632,6 +691,10 @@ namespace MonoDevelop.ValaBinding
                 FileService.RelativeToAbsolutePath(configuration.SourceDirectory, configuration.OutputDirectory),
                 configuration.Output + ".vapi");
             if (File.Exists(vapiFile)) { File.Delete(vapiFile); }
+
+			var output = projectConfiguration.IntermediateOutputDirectory;
+			if (Directory.Exists (output))
+				Directory.Delete (output, true);
         }
 		
 		/// <summary>
