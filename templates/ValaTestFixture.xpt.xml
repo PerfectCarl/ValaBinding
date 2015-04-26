@@ -8,7 +8,7 @@
 	<TemplateConfiguration>
 		<_Name>Test Fixture</_Name>
 		<_Category>Vala</_Category>
-		<Icon>md-project-cofnsole|res:vala-icon-32.png</Icon>
+		<Icon>md-project-console</Icon>
 		<LanguageName>Vala</LanguageName>
 		<_Description>Creates a Vala test fixture.</_Description>
 	</TemplateConfiguration>
@@ -25,9 +25,9 @@
 				/>
 			
 			<Files>
-				<File name = "main.vala" AddStandardHeader ="True"><![CDATA[using GLib;
+				<File name = "main.vala" AddStandardHeader ="True"><![CDATA[
 
-public class MyValaTest: GLib.Object {
+public class MyValaTest: Object {
 	public static void doTest() {
 		// Test code goes here
 	}

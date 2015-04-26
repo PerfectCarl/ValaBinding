@@ -25,9 +25,9 @@
 				/>
 			
 			<Files>
-				<File name = "main.vala" AddStandardHeader ="True"><![CDATA[using GLib;
+				<File name = "main.vala" AddStandardHeader ="True"><![CDATA[
 
-public class HelloVala: GLib.Object {
+public class HelloVala: Object {
 	public static int main (string[] args) {
 		stdout.printf ("Hello world!\n");
 		

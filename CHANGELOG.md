@@ -15,5 +15,6 @@
   - revert icons to the default
   - add new templates: 
     - new Class, Struct, ErrorDomain, Interface, etc.
+
 * 5.7 
   - initial release. See [Old changelog](ChangeLog) for more info

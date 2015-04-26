@@ -15,9 +15,11 @@ using MonoDevelop.Components;
 using MonoDevelop.Ide.Gui;
 using MonoDevelop.Ide;
 using MonoDevelop.Core;
+
 // using MonoDevelop.ValaBinding.Parser.Afrodite;
 using MonoDevelop.ValaBinding.Parser.Echo;
 using MonoDevelop.ValaBinding.Parser;
+using MonoDevelop.Ide.Gui.Components;
 
 namespace MonoDevelop.ValaBinding
 {
@@ -28,79 +30,125 @@ namespace MonoDevelop.ValaBinding
 	/// </summary>
 	public class ValaOutlineExtension : TextEditorExtension, IOutlinedDocument
 	{
-		TreeStore TreeStore;
-		MonoDevelop.Ide.Gui.Components.PadTreeView TreeView;
+		TreeModelSort sortedTreestore;
+		TreeStore treestore;
+		PadTreeView treeview;
 		Widget[] toolbarWidgets;
 		bool outlineReady;
 		bool dontJumpToDeclaration;
-		bool clickedOnOutlineItem; 
-		void IOutlinedDocument.ReleaseOutlineWidget()
-		{
-			if (TreeView == null)
-				return;
-			var w = (ScrolledWindow)TreeView.Parent;
-			w.Destroy();
+		bool clickedOnOutlineItem;
+		// ValaOutlineComparer comparer;
 
-			TreeStore.Dispose();
-			TreeStore = null;
-			TreeView = null;
+		void IOutlinedDocument.ReleaseOutlineWidget ()
+		{
+			if (treeview == null)
+				return;
+			var w = (ScrolledWindow)treeview.Parent;
+			w.Destroy ();
+
+			treestore.Dispose ();
+			treestore = null;
+			treeview = null;
 			//settings = null;
-			if(toolbarWidgets!=null)
+			if (toolbarWidgets != null)
 				foreach (var tw in toolbarWidgets)
-					w.Destroy();
+					w.Destroy ();
 			toolbarWidgets = null;
 			//comparer = null;
 		}
 
-		public IEnumerable<Widget> GetToolbarWidgets()
+		public IEnumerable<Widget> GetToolbarWidgets ()
 		{
-			return null;
+			if (toolbarWidgets != null)
+				return toolbarWidgets;
+
+			var sortAlphabeticallyToggleButton = new ToggleButton () {
+				Image = new Image (Ide.Gui.Stock.SortAlphabetically, IconSize.Menu),
+				TooltipText = GettextCatalog.GetString ("Sort entries alphabetically"),
+				Active = IsSorted,
+			};	
+			sortAlphabeticallyToggleButton.Toggled += delegate {
+				if (sortAlphabeticallyToggleButton.Active == IsSorted)
+					return;
+				IsSorted = sortAlphabeticallyToggleButton.Active;
+				UpdateSorting ();
+			};
+
+			return toolbarWidgets = new Widget[] {
+				//groupToggleButton,
+				sortAlphabeticallyToggleButton,
+				//new VSeparator (),
+				//preferencesButton,
+			};
 		}
 
-		public override bool ExtendsEditor(Document doc, IEditableTextBuffer editor)
+		bool IsSorted { get ; set ; }
+
+		void UpdateSorting ()
+		{
+			if (IsSorted) {
+				// Sort the model, sort keys may have changed.
+				// Only setting the column again does not re-sort so we set the function instead.
+				//outlineTreeModelSort.SetSortFunc (0, comparer.CompareNodes);
+				//treeview.Model = outlineTreeModelSort;
+			} else {
+				// treeview.Model = treestore;
+			}
+
+			// Because sorting the tree by setting the sort function also collapses the tree view we expand
+			// the whole tree.
+			treeview.ExpandAll ();
+		}
+
+		public override bool ExtendsEditor (Document doc, IEditableTextBuffer editor)
 		{
 			return true;
 		}
-			
-		public override void Initialize()
+
+		public override void Initialize ()
 		{
-			base.Initialize();
-			if (Document != null)
-			{
+			base.Initialize ();
+			if (Document != null) {
 				Document.DocumentParsed += UpdateDocumentOutline;
-				// CARL Document.Editor.Caret.PositionChanged += UpdateOutlineSelection;
+				Document.Editor.Caret.PositionChanged += UpdateOutlineSelection;
 			}
 		}
-		public Widget GetOutlineWidget()
+
+		public Widget GetOutlineWidget ()
 		{
-			if (TreeView != null)
-				return TreeView;
+			if (treeview != null)
+				return treeview;
 
-			TreeStore = new TreeStore(typeof(object));
+			treestore = new TreeStore (typeof(object));
+			sortedTreestore = new TreeModelSort (treestore);
+			//comparer = new ClassOutlineNodeComparer (GetAmbience (), settings, sortedTreestore);
 
-			TreeView = new MonoDevelop.Ide.Gui.Components.PadTreeView(TreeStore);
+			//sortedTreestore.SetSortFunc (0, comparer.CompareNodes);
+			//sortedTreestore.SetSortColumnId (0, SortType.Ascending);
 
-			var pixRenderer = new CellRendererPixbuf();
+			treeview = new MonoDevelop.Ide.Gui.Components.PadTreeView (treestore);
+
+			var pixRenderer = new CellRendererPixbuf ();
 			pixRenderer.Xpad = 0;
 			pixRenderer.Ypad = 0;
 
-			TreeView.TextRenderer.Xpad = 0;
-			TreeView.TextRenderer.Ypad = 0;
+			treeview.TextRenderer.Xpad = 0;
+			treeview.TextRenderer.Ypad = 0;
 
-			TreeViewColumn treeCol = new TreeViewColumn();
-			treeCol.PackStart(pixRenderer, false);
+			TreeViewColumn treeCol = new TreeViewColumn ();
+			treeCol.PackStart (pixRenderer, false);
 
-			treeCol.SetCellDataFunc(pixRenderer, new TreeCellDataFunc(OutlineTreeIconFunc));
-			treeCol.PackStart(TreeView.TextRenderer, true);
+			treeCol.SetCellDataFunc (pixRenderer, new TreeCellDataFunc (OutlineTreeIconFunc));
+			treeCol.PackStart (treeview.TextRenderer, true);
 
-			treeCol.SetCellDataFunc(TreeView.TextRenderer, new TreeCellDataFunc(OutlineTreeTextFunc));
-			TreeView.AppendColumn(treeCol);
+			treeCol.SetCellDataFunc (treeview.TextRenderer, new TreeCellDataFunc (OutlineTreeTextFunc));
+			treeview.AppendColumn (treeCol);
 
-			TreeView.TextRenderer.Editable = false;
+			treeview.TextRenderer.Editable = false;
 
-			TreeView.HeadersVisible = false;
+			treeview.HeadersVisible = false;
 
-			TreeView.Selection.Changed += delegate {
+			treeview.Selection.Changed += delegate {
 				if (dontJumpToDeclaration || !outlineReady)
 					return;
 
@@ -109,37 +157,39 @@ namespace MonoDevelop.ValaBinding
 				clickedOnOutlineItem = false;
 			};
 
-			TreeView.Realized += delegate { RefillOutlineStore(); };
+			treeview.Realized += delegate {
+				RefillOutlineStore ();
+			};
 
-			var sw = new CompactScrolledWindow();
-			sw.Add(TreeView);
-			sw.ShowAll();
+			var sw = new CompactScrolledWindow ();
+			sw.Add (treeview);
+			sw.ShowAll ();
 			return sw;
 		}
 
 
 		uint refillOutlineStoreId;
-		void UpdateDocumentOutline(object sender, EventArgs args)
+
+		void UpdateDocumentOutline (object sender, EventArgs args)
 		{
-			RefillOutlineStore();
+			RefillOutlineStore ();
 		}
 
-		void RemoveRefillOutlineStoreTimeout()
+		void RemoveRefillOutlineStoreTimeout ()
 		{
 			if (refillOutlineStoreId == 0)
 				return;
-			GLib.Source.Remove(refillOutlineStoreId);
+			GLib.Source.Remove (refillOutlineStoreId);
 			refillOutlineStoreId = 0;
 		}
 
-		public bool RefillOutlineStore()
+		public bool RefillOutlineStore ()
 		{
-			DispatchService.AssertGuiThread();
-			Gdk.Threads.Enter();
+			DispatchService.AssertGuiThread ();
+			Gdk.Threads.Enter ();
 
 			//refreshingOutline = false;
-			if (TreeStore == null || !TreeView.IsRealized)
-			{
+			if (treestore == null || !treeview.IsRealized) {
 				refillOutlineStoreId = 0;
 				return false;
 			}
@@ -150,41 +200,35 @@ namespace MonoDevelop.ValaBinding
 			int[] lastSelectedItem;
 			TreeIter i;
 
-			if (TreeView.Selection.GetSelected(out i))
-				lastSelectedItem = TreeStore.GetPath(i).Indices;
-			else 
+			if (treeview.Selection.GetSelected (out i))
+				lastSelectedItem = treestore.GetPath (i).Indices;
+			else
 				lastSelectedItem = null;
 
 			// Save previously expanded items if wanted
-			var lastExpanded = new List<int[]>();
+			var lastExpanded = new List<int[]> ();
 			if (/*DCompilerService.Instance.Outline.ExpansionBehaviour == DocOutlineCollapseBehaviour.ReopenPreviouslyExpanded && */
-				TreeStore.GetIterFirst(out i))
-			{
-				do{
-					var path = TreeStore.GetPath(i);
-					if(TreeView.GetRowExpanded(path))
-						lastExpanded.Add(path.Indices);
-				}
-				while(TreeStore.IterNext(ref i));
+				treestore.GetIterFirst (out i)) {
+				do {
+					var path = treestore.GetPath (i);
+					if (treeview.GetRowExpanded (path))
+						lastExpanded.Add (path.Indices);
+				} while(treestore.IterNext (ref i));
 			}
 
 			// Clear the tree
-			TreeStore.Clear();
+			treestore.Clear ();
 
-			try
-			{
+			try {
 				// Build up new tree
 				var caretLocation = Document.Editor.Caret.Location;
 				foreach (var symbol in ProjectInfo.GetRootSymbolsForFileEcho (FileName.CanonicalPath)) {
-					BuildTreeChildren(TreeIter.Zero, symbol, caretLocation.Column, caretLocation.Line);
+					BuildTreeChildren (TreeIter.Zero, symbol, caretLocation.Column, caretLocation.Line);
 				}
-			}
-			catch (Exception ex)
-			{
-				LoggingService.LogError("Error while updating document outline panel", ex);
-			}
-			finally
-			{
+				treeview.ExpandAll ();
+			} catch (Exception ex) {
+				LoggingService.LogError ("Error while updating document outline panel", ex);
+			} finally {
 				// Re-Expand tree items
 				/*switch(DCompilerService.Instance.Outline.ExpansionBehaviour)
 				{
@@ -198,30 +242,26 @@ namespace MonoDevelop.ValaBinding
 				}*/
 
 				// Restore selection
-				if (lastSelectedItem != null)
-				{
-					try
-					{
-						TreeView.ExpandToPath(new TreePath(lastSelectedItem));
+				if (lastSelectedItem != null) {
+					try {
+						treeview.ExpandToPath (new TreePath (lastSelectedItem));
+					} catch {
 					}
-					catch { }
 				}
 
 				outlineReady = true;
 			}
-			Gdk.Threads.Leave();
+			Gdk.Threads.Leave ();
 
 			//stop timeout handler
 			refillOutlineStoreId = 0;
 			return false;
 		}
 
-		private ProjectInformation ProjectInfo
-		{
-			get
-			{
+		private ProjectInformation ProjectInfo {
+			get {
 				ValaProject project = Document.Project as ValaProject;
-				return (null == project) ? null : ProjectInformationManager.Instance.Get(project);
+				return (null == project) ? null : ProjectInformationManager.Instance.Get (project);
 			}
 		}
 
@@ -231,15 +271,15 @@ namespace MonoDevelop.ValaBinding
 			return symbol.SourceReferences[0] ;
 		}*/
 
-		void BuildTreeChildren(TreeIter ParentTreeNode, Symbol symbol, int column, int line)
+		void BuildTreeChildren (TreeIter ParentTreeNode, Symbol symbol, int column, int line)
 		{
-			TreeIter childIter=ParentTreeNode; 
+			TreeIter childIter = ParentTreeNode; 
 			// var source = GetFirstReference (symbol);
 			//if (source.File == FileName.CanonicalPath) {
-				if (!ParentTreeNode.Equals (TreeIter.Zero))
-					childIter = TreeStore.AppendValues (ParentTreeNode, symbol);
-				else
-					childIter = TreeStore.AppendValues (symbol);
+			if (!ParentTreeNode.Equals (TreeIter.Zero))
+				childIter = treestore.AppendValues (ParentTreeNode, symbol);
+			else
+				childIter = treestore.AppendValues (symbol);
 			//}
 			foreach (var child in symbol.Children) {
 				BuildTreeChildren (childIter, child, column, line);
@@ -304,44 +344,31 @@ namespace MonoDevelop.ValaBinding
 			}*/
 		}
 
-		void OutlineTreeIconFunc(TreeViewColumn column, CellRenderer cell, TreeModel model, TreeIter iter)
+		void OutlineTreeIconFunc (TreeViewColumn column, CellRenderer cell, TreeModel model, TreeIter iter)
 		{
 			var pixRenderer = (CellRendererPixbuf)cell;
-			/*object o = model.GetValue(iter, 0);
-			string id = null;
-
-			if (o is DNode)
-			{
-				var icon = DIcons.GetNodeIcon(o as DNode);
-				if (!icon.IsNull)
-					id = icon.Name;
-			}
-			else if (o is StatementContainingStatement)
-				id = "gtk-add";
-*/
 			var symbol = model.GetValue (iter, 0) as Symbol;
 			var id = symbol.Icon;
-			if (id != null)
-			{
-				var img = ImageService.GetIcon(id);
+			if (id != null) {
+				var img = ImageService.GetIcon (id);
 				if (img != null)
-					pixRenderer.Pixbuf = img.ToPixbuf(IconSize.Menu);
+					pixRenderer.Pixbuf = img.ToPixbuf (IconSize.Menu);
 			}
 
 		}
 
-		void JumpToDeclaration(bool focusEditor)
+		void JumpToDeclaration (bool focusEditor)
 		{
 			if (!outlineReady)
 				return;
 
 			TreeIter iter;
-			if (!TreeView.Selection.GetSelected(out iter))
+			if (!treeview.Selection.GetSelected (out iter))
 				return;
 
-			var symbol = TreeStore.GetValue(iter, 0) as Symbol;
+			var symbol = treestore.GetValue (iter, 0) as Symbol;
 
-			if(symbol==null)
+			if (symbol == null)
 				return;
 
 			int line = 0; 
@@ -352,70 +379,92 @@ namespace MonoDevelop.ValaBinding
 			line = source.FirstLine; 
 			column = source.FirstColumn;
 			//line = symbol.
-			var openedDoc=IdeApp.Workbench.GetDocument(filename);
+			var openedDoc = IdeApp.Workbench.GetDocument (filename);
 
 			if (openedDoc == null)
 				return;
 
 
-			openedDoc.Editor.SetCaretTo(line, column);
-			openedDoc.Editor.ScrollToCaret();
+			openedDoc.Editor.SetCaretTo (line, column);
+			openedDoc.Editor.ScrollToCaret ();
 
-			if (focusEditor)
-			{
-				IdeApp.Workbench.ActiveDocument.Select();
+			if (focusEditor) {
+				IdeApp.Workbench.ActiveDocument.Select ();
 			}
 
-			openedDoc.Editor.Document.EnsureOffsetIsUnfolded(
-				openedDoc.Editor.LocationToOffset(
+			openedDoc.Editor.Document.EnsureOffsetIsUnfolded (
+				openedDoc.Editor.LocationToOffset (
 					line,
 					column
 				));
 		}
 
+		void UpdateOutlineSelection (object sender, Mono.TextEditor.DocumentLocationEventArgs e)
+		{
+			//var ast = SyntaxTree;
+
+			/*if (clickedOnOutlineItem ||treestore == null)
+				return;
+
+			var caretLocation = Document.Editor.Caret.Location;
+			var caretLocationD = new CodeLocation (caretLocation.Column, caretLocation.Line);
+
+			var currentblock = DResolver.SearchBlockAt (ast, caretLocationD);
+
+			INode selectedASTNode = null;
+
+			if (currentblock == null)
+				return;
+
+			foreach (var n in currentblock)
+				if (caretLocationD >= n.Location && caretLocationD <= n.EndLocation) {
+					selectedASTNode = n;
+					break;
+				}
+
+			// Select parameter node if needed
+			if (selectedASTNode == null && currentblock is DMethod)
+				foreach (var n in (currentblock as DMethod).Parameters)
+					if (caretLocationD >= n.Location && caretLocationD <= n.EndLocation) {
+						selectedASTNode = n;
+						break;
+					}
+
+			if (selectedASTNode == null)
+				selectedASTNode = currentblock;
+
+			if (selectedASTNode == null)
+				return;
+*/
+			var caretLocation = Document.Editor.Caret.Location;
+			var selectedSymbol = ProjectInfo.GetEnclosingSymbolAtPosition (FileName.FullPath, caretLocation.Line, caretLocation.Column);
+			treestore.Foreach ((TreeModel model, TreePath path, TreeIter iter) => {
+				var symbol = model.GetValue (iter, 0);
+				if (symbol.Equals (selectedSymbol)) {
+					dontJumpToDeclaration = true;
+					//var parentPath = path.Copy().Up();
+
+					treeview.ExpandToPath (path);
+					treeview.Selection.SelectIter (iter);
+					dontJumpToDeclaration = false;
+
+					return true;
+				}
+
+				return false;
+			});
+		}
+
 		void OutlineTreeTextFunc (TreeViewColumn column, CellRenderer cell, TreeModel model, TreeIter iter)
 		{
 			var symbol = model.GetValue (iter, 0) as Symbol;
-
 			string label;
 
-			/*var dm = n as DMethod;
-			if (dm != null) {
-				switch (dm.SpecialType) {
-				case DMethod.MethodType.Unittest:
-					label = "(Unittest)";
-					break;
-				case DMethod.MethodType.ClassInvariant:
-					label = "(Class Invariant)";
-					break;
-				case DMethod.MethodType.Allocator:
-					label = "(Class Allocator)";
-					break;
-				case DMethod.MethodType.Deallocator:
-					label = "(Class Deallocator)";
-					break;
-				default:
-					label = DCompilerService.Instance.Outline.ShowFuncParams ? dm.ToString (false, false) : n.Name;
-					break;
-				}
-			} else*/
 			label = symbol.DisplayText ?? string.Empty;
-
-			/*if (DCompilerService.Instance.Outline.ShowBaseTypes)
-				label = String.Format ("{0} {1}", (n as DNode).Type, label);*/
-
-			// if (DCompilerService.Instance.Outline.GrayOutNonPublic)
-			{
-				// symbol.Accessibility
-				//var dn = n as DNode;
-				//if (dn != null)
-				{
-					if (symbol.Accessibility != SymbolAccessibility.Public)
-						(cell as CellRendererText).Foreground = "#606060";
-					else
-						(cell as CellRendererText).Foreground = "black";
-				}
-			}
+			if (symbol.Accessibility != SymbolAccessibility.Public)
+				(cell as CellRendererText).Foreground = "#606060";
+			else
+				(cell as CellRendererText).Foreground = "black";
 
 			(cell as CellRendererText).Text = label;
 		}

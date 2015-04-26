@@ -524,7 +524,7 @@ namespace MonoDevelop.ValaBinding
 					var cFilePath = outputDir + prefixPath + "/" + filename;
 					var oFilePath = outputDir + prefixPath + "/" + f.FilePath.FileNameWithoutExtension + ".o";
 					filelist.AppendFormat ("\"{0}\" ", oFilePath);
-					if (File.GetCreationTime (cFilePath) <= File.GetCreationTime (oFilePath)) { 
+					if (File.GetCreationTime (cFilePath) <= File.GetCreationTime (oFilePath) && File.Exists(oFilePath)) { 
 						//monitor.Log.WriteLine ("Skipping {0}", filename );
 					}
 					else
@@ -570,7 +570,7 @@ namespace MonoDevelop.ValaBinding
 			// * Build only the recently modified files
 			// * 
 			// .o files are generated in obj/
-			if (globalExitCode == 0) {
+			if (globalExitCode == 0 && File.Exists(outputName)) {
 				if (compiledFileCount == 0) {
 					monitor.Log.WriteLine ("Everything is up to date");
 				} else {
@@ -620,7 +620,7 @@ namespace MonoDevelop.ValaBinding
 				if (f.Subtype != Subtype.Directory && f.BuildAction == BuildAction.Compile) {
 					filelist.AppendFormat ("\"{0}\" ", f.FilePath);
 				}
-			}/// Build file list
+			}
 
 			// Just generate the c code.
 			string compiler_args = string.Format ("{0} {1} --ccode --basedir {2} --directory {3} ",
@@ -635,10 +635,10 @@ namespace MonoDevelop.ValaBinding
             {
                 // error isn't recognized but cannot ignore it because exitCode != 0
 				var errMsg = "";
-				if( errorOutput == null || errorOutput == "" ) 
-					errMsg = string.Format("Return code {0}. No error message provided", exitCode) ;
+				if (string.IsNullOrEmpty (errorOutput))
+					errMsg = string.Format ("Return code {0}. No error message provided", exitCode);
 				else
-					errMsg = errorOutput ;
+					errMsg = errorOutput;
 				cr.Errors.Add (new CompilerError () { ErrorText = errMsg });
             }
 
@@ -662,8 +662,8 @@ namespace MonoDevelop.ValaBinding
 		/// </param>
         public void Clean(ProjectFileCollection projectFiles, ValaProjectConfiguration configuration, IProgressMonitor monitor)
         {
-            /// Clean up intermediate files
-            /// These should only be generated for libraries, but we'll check for them in all cases
+            // Clean up intermediate files
+            // These should only be generated for libraries, but we'll check for them in all cases
             foreach (ProjectFile file in projectFiles)
             {
                 if (file.BuildAction == BuildAction.Compile)
@@ -689,27 +689,6 @@ namespace MonoDevelop.ValaBinding
 			if (Directory.Exists (output))
 				Directory.Delete (output, true);
         }
-		
-		/// <summary>
-		/// Determines whether the target needs to be updated
-		/// </summary>
-		/// <param name="projectFiles">
-		/// The project's files
-		/// <see cref="ProjectFileCollection"/>
-		/// </param>
-		/// <param name="target">
-		/// The target
-		/// <see cref="System.String"/>
-		/// </param>
-		/// <returns>
-		/// true if target needs to be updated
-		/// <see cref="System.Boolean"/>
-		/// </returns>
-		private bool NeedsUpdate (ProjectFileCollection projectFiles,
-								  string target)
-		{
-			return true;
-		}
 		
 		/// <summary>
 		/// Parses a compiler output string into CompilerResults

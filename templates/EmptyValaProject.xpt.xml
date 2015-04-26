@@ -6,11 +6,11 @@
 	
 	<!-- Template Header -->
 	<TemplateConfiguration>
-		<_Name>Empty Vala Project</_Name>
+		<_Name>Empty Project</_Name>
 		<_Category>Vala</_Category>
-		<Icon>md-project|res:vala-icon-32.png</Icon>
+		<Icon>md-project</Icon>
 		<LanguageName>Vala</LanguageName>
-		<_Description>Creates an empty Vala solution.</_Description>
+		<_Description>Creates an empty Vala project.</_Description>
 	</TemplateConfiguration>
 	
 	<!-- Template Content -->

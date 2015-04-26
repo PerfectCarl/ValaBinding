@@ -37,7 +37,7 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 		public List<Symbol> GetAllSymbolsForFile (string fileFullPath, SymbolType type)
 		{
 			List<Symbol> list = new List<Symbol> ();
-			IntPtr items = echo_project_get_all_symbols_for_file (instance, fileFullPath,type);
+			IntPtr items = echo_project_get_all_symbols_for_file (instance, fileFullPath, type);
 
 			if (IntPtr.Zero != items) {
 				list = new ValaList (items).ToTypedList (item => new Symbol (item));
@@ -46,7 +46,8 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 			return list;
 		}
 
-		internal List<Symbol> GetSymbolsForFile (string fileFullPath) {
+		internal List<Symbol> GetSymbolsForFile (string fileFullPath)
+		{
 			List<Symbol> list = new List<Symbol> ();
 			IntPtr items = echo_project_get_symbols_for_file (instance, fileFullPath);
 
@@ -57,35 +58,35 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 			return list;
 		}
 
-		public Symbol GetSymbolAtPosition (string symbolName, string fileFullPath, int line, int column)
+		public Symbol GetEnclosingSymbolAtPosition (string fileFullPath, int line, int column)
 		{
-			IntPtr item = echo_project_get_symbol_at_position (instance, symbolName, fileFullPath, line, column);
-			return (IntPtr.Zero == item)? null: new Symbol (item);
+			IntPtr item = echo_project_get_enclosing_symbol_at_position (instance, fileFullPath, line, column);
+			return (IntPtr.Zero == item) ? null : new Symbol (item);
 		}
-			
+
 		#region P/Invokes
 
 		IntPtr instance;
 
-		[DllImport("libecho")]
+		[DllImport ("libecho")]
 		static extern IntPtr echo_project_new ();
 
-		[DllImport("libecho")]
+		[DllImport ("libecho")]
 		static extern void echo_project_add_external_package (IntPtr instance, string package);
 
-		[DllImport("libecho")]
+		[DllImport ("libecho")]
 		static extern void echo_project_add_file (IntPtr instance, string file_path);
 
-		[DllImport("libecho")]
+		[DllImport ("libecho")]
 		static extern void echo_project_update_sync (IntPtr instance);
 
-		[DllImport("libecho")]
+		[DllImport ("libecho")]
 		static extern IntPtr echo_project_get_symbols_for_file (IntPtr instance, string file_path);
 
-		[DllImport("libecho")]
-		static extern IntPtr echo_project_get_symbol_at_position (IntPtr instance, string symbol_name, string file_full_path, int line, int column);
+		[DllImport ("libecho")]
+		static extern IntPtr echo_project_get_enclosing_symbol_at_position (IntPtr instance, string file_full_path, int line, int column);
 
-		[DllImport("libecho")]
+		[DllImport ("libecho")]
 		static extern IntPtr echo_project_get_all_symbols_for_file (IntPtr instance, string file_full_path, SymbolType type);
 
 

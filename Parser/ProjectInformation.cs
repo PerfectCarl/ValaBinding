@@ -65,7 +65,7 @@ namespace MonoDevelop.ValaBinding.Parser
 			}*/
 			Completion = new TextCompletion (this, engine, echoProject); 
 		}
-		
+
 
 		/// <summary>
 		/// Adds a file to be parsed
@@ -74,11 +74,12 @@ namespace MonoDevelop.ValaBinding.Parser
 		{
 
 			LoggingService.LogDebug ("Adding file {0}", filename);
-			if( engine != null )
+			if (engine != null)
 				engine.QueueSourcefile (filename, filename.EndsWith (".vapi", StringComparison.OrdinalIgnoreCase), false);
 			if (echoProject != null)
 				echoProject.AddFile (filename);
-		}// AddFile
+		}
+		// AddFile
 
 		/// <summary>
 		/// Removes a file from the parse list
@@ -86,7 +87,8 @@ namespace MonoDevelop.ValaBinding.Parser
 		public void RemoveFile (string filename)
 		{
 			// Not currently possible with Afrodite completion engine
-		}// RemoveFile
+		}
+		// RemoveFile
 
 		/// <summary>
 		/// Adds a package to be parsed
@@ -107,33 +109,34 @@ namespace MonoDevelop.ValaBinding.Parser
 			
 			foreach (string path in Afrodite.Utils.GetPackagePaths (packagename)) {
 				LoggingService.LogDebug ("AddPackage: Queueing {0} for package {1}", path, packagename);
-				if( engine != null ) 
+				if (engine != null)
 					engine.QueueSourcefile (path, true, false);
 				if (echoProject != null)
 					echoProject.AddExternalPackage (packagename);
 			}
-		}// AddPackage
+		}
+		// AddPackage
 
 		[Obsolete]
 		internal Afrodite.Symbol GetFunction (string name, string filename, int line, int column)
 		{
 			// if (!DepsInstalled){ return null; }
-			if( engine != null )
-			using (Afrodite.CodeDom parseTree = engine.TryAcquireCodeDom ()) {
-				if (null != parseTree) {
-					LoggingService.LogDebug ("GetFunction: Looking up symbol at {0}:{1}:{2}", filename, line, column);
-					Afrodite.Symbol symbol = parseTree.GetSymbolForNameAndPath (name, filename, line, column);
-					LoggingService.LogDebug ("GetFunction: Got {0}", (null == symbol)? "null": symbol.Name);
-					return symbol;
-				} else {
-					LoggingService.LogDebug ("GetFunction: Unable to acquire codedom");
+			if (engine != null)
+				using (Afrodite.CodeDom parseTree = engine.TryAcquireCodeDom ()) {
+					if (null != parseTree) {
+						LoggingService.LogDebug ("GetFunction: Looking up symbol at {0}:{1}:{2}", filename, line, column);
+						Afrodite.Symbol symbol = parseTree.GetSymbolForNameAndPath (name, filename, line, column);
+						LoggingService.LogDebug ("GetFunction: Got {0}", (null == symbol) ? "null" : symbol.Name);
+						return symbol;
+					} else {
+						LoggingService.LogDebug ("GetFunction: Unable to acquire codedom");
+					}
 				}
-			}
 
 			return null;
 		}
 
-		internal Echo.Symbol GetSymbolAtPosition (string symbolName, string fileFullPath, int line, int column)
+		internal Echo.Symbol GetEnclosingSymbolAtPosition (string fileFullPath, int line, int column)
 		{
 			/*if( engine != null )
 				using (Afrodite.CodeDom parseTree = engine.TryAcquireCodeDom ()) {
@@ -146,7 +149,7 @@ namespace MonoDevelop.ValaBinding.Parser
 						LoggingService.LogDebug ("GetFunction: Unable to acquire codedom");
 					}
 				}*/
-			return echoProject.GetSymbolAtPosition (symbolName, fileFullPath, line, column);
+			return echoProject.GetEnclosingSymbolAtPosition (fileFullPath, line, column);
 
 			//return null;
 		}
@@ -159,7 +162,7 @@ namespace MonoDevelop.ValaBinding.Parser
 		{
 
 			// if (!DepsInstalled){ return symbol; }
-			if( engine != null )
+			if (engine != null)
 				using (Afrodite.CodeDom parseTree = engine.TryAcquireCodeDom ()) {
 					if (null != parseTree) {
 						LoggingService.LogDebug ("GetExpressionType: Looking up symbol at {0}:{1}:{2}", filename, line, column);
@@ -174,7 +177,8 @@ namespace MonoDevelop.ValaBinding.Parser
 				}
 
 			return symbol;
-		}// GetExpressionType
+		}
+		// GetExpressionType
 		
 		/// <summary>
 		/// Get overloads for a method
@@ -184,7 +188,7 @@ namespace MonoDevelop.ValaBinding.Parser
 		{
 			List<Afrodite.Symbol> overloads = new List<Afrodite.Symbol> ();
 			// if (!DepsInstalled){ return overloads; }
-			if( engine != null )
+			if (engine != null)
 				using (Afrodite.CodeDom parseTree = engine.TryAcquireCodeDom ()) {
 					if (null != parseTree) {
 						Afrodite.Symbol symbol = parseTree.GetSymbolForNameAndPath (name, filename, line, column);
@@ -195,13 +199,14 @@ namespace MonoDevelop.ValaBinding.Parser
 				}
 			
 			return overloads;
-		}// GetOverloads
+		}
+		// GetOverloads
 
 		[Obsolete]
 		internal List<Afrodite.Symbol> GetRootSymbolsForFile (string file)
 		{
 			var symbols = GetSymbolsForFile (file /*topContainers*/);
-			var result = new List<Symbol>();
+			var result = new List<Symbol> ();
 			foreach (var symbol in symbols) {
 				if (symbol.IsRoot)
 					result.Add (symbol);
@@ -209,7 +214,7 @@ namespace MonoDevelop.ValaBinding.Parser
 			return result;
 		}
 
-		bool projectUpdated = false ; 
+		bool projectUpdated = false;
 
 		internal List<Echo.Symbol> GetRootSymbolsForFileEcho (string file)
 		{
@@ -219,7 +224,7 @@ namespace MonoDevelop.ValaBinding.Parser
 				projectUpdated = true; 
 			}
 			var symbols = echoProject.GetSymbolsForFile (file);
-			var result = new List<Echo.Symbol>();
+			var result = new List<Echo.Symbol> ();
 			foreach (var symbol in symbols) {
 				result.Add (symbol);
 			}
@@ -236,21 +241,23 @@ namespace MonoDevelop.ValaBinding.Parser
 		/// A <see cref="IEnumerable<System.String>"/>: The types of symbols to allow. If null or missing all the symbols are allowed
 		/// </param>
 		[Obsolete]
-		internal List<Afrodite.Symbol> GetSymbolsForFile (string file, IEnumerable<string> desiredTypes = null )
+		internal List<Afrodite.Symbol> GetSymbolsForFile (string file, IEnumerable<string> desiredTypes = null)
 		{
 			List<Afrodite.Symbol> symbols = null;
 			List<Afrodite.Symbol> classes = new List<Afrodite.Symbol> ();
 			
-			if (engine == null){ return classes; }
+			if (engine == null) {
+				return classes;
+			}
 
 			using (Afrodite.CodeDom parseTree = engine.TryAcquireCodeDom ()) {
-				if (null != parseTree){
+				if (null != parseTree) {
 					Afrodite.SourceFile sourceFile = parseTree.LookupSourceFile (file);
 					if (null != sourceFile) {
 						symbols = sourceFile.Symbols;
 						if (null != symbols) {
 							foreach (Afrodite.Symbol symbol in symbols) {
-									if (desiredTypes == null )
+								if (desiredTypes == null)
 									classes.Add (symbol);
 								else {
 									foreach (string containerType in desiredTypes) {

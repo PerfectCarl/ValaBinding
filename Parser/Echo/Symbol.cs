@@ -15,7 +15,8 @@ using MonoDevelop.Ide.Gui;
 namespace MonoDevelop.ValaBinding.Parser.Echo
 {
 	// From echo api
-	public enum SymbolAccessibility {
+	public enum SymbolAccessibility
+	{
 		Private = 0x1,
 		Internal = 0x2,
 		Protected = 0x4,
@@ -26,7 +27,7 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 	public enum SymbolType
 	{
 		FILE = 0x1,
-		NAMESPACE  = 0x2,
+		NAMESPACE = 0x2,
 		CLASS = 0x4,
 		CONSTRUCTOR = 0x8,
 		DESTRUCTOR = 0xF,
@@ -36,8 +37,9 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 		STRUCT = 0x100,
 		PROPERTY = 0x200,
 		FIELD = 0x400,
-		SIGNAL  = 0x800
+		SIGNAL = 0x800
 	}
+
 	/// <summary>
 	/// Represents a Vala symbol
 	/// </summary>
@@ -67,7 +69,7 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 		public SourceReference Declaration {
 			get {
 				IntPtr ptr = echo_symbol_get_declaration (instance);
-				return (IntPtr.Zero == ptr)? null: new SourceReference (ptr);
+				return (IntPtr.Zero == ptr) ? null : new SourceReference (ptr);
 			}
 		}
 
@@ -104,9 +106,10 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 			get { 
 				if (Parent == null)
 					return true;
-				return Parent.Name == null ; 
+				return Parent.Name == null; 
 			}
 		}
+
 		/// <summary>
 		/// The fully qualified name of this symbol
 		/// </summary>
@@ -120,7 +123,7 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 		public Symbol Parent {
 			get {
 				IntPtr parent = echo_symbol_get_parent (instance);
-				return (IntPtr.Zero == parent)? null: new Symbol (parent);
+				return (IntPtr.Zero == parent) ? null : new Symbol (parent);
 			}
 		}
 
@@ -163,7 +166,9 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 				IntPtr parameters = echo_symbol_get_parameters (instance);
 
 				if (IntPtr.Zero != parameters) {
-					list = new ValaList (parameters).ToTypedList (delegate (IntPtr item){ return new DataType (item); });
+					list = new ValaList (parameters).ToTypedList (delegate (IntPtr item) {
+						return new DataType (item);
+					});
 				}
 
 				return list;
@@ -185,9 +190,9 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 				StringBuilder text = new StringBuilder (Name);
 				List<DataType> parameters = Parameters;
 				if (0 < parameters.Count) {
-					text.AppendFormat ("({0} {1}", parameters[0].TypeName, Parameters[0].Name);
+					text.AppendFormat (" ({0} {1}", parameters [0].TypeName, Parameters [0].Name);
 					for (int i = 1; i < parameters.Count; i++) {
-						text.AppendFormat (", {0} {1}", parameters[i].TypeName, Parameters[i].Name);
+						text.AppendFormat (", {0} {1}", parameters [i].TypeName, Parameters [i].Name);
 					}
 					text.AppendFormat (")");
 				}
@@ -197,6 +202,20 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 
 				return text.ToString ();
 			}
+		}
+
+		public override bool Equals (object obj)
+		{
+			if (obj == null || GetType () != obj.GetType ())
+				return false;
+
+			Symbol symbol = (Symbol)obj;
+			return this.Declaration.Equals (symbol.Declaration);
+		}
+
+		public override int GetHashCode ()
+		{
+			return new { FullyQualifiedName }.GetHashCode ();
 		}
 
 		#region Icons
@@ -285,28 +304,28 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 
 		IntPtr instance;
 
-		[DllImport("libecho")]
+		[DllImport ("libecho")]
 		static extern IntPtr echo_symbol_get_name (IntPtr instance);
 
-		[DllImport("libecho")]
+		[DllImport ("libecho")]
 		static extern int echo_symbol_get_symbol_type (IntPtr instance);
 
-		[DllImport("libecho")]
+		[DllImport ("libecho")]
 		static extern IntPtr echo_symbol_get_children (IntPtr instance);
 
-		[DllImport("libecho")]
+		[DllImport ("libecho")]
 		static extern IntPtr echo_symbol_get_parent (IntPtr instance);
 
-		[DllImport("libecho")]
+		[DllImport ("libecho")]
 		static extern IntPtr echo_symbol_get_fully_qualified_name (IntPtr instance);
 
-		[DllImport("libecho")]
+		[DllImport ("libecho")]
 		static extern int echo_symbol_get_access_type (IntPtr instance);
 
-		[DllImport("libecho")]
+		[DllImport ("libecho")]
 		static extern IntPtr echo_symbol_get_parameters (IntPtr instance);
 
-		[DllImport("libecho")]
+		[DllImport ("libecho")]
 		static extern IntPtr echo_symbol_get_declaration (IntPtr instance);
 
 		//[DllImport("libecho")]
