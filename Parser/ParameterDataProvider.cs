@@ -62,7 +62,7 @@ namespace MonoDevelop.ValaBinding
 				functions.Add (function);
 			}
 		}
-// member function constructor
+		// member function constructor
 
 		/// <summary>
 		/// Create a ParameterDataProvider for a constructor
@@ -88,7 +88,7 @@ namespace MonoDevelop.ValaBinding
 
 			functions = myfunctions;
 		}
-// constructor constructor
+		// constructor constructor
 
 		public override int Count {
 			get {
@@ -242,7 +242,7 @@ namespace MonoDevelop.ValaBinding
 		}
 	}
 
-	internal class ValaCompletionDataList : CompletionDataList, IMutableCompletionDataList
+	public class ValaCompletionDataList : CompletionDataList, IMutableCompletionDataList
 	{
 		public ValaCompletionDataList ()
 			: base ()
@@ -298,7 +298,7 @@ namespace MonoDevelop.ValaBinding
 		{
 		}
 	}
-// ValaCompletionDataList
+	// ValaCompletionDataList
 
 	internal class ValaCompletionCategory : CompletionCategory
 	{

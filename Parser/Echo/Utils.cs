@@ -6,10 +6,27 @@
 //
 // Copyright (c) 2015 cran
 //
+using System.Collections.Generic;
+using System;
+using System.Runtime.InteropServices;
+
 namespace MonoDevelop.ValaBinding.Parser.Echo
 {
 	public class Utils
 	{
+
+		public static List<string> GetPackagePaths (string package)
+		{
+			List<string> list = new List<string> ();
+			IntPtr paths = echo_utils_get_package_paths (package, IntPtr.Zero, null);
+			if (IntPtr.Zero != paths)
+				list = new ValaList (paths).ToTypedList (delegate(IntPtr item) {
+					return Marshal.PtrToStringAuto (item);
+				});
+
+			return list;
+		}
+
 		public static string GetTypeDescription (SymbolType type)
 		{
 			/*switch (type) {
@@ -90,7 +107,12 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 			default:
 				return type.ToString ();
 			}
-		}	
+		}
+
+		[DllImport ("libecho")]
+		static extern IntPtr echo_utils_get_package_paths (string package, IntPtr codeContext, string[] vapiDirs);
+
 	}
+
 }
 

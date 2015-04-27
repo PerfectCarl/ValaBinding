@@ -444,7 +444,7 @@ namespace MonoDevelop.ValaBinding
 					dontJumpToDeclaration = true;
 					//var parentPath = path.Copy().Up();
 
-					treeview.ExpandToPath (path);
+					//treeview.ExpandToPath (path);
 					treeview.Selection.SelectIter (iter);
 					dontJumpToDeclaration = false;
 

@@ -64,6 +64,11 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 			return (IntPtr.Zero == item) ? null : new Symbol (item);
 		}
 
+		public CompletionReport complete (string fileFullPath, string lineText, char completionChar, int line, int column)
+		{
+			return new CompletionReport ();
+		}
+
 		#region P/Invokes
 
 		IntPtr instance;

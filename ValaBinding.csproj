@@ -92,6 +92,17 @@
     <None Include="CHANGELOG.md" />
     <None Include="README.md" />
     <None Include="Parser\ValaOutlineComparer.cs" />
+    <None Include="Parser\Afrodite\Symbol.cs" />
+    <None Include="Parser\Afrodite\CodeDom.cs" />
+    <None Include="Parser\Afrodite\DataType.cs" />
+    <None Include="Parser\Afrodite\ValaList.cs" />
+    <None Include="Parser\Afrodite\SourceFile.cs" />
+    <None Include="Parser\Afrodite\SourceReference.cs" />
+    <None Include="Parser\Afrodite\Utils.cs" />
+    <None Include="Parser\Afrodite\Query.cs" />
+    <None Include="Parser\Afrodite\CompletionEngine.cs" />
+    <None Include="Parser\Afrodite\ValaEnumerator.cs" />
+    <None Include="Parser\Afrodite\CodeDomDumper.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="ValaBinding.addin.xml" />
@@ -217,17 +228,6 @@
     <Compile Include="Gui\DataProvider.cs" />
     <Compile Include="AddinInfo.cs" />
     <Compile Include="Parser\ValaOutlineExtension.cs" />
-    <Compile Include="Parser\Afrodite\Symbol.cs" />
-    <Compile Include="Parser\Afrodite\CodeDom.cs" />
-    <Compile Include="Parser\Afrodite\DataType.cs" />
-    <Compile Include="Parser\Afrodite\ValaList.cs" />
-    <Compile Include="Parser\Afrodite\SourceFile.cs" />
-    <Compile Include="Parser\Afrodite\SourceReference.cs" />
-    <Compile Include="Parser\Afrodite\Utils.cs" />
-    <Compile Include="Parser\Afrodite\Query.cs" />
-    <Compile Include="Parser\Afrodite\CompletionEngine.cs" />
-    <Compile Include="Parser\Afrodite\ValaEnumerator.cs" />
-    <Compile Include="Parser\Afrodite\CodeDomDumper.cs" />
     <Compile Include="Compiler\FastValaCompiler.cs" />
     <Compile Include="Parser\Echo\Symbol.cs" />
     <Compile Include="Parser\Echo\DataType.cs" />
@@ -239,6 +239,7 @@
     <Compile Include="Parser\TextCompletion.cs" />
     <Compile Include="Parser\ValaTextEditorExtension.cs" />
     <Compile Include="Parser\ParameterDataProvider.cs" />
+    <Compile Include="Parser\Echo\CompletionReport.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

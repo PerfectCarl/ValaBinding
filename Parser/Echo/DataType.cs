@@ -50,17 +50,23 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 					text.Append ("<");
 					List<DataType> parameters = GenericTypes;
 					if (parameters != null && parameters.Count > 0) {
-						text.Append (parameters[0].TypeName);
+						text.Append (parameters [0].TypeName);
 						for (int i = 0; i < parameters.Count; i++) {
-							text.AppendFormat (",{0}", parameters[i].TypeName);
+							text.AppendFormat (",{0}", parameters [i].TypeName);
 						}
 					}
 					text.Append (">");
 				}
 
-				if (IsArray) { text.Append ("[]"); }
-				if (IsNullable){ text.Append ("?"); }
-				if (IsPointer){ text.Append ("*"); }
+				if (IsArray) {
+					text.Append ("[]");
+				}
+				if (IsNullable) {
+					text.Append ("?");
+				}
+				if (IsPointer) {
+					text.Append ("*");
+				}
 
 				return text.ToString ();
 			}
@@ -72,7 +78,7 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 		public Symbol Symbol {
 			get {
 				IntPtr symbol = echo_data_type_get_symbol (instance);
-				return (IntPtr.Zero == symbol)? null: new Symbol (symbol);
+				return (IntPtr.Zero == symbol) ? null : new Symbol (symbol);
 			}
 		}
 
@@ -138,34 +144,34 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 
 		IntPtr instance;
 
-		[DllImport("libecho")]
+		[DllImport ("libecho")]
 		static extern IntPtr echo_data_type_get_type_name (IntPtr instance);
 
-		[DllImport("libecho")]
+		[DllImport ("libecho")]
 		static extern IntPtr echo_data_type_get_name (IntPtr instance);
 
-		[DllImport("libecho")]
+		[DllImport ("libecho")]
 		static extern IntPtr echo_data_type_get_symbol (IntPtr instance);
 
-		[DllImport("libecho")]
+		[DllImport ("libecho")]
 		static extern IntPtr echo_data_type_get_generic_types (IntPtr instance);
 
-		[DllImport("libecho")]
+		[DllImport ("libecho")]
 		static extern bool echo_data_type_get_is_array (IntPtr instance);
 
-		[DllImport("libecho")]
+		[DllImport ("libecho")]
 		static extern bool echo_data_type_get_is_pointer (IntPtr instance);
 
-		[DllImport("libecho")]
+		[DllImport ("libecho")]
 		static extern bool echo_data_type_get_is_nullable (IntPtr instance);
 
-		[DllImport("libecho")]
+		[DllImport ("libecho")]
 		static extern bool echo_data_type_get_is_out (IntPtr instance);
 
-		[DllImport("libecho")]
+		[DllImport ("libecho")]
 		static extern bool echo_data_type_get_is_ref (IntPtr instance);
 
-		[DllImport("libecho")]
+		[DllImport ("libecho")]
 		static extern bool echo_data_type_get_is_generic (IntPtr instance);
 
 

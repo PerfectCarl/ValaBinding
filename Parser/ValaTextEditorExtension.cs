@@ -46,27 +46,25 @@ using MonoDevelop.Ide.TypeSystem;
 
 namespace MonoDevelop.ValaBinding
 {
-    public class ValaTextEditorExtension : CompletionTextEditorExtension, IPathedDocument
-    {
-        // Allowed chars to be next to an identifier
-        private static char[] allowedChars = new char[] { ' ', '\t', '\r', '\n', 
+	public class ValaTextEditorExtension : CompletionTextEditorExtension, IPathedDocument
+	{
+		// Allowed chars to be next to an identifier
+		private static char[] allowedChars = new char[] { ' ', '\t', '\r', '\n', 
 			':', '=', '*', '+', '-', '/', '%', ',', '&',
 			'|', '^', '{', '}', '[', ']', '(', ')', '\n', '!', '?', '<', '>'
 		};
 
-        private static char[] operators = new char[] {
+		private static char[] operators = new char[] {
 			'=', '+', '-', ',', '&', '|',
 			'^', '[', '!', '?', '<', '>', ':'
 		};
 
-        private ProjectInformation ProjectInfo
-        {
-            get
-            {
-                ValaProject project = Document.Project as ValaProject;
-                return (null == project) ? null : ProjectInformationManager.Instance.Get(project);
-            }
-        }
+		private ProjectInformation ProjectInfo {
+			get {
+				ValaProject project = Document.Project as ValaProject;
+				return (null == project) ? null : ProjectInformationManager.Instance.Get (project);
+			}
+		}
 
 		private TextCompletion Completion {
 			get {
@@ -74,26 +72,23 @@ namespace MonoDevelop.ValaBinding
 			}
 		}
 
-        protected Mono.TextEditor.TextEditorData textEditorData { get; set; }
+		protected Mono.TextEditor.TextEditorData textEditorData { get; set; }
 
-        public override bool KeyPress(Gdk.Key key, char keyChar, Gdk.ModifierType modifier)
-        {
-            string lineText = Editor.GetLineText(Editor.Caret.Line);
+		public override bool KeyPress (Gdk.Key key, char keyChar, Gdk.ModifierType modifier)
+		{
+			string lineText = Editor.GetLineText (Editor.Caret.Line);
 
-            // smart formatting strategy
-            if (Document.Editor.Options.IndentStyle == IndentStyle.Smart ||
-                Document.Editor.Options.IndentStyle == IndentStyle.Virtual)
-            {
-                if (key == Gdk.Key.Return)
-                {
-                    if (lineText.TrimEnd().EndsWith("{"))
-                    {
-                        Editor.InsertAtCaret("\n" + Document.Editor.Options.IndentationString + Editor.Document.GetLineIndent(Editor.Caret.Line));
-                        return false;
-                    }
-                }
-                // TODO: The '}' is invisible before next key press
-                /*else if (keyChar == '}' && AllWhiteSpace(lineText)
+			// smart formatting strategy
+			if (Document.Editor.Options.IndentStyle == IndentStyle.Smart ||
+			    Document.Editor.Options.IndentStyle == IndentStyle.Virtual) {
+				if (key == Gdk.Key.Return) {
+					if (lineText.TrimEnd ().EndsWith ("{")) {
+						Editor.InsertAtCaret ("\n" + Document.Editor.Options.IndentationString + Editor.Document.GetLineIndent (Editor.Caret.Line));
+						return false;
+					}
+				}
+				// TODO: The '}' is invisible before next key press
+				/*else if (keyChar == '}' && AllWhiteSpace(lineText)
                   && lineText.StartsWith(Document.Editor.Options.IndentationString))
                 {
                     if (lineText.Length > 0)
@@ -102,23 +97,30 @@ namespace MonoDevelop.ValaBinding
                     Editor.Replace(lineSegment.Offset, lineSegment.Length, lineText + "}");
                     return false;
                 }*/
-            }
+			}
 
-            return base.KeyPress(key, keyChar, modifier);
-        }
+			return base.KeyPress (key, keyChar, modifier);
+		}
 
-        /// <summary>
-        /// Expression to match instance construction/initialization
-        /// </summary>
-        private static Regex initializationRegex = new Regex(@"(((?<typename>\w[\w\d\.<>]*)\s+)?(?<variable>\w[\w\d]*)\s*=\s*)?new\s*(?<constructor>\w[\w\d\.<>]*)?", RegexOptions.Compiled);
+		/// <summary>
+		/// Expression to match instance construction/initialization
+		/// </summary>
+		private static Regex initializationRegex = new Regex (@"(((?<typename>\w[\w\d\.<>]*)\s+)?(?<variable>\w[\w\d]*)\s*=\s*)?new\s*(?<constructor>\w[\w\d\.<>]*)?", RegexOptions.Compiled);
 
-        public override ICompletionDataList HandleCodeCompletion(CodeCompletionContext completionContext, char completionChar, ref int triggerWordLength)
-        {
-            string lineText = null;
-            //ProjectInformation parser = ProjectInfo;
-            var loc = Editor.Document.OffsetToLocation(completionContext.TriggerOffset);
-            int line = loc.Line, column = loc.Column;
-            switch (completionChar)
+		public override ICompletionDataList HandleCodeCompletion (CodeCompletionContext completionContext, char completionChar, ref int triggerWordLength)
+		{
+			//ProjectInformation parser = ProjectInfo;
+			var loc = Editor.Document.OffsetToLocation (completionContext.TriggerOffset);
+			int line = loc.Line, column = loc.Column;
+			string lineText = Editor.GetLineText (line); 
+
+			var result = new ValaCompletionDataList ();
+
+			ThreadPool.QueueUserWorkItem (delegate {
+				ProjectInfo.complete (result, Document.FileName, lineText, completionChar, line, column);
+			}); 
+			return result; 
+			/*switch (completionChar)
             {
                 case '.': // foo.[complete]
                     lineText = Editor.GetLineText(line);
@@ -169,230 +171,216 @@ namespace MonoDevelop.ValaBinding
                     }
                     break;
             }
+			*/
+			return null;
+		}
 
-            return null;
-        }
+		/*static string GetTrailingSymbol (string text)
+		{
+			// remove the trailing '.'
+			if (text.EndsWith (".", StringComparison.Ordinal))
+				text = text.Substring (0, text.Length - 1);
 
-        static string GetTrailingSymbol(string text)
-        {
-            // remove the trailing '.'
-            if (text.EndsWith(".", StringComparison.Ordinal))
-                text = text.Substring(0, text.Length - 1);
+			int nameStart = text.LastIndexOfAny (allowedChars);
+			return text.Substring (nameStart + 1).Trim ();
+		}*/
 
-            int nameStart = text.LastIndexOfAny(allowedChars);
-            return text.Substring(nameStart + 1).Trim();
-        }
+		/// <summary>
+		/// Perform constructor-specific completion
+		/// </summary>
+		/*private ValaCompletionDataList CompleteConstructor (string lineText, int line, int column)
+		{
+			//ProjectInformation parser = ProjectInfo;
+			Match match = initializationRegex.Match (lineText);
+			var list = new ValaCompletionDataList ();
 
-        /// <summary>
-        /// Perform constructor-specific completion
-        /// </summary>
-        private ValaCompletionDataList CompleteConstructor(string lineText, int line, int column)
-        {
-            //ProjectInformation parser = ProjectInfo;
-            Match match = initializationRegex.Match(lineText);
-            var list = new ValaCompletionDataList();
+			ThreadPool.QueueUserWorkItem (delegate {
+				if (match.Success) {
+					// variable initialization
+					if (match.Groups ["typename"].Success || "var" != match.Groups ["typename"].Value) {
+						// simultaneous declaration and initialization
+						Completion.GetConstructorsForType (match.Groups ["typename"].Value, Document.FileName, line, column, list);
+					} else if (match.Groups ["variable"].Success) {
+						// initialization of previously declared variable
+						Completion.GetConstructorsForExpression (match.Groups ["variable"].Value, Document.FileName, line, column, list);
+					}
+					if (0 == list.Count) {
+						// Fallback to known types
+						Completion.GetTypesVisibleFrom (Document.FileName, line, column, list);
+					}
+				}
+			});
 
-            ThreadPool.QueueUserWorkItem(delegate
-            {
-                if (match.Success)
-                {
-                    // variable initialization
-                    if (match.Groups["typename"].Success || "var" != match.Groups["typename"].Value)
-                    {
-                        // simultaneous declaration and initialization
-							Completion.GetConstructorsForType(match.Groups["typename"].Value, Document.FileName, line, column, list);
-                    }
-                    else if (match.Groups["variable"].Success)
-                    {
-                        // initialization of previously declared variable
-							Completion.GetConstructorsForExpression(match.Groups["variable"].Value, Document.FileName, line, column, list);
-                    }
-                    if (0 == list.Count)
-                    {
-                        // Fallback to known types
-							Completion.GetTypesVisibleFrom(Document.FileName, line, column, list);
-                    }
-                }
-            });
+			return list;
+		}*/
+		// CompleteConstructor
 
-            return list;
-        }// CompleteConstructor
+		public override ICompletionDataList CodeCompletionCommand (
+			CodeCompletionContext completionContext)
+		{
+			if (null == (Document.Project as ValaProject)) {
+				return null;
+			}
 
-        public override ICompletionDataList CodeCompletionCommand(
-            CodeCompletionContext completionContext)
-        {
-            if (null == (Document.Project as ValaProject)) { return null; }
+			int pos = completionContext.TriggerOffset;
+			int triggerWordLength = completionContext.TriggerWordLength;
 
-            int pos = completionContext.TriggerOffset;
-            int triggerWordLength = completionContext.TriggerWordLength;
+			ICompletionDataList list = HandleCodeCompletion (completionContext, Editor.GetCharAt (pos), ref triggerWordLength);
+			if (null == list) {
+				list = GlobalComplete (completionContext);
+			}
+			return list;
+		}
 
-            ICompletionDataList list = HandleCodeCompletion(completionContext, Editor.GetCharAt(pos), ref triggerWordLength);
-            if (null == list)
-            {
-                list = GlobalComplete(completionContext);
-            }
-            return list;
-        }
+		/// <summary>
+		/// Get the members of a symbol
+		/// </summary>
+		/*private ValaCompletionDataList GetMembersOfItem (string itemFullName, int line, int column)
+		{
+			//ProjectInformation info = ProjectInfo;
+			if (null == ProjectInfo) {
+				return null;
+			}
 
-        /// <summary>
-        /// Get the members of a symbol
-        /// </summary>
-        private ValaCompletionDataList GetMembersOfItem(string itemFullName, int line, int column)
-        {
-            //ProjectInformation info = ProjectInfo;
-			if (null == ProjectInfo) { return null; }
+			ValaCompletionDataList list = new ValaCompletionDataList ();
+			ThreadPool.QueueUserWorkItem (delegate {
+				ProjectInfo.Completion.Complete (itemFullName, Document.FileName, line, column, list);
+			});
+			return list;
+		}
+*/
+		/// <summary>
+		/// Complete all symbols visible from a given location
+		/// </summary>
+		private ValaCompletionDataList GlobalComplete (CodeCompletionContext context)
+		{
+			//ProjectInformation info = ProjectInfo;
+			if (null == ProjectInfo) {
+				return null;
+			}
 
-            ValaCompletionDataList list = new ValaCompletionDataList();
-            ThreadPool.QueueUserWorkItem(delegate
-            {
-				ProjectInfo.Completion.Complete(itemFullName, Document.FileName, line, column, list);
-            });
-            return list;
-        }
+			ValaCompletionDataList list = new ValaCompletionDataList ();
+			var loc = Editor.Document.OffsetToLocation (context.TriggerOffset);
+			ThreadPool.QueueUserWorkItem (delegate {
+				ProjectInfo.Completion.GetSymbolsVisibleFrom (Document.FileName, loc.Line + 1, loc.Column + 1, list);
+			});
+			return list;
+		}
 
-        /// <summary>
-        /// Complete all symbols visible from a given location
-        /// </summary>
-        private ValaCompletionDataList GlobalComplete(CodeCompletionContext context)
-        {
-            //ProjectInformation info = ProjectInfo;
-			if (null == ProjectInfo) { return null; }
+		public override MonoDevelop.Ide.CodeCompletion.ParameterDataProvider HandleParameterCompletion (
+			CodeCompletionContext completionContext, char completionChar)
+		{
+			if (completionChar != '(')
+				return null;
 
-            ValaCompletionDataList list = new ValaCompletionDataList();
-            var loc = Editor.Document.OffsetToLocation(context.TriggerOffset);
-            ThreadPool.QueueUserWorkItem(delegate
-            {
-				ProjectInfo.Completion.GetSymbolsVisibleFrom(Document.FileName, loc.Line + 1, loc.Column + 1, list);
-            });
-            return list;
-        }
+			//ProjectInformation info = ProjectInfo;
+			if (null == ProjectInfo) {
+				return null;
+			}
 
-        public override MonoDevelop.Ide.CodeCompletion.ParameterDataProvider HandleParameterCompletion(
-            CodeCompletionContext completionContext, char completionChar)
-        {
-            if (completionChar != '(')
-                return null;
+			int position = Editor.Document.GetLine (Editor.Caret.Line).Offset;
+			string lineText = Editor.GetTextBetween (position, Editor.Caret.Offset - 1).TrimEnd ();
+			string functionName = string.Empty;
 
-            //ProjectInformation info = ProjectInfo;
-			if (null == ProjectInfo) { return null; }
+			Match match = initializationRegex.Match (lineText);
+			if (match.Success && match.Groups ["constructor"].Success) {
+				string[] tokens = match.Groups ["constructor"].Value.Split ('.');
+				string overload = tokens [tokens.Length - 1];
+				string typename = (match.Groups ["typename"].Success ? match.Groups ["typename"].Value : null);
+				int index = 0;
 
-            int position = Editor.Document.GetLine(Editor.Caret.Line).Offset;
-            string lineText = Editor.GetTextBetween(position, Editor.Caret.Offset - 1).TrimEnd();
-            string functionName = string.Empty;
+				if (1 == tokens.Length || null == typename) {
+					// Ideally if typename is null and token length is longer than 1, 
+					// we have an expression like: var w = new x.y.z(); and 
+					// we would check whether z is the type or if y.z is an overload for type y
+					typename = overload;
+				} else if ("var".Equals (typename, StringComparison.Ordinal)) {
+					typename = match.Groups ["constructor"].Value;
+				} else {
+					// Foo.Bar bar = new Foo.Bar.blah( ...
+					for (string[] typeTokens = typename.Split ('.'); index < typeTokens.Length && index < tokens.Length; ++index) {
+						if (!typeTokens [index].Equals (tokens [index], StringComparison.Ordinal)) {
+							break;
+						}
+					}
+					List<string> overloadTokens = new List<string> ();
+					for (int i = index; i < tokens.Length; ++i) {
+						overloadTokens.Add (tokens [i]);
+					}
+					overload = string.Join (".", overloadTokens.ToArray ());
+				}
 
-            Match match = initializationRegex.Match(lineText);
-            if (match.Success && match.Groups["constructor"].Success)
-            {
-                string[] tokens = match.Groups["constructor"].Value.Split('.');
-                string overload = tokens[tokens.Length - 1];
-                string typename = (match.Groups["typename"].Success ? match.Groups["typename"].Value : null);
-                int index = 0;
+				// HACK: Generics
+				if (0 < (index = overload.IndexOf ("<", StringComparison.Ordinal))) {
+					overload = overload.Substring (0, index);
+				}
+				if (0 < (index = typename.IndexOf ("<", StringComparison.Ordinal))) {
+					typename = typename.Substring (0, index);
+				}
 
-                if (1 == tokens.Length || null == typename)
-                {
-                    // Ideally if typename is null and token length is longer than 1, 
-                    // we have an expression like: var w = new x.y.z(); and 
-                    // we would check whether z is the type or if y.z is an overload for type y
-                    typename = overload;
-                }
-                else if ("var".Equals(typename, StringComparison.Ordinal))
-                {
-                    typename = match.Groups["constructor"].Value;
-                }
-                else
-                {
-                    // Foo.Bar bar = new Foo.Bar.blah( ...
-                    for (string[] typeTokens = typename.Split('.'); index < typeTokens.Length && index < tokens.Length; ++index)
-                    {
-                        if (!typeTokens[index].Equals(tokens[index], StringComparison.Ordinal))
-                        {
-                            break;
-                        }
-                    }
-                    List<string> overloadTokens = new List<string>();
-                    for (int i = index; i < tokens.Length; ++i)
-                    {
-                        overloadTokens.Add(tokens[i]);
-                    }
-                    overload = string.Join(".", overloadTokens.ToArray());
-                }
+				// Console.WriteLine ("Constructor: type {0}, overload {1}", typename, overload);
+				return new ParameterDataProvider (Document, ProjectInfo, typename, overload);
+			}
 
-                // HACK: Generics
-                if (0 < (index = overload.IndexOf("<", StringComparison.Ordinal)))
-                {
-                    overload = overload.Substring(0, index);
-                }
-                if (0 < (index = typename.IndexOf("<", StringComparison.Ordinal)))
-                {
-                    typename = typename.Substring(0, index);
-                }
+			int nameStart = lineText.LastIndexOfAny (allowedChars) + 1;
+			functionName = lineText.Substring (nameStart).Trim ();
+			return (string.IsNullOrEmpty (functionName) ? null : new ParameterDataProvider (Document, ProjectInfo, functionName));
+		}
+		/*
+		private bool AllWhiteSpace (string lineText)
+		{
+			foreach (char c in lineText)
+				if (!char.IsWhiteSpace (c))
+					return false;
 
-                // Console.WriteLine ("Constructor: type {0}, overload {1}", typename, overload);
-				return new ParameterDataProvider(Document, ProjectInfo, typename, overload);
-            }
+			return true;
+		}
+*/
 
-            int nameStart = lineText.LastIndexOfAny(allowedChars) + 1;
-            functionName = lineText.Substring(nameStart).Trim();
-			return (string.IsNullOrEmpty(functionName) ? null : new ParameterDataProvider(Document, ProjectInfo, functionName));
-        }
+		#region IPathedDocument implementation
 
-        private bool AllWhiteSpace(string lineText)
-        {
-            foreach (char c in lineText)
-                if (!char.IsWhiteSpace(c))
-                    return false;
+		public event EventHandler<DocumentPathChangedEventArgs> PathChanged;
 
-            return true;
-        }
+		public Gtk.Widget CreatePathWidget (int index)
+		{
+			PathEntry[] path = CurrentPath;
+			if (null == path || 0 > index || path.Length <= index) {
+				return null;
+			}
 
-        #region IPathedDocument implementation
-        public event EventHandler<DocumentPathChangedEventArgs> PathChanged;
+			object tag = path [index].Tag;
+			DropDownBoxListWindow.IListDataProvider provider = null;
+			if (tag is ParsedDocument) {
+				provider = new CompilationUnitDataProvider (Document);
+			} else {
+				provider = new DataProvider (Document, tag, GetAmbience ());
+			}
 
-        public Gtk.Widget CreatePathWidget(int index)
-        {
-            PathEntry[] path = CurrentPath;
-            if (null == path || 0 > index || path.Length <= index)
-            {
-                return null;
-            }
+			DropDownBoxListWindow window = new DropDownBoxListWindow (provider);
+			window.SelectItem (tag);
+			return window;
+		}
 
-            object tag = path[index].Tag;
-            DropDownBoxListWindow.IListDataProvider provider = null;
-            if (tag is ParsedDocument)
-            {
-                provider = new CompilationUnitDataProvider(Document);
-            }
-            else
-            {
-                provider = new DataProvider(Document, tag, GetAmbience());
-            }
+		public PathEntry[] CurrentPath {
+			get;
+			private set;
+		}
 
-            DropDownBoxListWindow window = new DropDownBoxListWindow(provider);
-            window.SelectItem(tag);
-            return window;
-        }
+		protected virtual void OnPathChanged (DocumentPathChangedEventArgs args)
+		{
+			if (null != PathChanged) {
+				PathChanged (this, args);
+			}
+		}
 
-        public PathEntry[] CurrentPath
-        {
-            get;
-            private set;
-        }
+		#endregion
 
-        protected virtual void OnPathChanged(DocumentPathChangedEventArgs args)
-        {
-            if (null != PathChanged)
-            {
-                PathChanged(this, args);
-            }
-        }
-        #endregion
+		// Yoinked from C# binding
+		void UpdatePath (object sender, DocumentLocationEventArgs e)
+		{
+			// TODO:
 
-        // Yoinked from C# binding
-        void UpdatePath(object sender, DocumentLocationEventArgs e)
-        {
-            // TODO:
-
-            /*var unit = Document.CompilationUnit;
+			/*var unit = Document.CompilationUnit;
             if (unit == null)
                 return;
 
@@ -459,15 +447,17 @@ namespace MonoDevelop.ValaBinding
             var prev = CurrentPath;
             CurrentPath = result.ToArray();
             OnPathChanged(new DocumentPathChangedEventArgs(prev));*/
-        }
+		}
 
-        public override void Initialize()
-        {
-            base.Initialize();
-            textEditorData = Document.Editor;
-            UpdatePath(null, null);
-            textEditorData.Caret.PositionChanged += UpdatePath;
-            Document.DocumentParsed += delegate { UpdatePath(null, null); };
-        }
-    }
+		public override void Initialize ()
+		{
+			base.Initialize ();
+			textEditorData = Document.Editor;
+			UpdatePath (null, null);
+			textEditorData.Caret.PositionChanged += UpdatePath;
+			Document.DocumentParsed += delegate {
+				UpdatePath (null, null);
+			};
+		}
+	}
 }
