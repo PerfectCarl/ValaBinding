@@ -1,6 +1,6 @@
 # Vala addin for Monodevelop
 
-ValaBinding is a Vala language binding for MonoDevelop.
+ValaBinding is a Vala language binding for MonoDevelop 5.7 and superior.
 
 # Features
 * Vala project support for executable projects, libraries, and unit test projects (using GTest).
@@ -26,6 +26,8 @@ ValaBinding is a Vala language binding for MonoDevelop.
 See more features [in action](docs/screenshots.md)
 # How to install 
 Not released or packaged yet. See [#4 for more information](https://github.com/PerfectCarl/ValaBinding/issues/4)
+
+# [Changelog](CHANGELOG.md)
 
 # How to build
 First we need to install [Mono for ubuntu](http://www.mono-project.com/docs/getting-started/install/linux/#debian-ubuntu-and-derivatives")
