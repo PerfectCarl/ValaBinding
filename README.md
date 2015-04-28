@@ -25,7 +25,7 @@ ValaBinding is a Vala language binding for MonoDevelop.
 
 See more features [in action](docs/screenshots.md)
 # How to install 
-Not released or packaged yet. See #4 for more information
+Not released or packaged yet. See [#4 for more information](https://github.com/PerfectCarl/ValaBinding/issues/4)
 
 # How to build
 First we need to install [Mono for ubuntu](http://www.mono-project.com/docs/getting-started/install/linux/#debian-ubuntu-and-derivatives")
