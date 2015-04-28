@@ -8,22 +8,24 @@ ValaBinding is a Vala language binding for MonoDevelop.
 * Class browser.
 * Basic Makefile integration.
 * Breakpoints (via gdb)
-* Full completion (code and packages. Using [afrodite](https://github.com/inizan-yannick/afrodite))
-* Vala package management
+* Full vala package management
+* Using [echo](https://github.com/I-hate-farms/echo) for completion and code AST
+
+# TODO 
+* Full completion (code and packages, etc)
+* Display vala variables in debug mode
+* Find reference in code
+* Basic refactoring (rename)
+* More file and project templates (unit tests, elementary application/plugs, libpeas plugin, etc)
+* Build the project via command line (make, cmake, hen, etc)
 
 # Screenshots
 
-## Standard
 ![standard](docs/ide-monodevelop.png)
 
-## Full completion
-![debugging](docs/ide-monodevelop-completion.png)
-
-## Debugging
-![debugging](docs/ide-monodevelop-debug.png)
-
-## Vala package management
-![packages](docs/ide-monodevelop-packages.png)
+See more features [in action](docs/screenshots.md)
+# How to install 
+Not released or packaged yet. See #4 for more information
 
 # How to build
 First we need to install [Mono for ubuntu](http://www.mono-project.com/docs/getting-started/install/linux/#debian-ubuntu-and-derivatives")
@@ -42,14 +44,10 @@ Then we build the vala plugin and its dependencies
 sudo apt-get install monodevelop-nunit monodevelop-versioncontrol
 sudo apt-get install libmono-addins-cil-dev libmono-addins-gui-cil-dev libmono-addins-gui0.2-cil libmono-addins-msbuild-cil-dev libmono-addins-msbuild0.2-cil libmono-addins0.2-cil mono-addins-utils
 
-sudo apt-get install libvala-0.28-dev
-git clone https://github.com/inizan-yannick/afrodite
-cd afrodite
-chmod +x autogen.sh
-./autogen.sh --prefix=/usr --enable-debug && ./configure --prefix=/usr
-make
-sudo make install
-sudo ln -s  /usr/lib/libafrodite-0.28.so /usr/lib/libafrodite.so
+# Install spore ppa in not done already
+curl -sL  http://i-hate-farms.github.io/spores/install | sudo bash -  
+# Install project dependencies: echo
+sudo apt-get install libecho-dev
 ```
 And finally build the addin
 ```
