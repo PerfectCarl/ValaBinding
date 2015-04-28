@@ -1,13 +1,15 @@
 # Screenshots
 
 ## Standard
-![standard](docs/ide-monodevelop.png)
+![standard](ide-monodevelop.png)
 
 ## Full completion
-![debugging](docs/ide-monodevelop-completion.png)
+![completion](ide-monodevelop-completion.png)
+
+Still work in progress 
 
 ## Debugging
-![debugging](docs/ide-monodevelop-debug.png)
+![debugging](/ide-monodevelop-debug.png)
 
 ## Vala package management
-![packages](docs/ide-monodevelop-packages.png)
+![packages](ide-monodevelop-packages.png)
