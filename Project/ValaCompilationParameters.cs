@@ -42,14 +42,15 @@ using MonoDevelop.Core.Serialization;
 
 namespace MonoDevelop.ValaBinding
 {
-	public enum WarningLevel {
+	public enum WarningLevel
+	{
 		None,
 		Normal,
 		All
 	}
-	
+
 	public class ValaCompilationParameters : ICloneable
-	{		
+	{
 		[ItemProperty ("WarningLevel")]
 		private WarningLevel warning_level = WarningLevel.Normal;
 		
@@ -67,22 +68,31 @@ namespace MonoDevelop.ValaBinding
 
 		[ItemProperty ("EnableMultithreading")]
 		private bool enable_multithreading = false;
-		
+
+		[ItemProperty ("TargetGlib232")]
+		private bool target_glib232 = true;
+
+		[ItemProperty ("GettextId")]
+		private string gettext_id = string.Empty;
+
+		[ItemProperty ("LinkMathsLib")]
+		private bool link_maths_lib = false;
+
 		public object Clone ()
 		{
 			return MemberwiseClone ();
 		}
-		
+
 		public WarningLevel WarningLevel {
 			get { return warning_level; }
 			set { warning_level = value; }
 		}
-		
+
 		public bool WarningsAsErrors {
 			get { return warnings_as_errors; }
 			set { warnings_as_errors = value; }
 		}
-		
+
 		public int OptimizationLevel {
 			get { return optimization; }
 			set {
@@ -92,12 +102,12 @@ namespace MonoDevelop.ValaBinding
 					optimization = 0;
 			}
 		}
-		
+
 		public string ExtraCompilerArguments {
 			get { return extra_compiler_args; }
 			set { extra_compiler_args = value; }
 		}
-		
+
 		public string DefineSymbols {
 			get { return define_symbols; }
 			set { define_symbols = value; }
@@ -107,5 +117,21 @@ namespace MonoDevelop.ValaBinding
 			get { return enable_multithreading; }
 			set { enable_multithreading = value; }
 		}
+
+		public bool TargetGlib232 {
+			get { return target_glib232; }
+			set { target_glib232 = value; }
+		}
+
+		public string GettextId {
+			get { return gettext_id; }
+			set { gettext_id = value; }
+		}
+
+		public bool LinkMathsLib {
+			get { return link_maths_lib; }
+			set { link_maths_lib = value; }
+		}
+
 	}
 }

@@ -61,7 +61,7 @@ namespace MonoDevelop.ValaBinding.Parser
 			this.Project = project;
 			//string projectName = (null == project)? "NoExistingProject": project.Name;
 
-			echoProject = new Echo.Project ();
+			echoProject = new Echo.Project (project.Name);
 			/*if (CompletionEngine.DepsInstalled) {
 				engine = new CompletionEngine (projectName);
 			}*/
@@ -75,7 +75,7 @@ namespace MonoDevelop.ValaBinding.Parser
 		public void AddFile (string filename)
 		{
 
-			LoggingService.LogDebug ("Adding file {0}", filename);
+			//LoggingService.LogDebug ("Adding file {0}", filename);
 			//if (engine != null)
 			//	engine.QueueSourcefile (filename, filename.EndsWith (".vapi", StringComparison.OrdinalIgnoreCase), false);
 			if (echoProject != null)
@@ -99,7 +99,7 @@ namespace MonoDevelop.ValaBinding.Parser
 		{
 			// if (!CompletionEngine.DepsInstalled){ return; }
 			
-			if ("glib-2.0".Equals (packagename, StringComparison.Ordinal)) {
+			/*if ("glib-2.0".Equals (packagename, StringComparison.Ordinal)) {
 				LoggingService.LogDebug ("AddPackage: Skipping {0} for afrodite", packagename);
 				// Echo needs all the packages
 				if (echoProject != null)
@@ -107,7 +107,7 @@ namespace MonoDevelop.ValaBinding.Parser
 				return;
 			} else {
 				LoggingService.LogDebug ("AddPackage: Adding package {0}", packagename);
-			}
+			}*/
 			
 			foreach (string path in Echo.Utils.GetPackagePaths (packagename)) {
 				LoggingService.LogDebug ("AddPackage: Queueing {0} for package {1}", path, packagename);

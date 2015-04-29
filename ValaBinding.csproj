@@ -103,6 +103,7 @@
     <None Include="Parser\Afrodite\CompletionEngine.cs" />
     <None Include="Parser\Afrodite\ValaEnumerator.cs" />
     <None Include="Parser\Afrodite\CodeDomDumper.cs" />
+    <None Include="TODO.md" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="ValaBinding.addin.xml" />

@@ -403,9 +403,9 @@ namespace MonoDevelop.ValaBinding
 		{
 			//var ast = SyntaxTree;
 
-			/*if (clickedOnOutlineItem ||treestore == null)
+			if (clickedOnOutlineItem || treestore == null)
 				return;
-
+			/*
 			var caretLocation = Document.Editor.Caret.Location;
 			var caretLocationD = new CodeLocation (caretLocation.Column, caretLocation.Line);
 

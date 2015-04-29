@@ -48,8 +48,8 @@ namespace MonoDevelop.ValaBinding
 		private ValaCompilationParameters compilationParameters;
 		private Gtk.ListStore libStore = new Gtk.ListStore (typeof(string));
 		private Gtk.ListStore includePathStore = new Gtk.ListStore (typeof(string));
-		
-		public CodeGenerationPanel () 
+
+		public CodeGenerationPanel ()
 		{
 			this.Build ();
 			
@@ -63,14 +63,13 @@ namespace MonoDevelop.ValaBinding
 			includePathTreeView.HeadersVisible = false;
 			includePathTreeView.AppendColumn ("Include", textRenderer, "text", 0);
 		}
-		
+
 		public void Load (ValaProjectConfiguration config)
 		{
 			configuration = config;
 			compilationParameters = (ValaCompilationParameters)configuration.CompilationParameters;
 			
-			switch (compilationParameters.WarningLevel)
-			{
+			switch (compilationParameters.WarningLevel) {
 			case WarningLevel.None:
 				noWarningRadio.Active = true;
 				break;
@@ -88,8 +87,7 @@ namespace MonoDevelop.ValaBinding
 			
 			optimizationSpinButton.Value = compilationParameters.OptimizationLevel;
 			
-			switch (configuration.CompileTarget)
-			{
+			switch (configuration.CompileTarget) {
 			case ValaBinding.CompileTarget.Bin:
 				targetComboBox.Active = 0;
 				break;
@@ -105,15 +103,19 @@ namespace MonoDevelop.ValaBinding
 			
 			defineSymbolsTextEntry.Text = compilationParameters.DefineSymbols;
 
-            libStore.Clear();
+			libStore.Clear ();
 			foreach (string lib in configuration.Libs)
 				libStore.AppendValues (lib);
 
-            includePathStore.Clear();
+			includePathStore.Clear ();
 			foreach (string includePath in configuration.Includes)
 				includePathStore.AppendValues (includePath);
+			if (string.IsNullOrEmpty (compilationParameters.GettextId))
+				gettextID.Text = configuration.CompiledOutputName;
+			targetGlib232.Active = compilationParameters.TargetGlib232;
+			linkMathsLib.Active = compilationParameters.LinkMathsLib;
 		}
-		
+
 		private void OnIncludePathAdded (object sender, EventArgs e)
 		{
 			if (includePathEntry.Text.Length > 0) {				
@@ -121,14 +123,14 @@ namespace MonoDevelop.ValaBinding
 				includePathEntry.Text = string.Empty;
 			}
 		}
-		
+
 		private void OnIncludePathRemoved (object sender, EventArgs e)
 		{
 			Gtk.TreeIter iter;
 			includePathTreeView.Selection.GetSelected (out iter);
 			includePathStore.Remove (ref iter);
 		}
-		
+
 		private void OnLibAdded (object sender, EventArgs e)
 		{
 			if (libAddEntry.Text.Length > 0) {				
@@ -136,21 +138,21 @@ namespace MonoDevelop.ValaBinding
 				libAddEntry.Text = string.Empty;
 			}
 		}
-		
+
 		private void OnLibRemoved (object sender, EventArgs e)
 		{
 			Gtk.TreeIter iter;
 			libTreeView.Selection.GetSelected (out iter);
 			libStore.Remove (ref iter);
 		}
-		
+
 		private void OnBrowseButtonClick (object sender, EventArgs e)
 		{
 			AddLibraryDialog dialog = new AddLibraryDialog ();
 			dialog.Run ();
 			libAddEntry.Text = dialog.Library;
 		}
-		
+
 		private void OnIncludePathBrowseButtonClick (object sender, EventArgs e)
 		{
 			AddPathDialog dialog = new AddPathDialog (configuration.SourceDirectory);
@@ -158,68 +160,70 @@ namespace MonoDevelop.ValaBinding
 			includePathEntry.Text = dialog.SelectedPath;
 		}
 
-        public bool Store()
-        {
-            if (compilationParameters == null || configuration == null)
-                return false;
+		public bool Store ()
+		{
+			if (compilationParameters == null || configuration == null)
+				return false;
 
-            string line;
-            Gtk.TreeIter iter;
+			string line;
+			Gtk.TreeIter iter;
 
-            if (noWarningRadio.Active)
-                compilationParameters.WarningLevel = WarningLevel.None;
-            else if (normalWarningRadio.Active)
-                compilationParameters.WarningLevel = WarningLevel.Normal;
-            else
-                compilationParameters.WarningLevel = WarningLevel.All;
+			if (noWarningRadio.Active)
+				compilationParameters.WarningLevel = WarningLevel.None;
+			else if (normalWarningRadio.Active)
+				compilationParameters.WarningLevel = WarningLevel.Normal;
+			else
+				compilationParameters.WarningLevel = WarningLevel.All;
 
-            compilationParameters.WarningsAsErrors = warningsAsErrorsCheckBox.Active;
+			compilationParameters.WarningsAsErrors = warningsAsErrorsCheckBox.Active;
 
-            compilationParameters.OptimizationLevel = (int)optimizationSpinButton.Value;
+			compilationParameters.OptimizationLevel = (int)optimizationSpinButton.Value;
 
-            switch (targetComboBox.Active)
-            {
-                case 0:
-                    configuration.CompileTarget = ValaBinding.CompileTarget.Bin;
-                    compilationParameters.EnableMultithreading = threadingCheckbox.Active;
-                    break;
-                case 1:
-                    configuration.CompileTarget = ValaBinding.CompileTarget.StaticLibrary;
-                    break;
-                case 2:
-                    configuration.CompileTarget = ValaBinding.CompileTarget.SharedLibrary;
-                    break;
-            }
+			switch (targetComboBox.Active) {
+			case 0:
+				configuration.CompileTarget = ValaBinding.CompileTarget.Bin;
+				compilationParameters.EnableMultithreading = threadingCheckbox.Active;
+				break;
+			case 1:
+				configuration.CompileTarget = ValaBinding.CompileTarget.StaticLibrary;
+				break;
+			case 2:
+				configuration.CompileTarget = ValaBinding.CompileTarget.SharedLibrary;
+				break;
+			}
 
-            compilationParameters.ExtraCompilerArguments = extraCompilerTextView.Buffer.Text;
+			compilationParameters.ExtraCompilerArguments = extraCompilerTextView.Buffer.Text;
 
-            compilationParameters.DefineSymbols = defineSymbolsTextEntry.Text;
+			compilationParameters.DefineSymbols = defineSymbolsTextEntry.Text;
 
-            libStore.GetIterFirst(out iter);
-            configuration.Libs.Clear();
-            while (libStore.IterIsValid(iter))
-            {
-                line = (string)libStore.GetValue(iter, 0);
-                configuration.Libs.Add(line);
-                libStore.IterNext(ref iter);
-            }
+			libStore.GetIterFirst (out iter);
+			configuration.Libs.Clear ();
+			while (libStore.IterIsValid (iter)) {
+				line = (string)libStore.GetValue (iter, 0);
+				configuration.Libs.Add (line);
+				libStore.IterNext (ref iter);
+			}
 
-            includePathStore.GetIterFirst(out iter);
-            configuration.Includes.Clear();
-            while (includePathStore.IterIsValid(iter))
-            {
-                line = (string)includePathStore.GetValue(iter, 0);
+			includePathStore.GetIterFirst (out iter);
+			configuration.Includes.Clear ();
+			while (includePathStore.IterIsValid (iter)) {
+				line = (string)includePathStore.GetValue (iter, 0);
 
-                var baseDirectory = FileUtils.GetExactPathName(configuration.SourceDirectory);
-                var path = FileUtils.GetExactPathName(line.Trim());
-                configuration.Includes.Add(FileService.AbsoluteToRelativePath(
-                    baseDirectory, path));
+				var baseDirectory = FileUtils.GetExactPathName (configuration.SourceDirectory);
+				var path = FileUtils.GetExactPathName (line.Trim ());
+				configuration.Includes.Add (FileService.AbsoluteToRelativePath (
+					baseDirectory, path));
 
-                includePathStore.IterNext(ref iter);
-            }
+				includePathStore.IterNext (ref iter);
+			}
+			if (gettextID.Text == configuration.CompiledOutputName)
+				compilationParameters.GettextId = "";
+			compilationParameters.TargetGlib232 = targetGlib232.Active;
+			compilationParameters.LinkMathsLib = linkMathsLib.Active;
 
-            return true;
-        }
+
+			return true;
+		}
 
 		protected virtual void OnLibAddEntryChanged (object sender, EventArgs e)
 		{
@@ -256,7 +260,7 @@ namespace MonoDevelop.ValaBinding
 		{
 			includePathRemoveButton.Sensitive = false;
 		}
-		
+
 		protected virtual void OnLibAddEntryActivated (object sender, System.EventArgs e)
 		{
 			OnLibAdded (this, new EventArgs ());
@@ -276,19 +280,19 @@ namespace MonoDevelop.ValaBinding
 			threadingCheckbox.Active = (threadingCheckbox.Active && threadingCheckbox.Sensitive);
 		}
 	}
-	
+
 	public class CodeGenerationPanelBinding : MultiConfigItemOptionsPanel
 	{
 		private CodeGenerationPanel panel;
-		
+
 		public override Gtk.Widget CreatePanelWidget ()
 		{
 			return panel = new CodeGenerationPanel ();
 		}
-		
+
 		public override void LoadConfigData ()
 		{
-			panel.Load((ValaProjectConfiguration) CurrentConfiguration);
+			panel.Load ((ValaProjectConfiguration)CurrentConfiguration);
 //			panel = new CodeGenerationPanel ((Properties)CustomizationObject);
 //			Add (panel);
 		}

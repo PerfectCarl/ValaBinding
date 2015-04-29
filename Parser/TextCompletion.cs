@@ -205,9 +205,9 @@ namespace MonoDevelop.ValaBinding.Parser
 		//		}
 		// GetConstructorsForType
 
-		public List<Echo.Symbol> GetConstructorsForTypeEcho (string typename, string filename, int line, int column, ValaCompletionDataList results)
+		public List<Echo.Symbol> GetConstructorsForTypeEcho (string className, string fileFullPath, int line, int column, ValaCompletionDataList results)
 		{
-			List<Echo.Symbol> functions = new List<Echo.Symbol> ();
+			//List<Echo.Symbol> results = new List<Echo.Symbol> ();
 			/*foreach (Afrodite.Symbol node in CompleteType (typename, filename, line, column, null)) {
 				if ("constructor".Equals (node.MemberType, StringComparison.OrdinalIgnoreCase) || 
 					"creationmethod".Equals (node.MemberType, StringComparison.OrdinalIgnoreCase)) {
@@ -217,7 +217,8 @@ namespace MonoDevelop.ValaBinding.Parser
 
 			AddResults ((IList<Echo.Symbol>)functions, results);
 			*/
-			return functions;
+			//return results;
+			return echoProject.GetConstructorsForClass (fileFullPath, className, line, column);
 		}
 
 		/// <summary>

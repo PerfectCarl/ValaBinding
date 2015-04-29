@@ -43,6 +43,8 @@ using MonoDevelop.Components;
 using MonoDevelop.ValaBinding.Parser;
 using Mono.TextEditor;
 using MonoDevelop.Ide.TypeSystem;
+using MonoDevelop.ValaBinding.Parser.Echo;
+using MonoDevelop.Ide;
 
 namespace MonoDevelop.ValaBinding
 {
@@ -381,72 +383,60 @@ namespace MonoDevelop.ValaBinding
 			// TODO:
 
 			/*var unit = Document.CompilationUnit;
-            if (unit == null)
-                return;
+			if (unit == null)
+				return;
+*/
+			var loc = textEditorData.Caret.Location;
 
-            var loc = textEditorData.Caret.Location;
-            IType type = unit.GetTypeAt(loc.Line, loc.Column);
-            List<PathEntry> result = new List<PathEntry>();
-            Ambience amb = GetAmbience();
-            IMember member = null;
-            INode node = (INode)unit;
+			//IType type = unit.GetTypeAt (loc.Line, loc.Column);
+			List<PathEntry> result = new List<PathEntry> ();
+			//Ambience amb = GetAmbience ();
+			//IMember member = null;
+			//INode node = (INode)unit;
+			Symbol node = ProjectInfo.GetEnclosingSymbolAtPosition (FileName.FullPath, loc.Line, loc.Column);
+			/*
+			if (type != null && type.ClassType != ClassType.Delegate) {
+				member = type.GetMemberAt (loc.Line, loc.Column);
+			}
 
-            if (type != null && type.ClassType != ClassType.Delegate)
-            {
-                member = type.GetMemberAt(loc.Line, loc.Column);
-            }
+			if (null != member) {
+				node = member;
+			} else if (null != type) {
+				node = type;
+			}*/
 
-            if (null != member)
-            {
-                node = member;
-            }
-            else if (null != type)
-            {
-                node = type;
-            }
+			//List<PathEntry> result = new List<PathEntry>();
+			//INode node = currentblock;
+			PathEntry entry;
 
-            while (node != null)
-            {
-                PathEntry entry;
-                if (node is ICompilationUnit)
-                {
-                    if (!Document.ParsedDocument.UserRegions.Any())
-                        break;
-                    FoldingRegion reg = Document.ParsedDocument.UserRegions.Where(r => r.Region.Contains(loc.Line, loc.Column)).LastOrDefault();
-                    if (reg == null)
-                    {
-                        entry = new PathEntry(GettextCatalog.GetString("No region"));
-                    }
-                    else
-                    {
-                        entry = new PathEntry(CompilationUnitDataProvider.Pixbuf, reg.Name);
-                    }
-                    entry.Position = EntryPosition.Right;
-                }
-                else
-                {
-                    entry = new PathEntry(ImageService.GetPixbuf(((IMember)node).StockIcon, IconSize.Menu), amb.GetString((IMember)node, OutputFlags.IncludeGenerics | OutputFlags.IncludeParameters | OutputFlags.ReformatDelegates));
-                }
-                entry.Tag = node;
-                result.Insert(0, entry);
-                node = node.Parent;
-            }
+			while ((node != null) /*&& ((node is IBlockNode) || (node is DEnumValue))*/) {
+				// var icon = DIcons.GetNodeIcon(node as DNode);
+				Xwt.Drawing.Image icon = null; 
+				if (!string.IsNullOrEmpty (node.Icon))
+					icon = ImageService.GetIcon (node.Icon);
+				entry = new PathEntry (icon, 
+					node.DisplayText /*+ DParameterDataProvider.GetNodeParamString (node)*/);
+				entry.Position = EntryPosition.Left;
+				entry.Tag = node;
+				//do not include the module in the path bar
+				if ((node.Parent != null) /*&& !((node is DNode) && (node as DNode).IsAnonymous)*/)
+					result.Insert (0, entry);
+				node = node.Parent;
+			}
 
-            PathEntry noSelection = null;
-            if (type == null)
-            {
-                noSelection = new PathEntry(GettextCatalog.GetString("No selection")) { Tag = new CustomNode(Document.CompilationUnit) };
-            }
-            else if (member == null && type.ClassType != ClassType.Delegate)
-                noSelection = new PathEntry(GettextCatalog.GetString("No selection")) { Tag = new CustomNode(type) };
-            if (noSelection != null)
-            {
-                result.Add(noSelection);
-            }
+			/*if (!((currentblock is DMethod) || (currentblock is DEnumValue)))
+			{
+				PathEntry noSelection = new PathEntry(GettextCatalog.GetString("No Selection")) { Tag = new NoSelectionCustomNode(currentblock) };
+				result.Add(noSelection);
+			}*/
 
-            var prev = CurrentPath;
-            CurrentPath = result.ToArray();
-            OnPathChanged(new DocumentPathChangedEventArgs(prev));*/
+			//entry = GetRegionEntry (Document.GetDDocument (), Document.Editor.Caret.Location);
+			//if (entry != null)
+			//	result.Add (entry);
+
+			var prev = CurrentPath;
+			CurrentPath = result.ToArray ();
+			OnPathChanged (new DocumentPathChangedEventArgs (prev));
 		}
 
 		public override void Initialize ()

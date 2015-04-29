@@ -510,7 +510,7 @@ System.InvalidOperationException: Console could not be created.
 			if (!package.IsProject) {
 				return;
 			}
-
+			// FIXME CARL 
 			// TODO: for now user can do it manually
 			/*string depsfile = Path.ChangeExtension (package.File, ".deps");
             try {

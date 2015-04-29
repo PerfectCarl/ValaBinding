@@ -9,13 +9,17 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using MonoDevelop.Core;
 
 namespace MonoDevelop.ValaBinding.Parser.Echo
 {
 	public class Project
 	{
-		public Project ()
+		string name;
+
+		public Project (string name)
 		{
+			this.name = name;
 			this.instance = echo_project_new ();
 		}
 
@@ -31,7 +35,13 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 
 		public void UpdateSync ()
 		{
+			LoggingService.Log (MonoDevelop.Core.Logging.LogLevel.Info, "Updating " + name);
 			echo_project_update_sync (instance);
+		}
+
+		public void UpdateFileContents (string fileFullPath, string content, bool scheduleUpdate)
+		{
+			echo_project_update_file_contents (instance, fileFullPath, content, scheduleUpdate);
 		}
 
 		public List<Symbol> GetAllSymbolsForFile (string fileFullPath, SymbolType type)
@@ -69,6 +79,18 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 			return new CompletionReport ();
 		}
 
+		public List<Symbol> GetConstructorsForClass (string fileFullPath, string className, int line, int column)
+		{
+			List<Symbol> list = new List<Symbol> ();
+			IntPtr items = echo_project_get_constructors_for_class (instance, fileFullPath, className, line, column);
+
+			if (IntPtr.Zero != items) {
+				list = new ValaList (items).ToTypedList (item => new Symbol (item));
+			}
+
+			return list;
+		}
+
 		#region P/Invokes
 
 		IntPtr instance;
@@ -94,6 +116,11 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 		[DllImport ("libecho")]
 		static extern IntPtr echo_project_get_all_symbols_for_file (IntPtr instance, string file_full_path, SymbolType type);
 
+		[DllImport ("libecho")]
+		static extern IntPtr echo_project_get_constructors_for_class (IntPtr instance, string file_full_path, string class_name, int line, int column);
+
+		[DllImport ("libecho")]
+		static extern void echo_project_update_file_contents (IntPtr instance, string file_full_path, string content, bool schedule_update) ;
 
 		#endregion
 	}
