@@ -402,6 +402,7 @@ Shared Object</property>
                 <child>
                   <widget class="Gtk.Entry" id="defineSymbolsTextEntry">
                     <property name="MemberName" />
+                    <property name="WidthRequest">300</property>
                     <property name="Tooltip" translatable="yes">A space-separated list of symbols to define.</property>
                     <property name="CanFocus">True</property>
                     <property name="IsEditable">True</property>
@@ -410,6 +411,7 @@ Shared Object</property>
                   <packing>
                     <property name="Position">1</property>
                     <property name="AutoSize">False</property>
+                    <property name="Expand">False</property>
                     <property name="Padding">14</property>
                   </packing>
                 </child>
@@ -445,6 +447,7 @@ Shared Object</property>
                 <child>
                   <widget class="Gtk.Entry" id="gettextID">
                     <property name="MemberName" />
+                    <property name="WidthRequest">300</property>
                     <property name="CanFocus">True</property>
                     <property name="IsEditable">True</property>
                     <property name="InvisibleChar">•</property>
@@ -452,6 +455,7 @@ Shared Object</property>
                   <packing>
                     <property name="Position">1</property>
                     <property name="AutoSize">False</property>
+                    <property name="Expand">False</property>
                     <property name="Padding">44</property>
                   </packing>
                 </child>

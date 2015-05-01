@@ -112,6 +112,8 @@ namespace MonoDevelop.ValaBinding
 				includePathStore.AppendValues (includePath);
 			if (string.IsNullOrEmpty (compilationParameters.GettextId))
 				gettextID.Text = configuration.CompiledOutputName;
+			else
+				gettextID.Text = compilationParameters.GettextId;
 			targetGlib232.Active = compilationParameters.TargetGlib232;
 			linkMathsLib.Active = compilationParameters.LinkMathsLib;
 		}
@@ -218,6 +220,8 @@ namespace MonoDevelop.ValaBinding
 			}
 			if (gettextID.Text == configuration.CompiledOutputName)
 				compilationParameters.GettextId = "";
+			else
+				compilationParameters.GettextId = gettextID.Text;
 			compilationParameters.TargetGlib232 = targetGlib232.Active;
 			compilationParameters.LinkMathsLib = linkMathsLib.Active;
 

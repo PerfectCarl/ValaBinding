@@ -159,6 +159,10 @@ namespace MonoDevelop.ValaBinding.Parser
 						LoggingService.LogDebug ("GetFunction: Unable to acquire codedom");
 					}
 				}*/
+			if (!projectUpdated) {
+				echoProject.UpdateSync ();
+				projectUpdated = true; 
+			}
 			return echoProject.GetEnclosingSymbolAtPosition (fileFullPath, line, column);
 
 			//return null;

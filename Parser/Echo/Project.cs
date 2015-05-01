@@ -20,7 +20,7 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 		public Project (string name)
 		{
 			this.name = name;
-			this.instance = echo_project_new ();
+			this.instance = echo_project_new (name);
 		}
 
 		public void AddExternalPackage (string vala_package)
@@ -79,6 +79,15 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 			return new CompletionReport ();
 		}
 
+		public bool TargetGlib232 {
+			get {
+				return echo_project_get_target_glib232 (instance);
+			}
+			set {
+				echo_project_set_target_glib232 (instance, value);
+			}
+		}
+
 		public List<Symbol> GetConstructorsForClass (string fileFullPath, string className, int line, int column)
 		{
 			List<Symbol> list = new List<Symbol> ();
@@ -96,7 +105,7 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 		IntPtr instance;
 
 		[DllImport ("libecho")]
-		static extern IntPtr echo_project_new ();
+		static extern IntPtr echo_project_new (string name);
 
 		[DllImport ("libecho")]
 		static extern void echo_project_add_external_package (IntPtr instance, string package);
@@ -121,6 +130,13 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 
 		[DllImport ("libecho")]
 		static extern void echo_project_update_file_contents (IntPtr instance, string file_full_path, string content, bool schedule_update) ;
+
+		[DllImport ("libecho")]
+		static extern bool echo_project_get_target_glib232 (IntPtr instance) ;
+
+		[DllImport ("libecho")]
+		static extern void echo_project_set_target_glib232 (IntPtr instance, bool target_glib232) ;
+
 
 		#endregion
 	}

@@ -361,6 +361,7 @@ namespace MonoDevelop.ValaBinding
 			// Container child hbox1.Gtk.Box+BoxChild
 			this.defineSymbolsTextEntry = new global::Gtk.Entry ();
 			this.defineSymbolsTextEntry.TooltipMarkup = "A space-separated list of symbols to define.";
+			this.defineSymbolsTextEntry.WidthRequest = 300;
 			this.defineSymbolsTextEntry.CanFocus = true;
 			this.defineSymbolsTextEntry.Name = "defineSymbolsTextEntry";
 			this.defineSymbolsTextEntry.IsEditable = true;
@@ -368,6 +369,7 @@ namespace MonoDevelop.ValaBinding
 			this.hbox1.Add (this.defineSymbolsTextEntry);
 			global::Gtk.Box.BoxChild w19 = ((global::Gtk.Box.BoxChild)(this.hbox1 [this.defineSymbolsTextEntry]));
 			w19.Position = 1;
+			w19.Expand = false;
 			w19.Padding = ((uint)(14));
 			this.vbox6.Add (this.hbox1);
 			global::Gtk.Box.BoxChild w20 = ((global::Gtk.Box.BoxChild)(this.vbox6 [this.hbox1]));
@@ -391,6 +393,7 @@ namespace MonoDevelop.ValaBinding
 			w21.Fill = false;
 			// Container child hbox3.Gtk.Box+BoxChild
 			this.gettextID = new global::Gtk.Entry ();
+			this.gettextID.WidthRequest = 300;
 			this.gettextID.CanFocus = true;
 			this.gettextID.Name = "gettextID";
 			this.gettextID.IsEditable = true;
@@ -398,6 +401,7 @@ namespace MonoDevelop.ValaBinding
 			this.hbox3.Add (this.gettextID);
 			global::Gtk.Box.BoxChild w22 = ((global::Gtk.Box.BoxChild)(this.hbox3 [this.gettextID]));
 			w22.Position = 1;
+			w22.Expand = false;
 			w22.Padding = ((uint)(44));
 			this.vbox6.Add (this.hbox3);
 			global::Gtk.Box.BoxChild w23 = ((global::Gtk.Box.BoxChild)(this.vbox6 [this.hbox3]));
