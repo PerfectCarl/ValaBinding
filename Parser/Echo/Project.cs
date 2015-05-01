@@ -50,7 +50,20 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 			IntPtr items = echo_project_get_all_symbols_for_file (instance, fileFullPath, type);
 
 			if (IntPtr.Zero != items) {
-				list = new ValaList (items).ToTypedList (item => new Symbol (item));
+				list = new GeeList (items).ToTypedList (item => new Symbol (item));
+			}
+
+			return list;
+		}
+
+		public List<ParsingError> GetParsingErrors ()
+		{
+
+			List<ParsingError> list = new List<ParsingError> ();
+			IntPtr items = echo_project_get_parsing_errors (instance);
+
+			if (IntPtr.Zero != items) {
+				list = new GeeList (items).ToTypedList (item => new ParsingError (item));
 			}
 
 			return list;
@@ -62,7 +75,7 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 			IntPtr items = echo_project_get_symbols_for_file (instance, fileFullPath);
 
 			if (IntPtr.Zero != items) {
-				list = new ValaList (items).ToTypedList (item => new Symbol (item));
+				list = new GeeList (items).ToTypedList (item => new Symbol (item));
 			}
 
 			return list;
@@ -94,7 +107,7 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 			IntPtr items = echo_project_get_constructors_for_class (instance, fileFullPath, className, line, column);
 
 			if (IntPtr.Zero != items) {
-				list = new ValaList (items).ToTypedList (item => new Symbol (item));
+				list = new GeeList (items).ToTypedList (item => new Symbol (item));
 			}
 
 			return list;
@@ -137,6 +150,8 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 		[DllImport ("libecho")]
 		static extern void echo_project_set_target_glib232 (IntPtr instance, bool target_glib232) ;
 
+		[DllImport ("libecho")]
+		static extern IntPtr echo_project_get_parsing_errors (IntPtr instance) ;
 
 		#endregion
 	}

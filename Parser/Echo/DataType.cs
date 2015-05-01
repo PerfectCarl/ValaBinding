@@ -133,7 +133,7 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 				IntPtr types = echo_data_type_get_generic_types (instance);
 
 				if (IntPtr.Zero != types) {
-					list = new ValaList (types).ToTypedList (item => new DataType (item));
+					list = new GeeList (types).ToTypedList (item => new DataType (item));
 				}
 
 				return list;

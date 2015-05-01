@@ -59,7 +59,7 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 				IntPtr children = echo_symbol_get_children (instance);
 
 				if (IntPtr.Zero != children) {
-					list = new ValaList (children).ToTypedList (item => new Symbol (item));
+					list = new GeeList (children).ToTypedList (item => new Symbol (item));
 				}
 
 				return list;
@@ -166,7 +166,7 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 				IntPtr parameters = echo_symbol_get_parameters (instance);
 
 				if (IntPtr.Zero != parameters) {
-					list = new ValaList (parameters).ToTypedList (delegate (IntPtr item) {
+					list = new GeeList (parameters).ToTypedList (delegate (IntPtr item) {
 						return new DataType (item);
 					});
 				}

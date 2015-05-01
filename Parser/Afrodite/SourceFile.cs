@@ -18,7 +18,7 @@ namespace MonoDevelop.ValaBinding.Parser.Afrodite
 	internal class SourceFile
 	{
 		public SourceFile (string filename)
-			:this (afrodite_source_file_new (filename))
+			: this (afrodite_source_file_new (filename))
 		{
 		}
 
@@ -36,7 +36,9 @@ namespace MonoDevelop.ValaBinding.Parser.Afrodite
 				IntPtr symbols = afrodite_source_file_get_symbols (instance);
 
 				if (IntPtr.Zero != symbols) {
-					list = new ValaList (symbols).ToTypedList (delegate (IntPtr item){ return new Symbol (item); });
+					list = new GeeList (symbols).ToTypedList (delegate (IntPtr item) {
+						return new Symbol (item);
+					});
 				}
 
 				return list;
@@ -70,16 +72,16 @@ namespace MonoDevelop.ValaBinding.Parser.Afrodite
 
 		IntPtr instance;
 
-		[DllImport("libafrodite")]
+		[DllImport ("libafrodite")]
 		static extern IntPtr afrodite_source_file_new (string filename);
 
-		[DllImport("libafrodite")]
+		[DllImport ("libafrodite")]
 		static extern IntPtr afrodite_source_file_get_filename (IntPtr instance);
 
-		[DllImport("libafrodite")]
+		[DllImport ("libafrodite")]
 		static extern IntPtr afrodite_source_file_get_symbols (IntPtr instance);
 
-		[DllImport("libafrodite")]
+		[DllImport ("libafrodite")]
 		static extern IntPtr afrodite_source_file_get_using_directives (IntPtr instance);
 
 

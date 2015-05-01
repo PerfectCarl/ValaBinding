@@ -20,7 +20,7 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 			List<string> list = new List<string> ();
 			IntPtr paths = echo_utils_get_package_paths (package, IntPtr.Zero, null);
 			if (IntPtr.Zero != paths)
-				list = new ValaList (paths).ToTypedList (delegate(IntPtr item) {
+				list = new GeeList (paths).ToTypedList (delegate(IntPtr item) {
 					return Marshal.PtrToStringAuto (item);
 				});
 

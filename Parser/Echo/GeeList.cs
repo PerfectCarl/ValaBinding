@@ -114,6 +114,7 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 		IEnumerator<IntPtr> IEnumerable<IntPtr>.GetEnumerator ()
 		{
 			return new GeeEnumerator (gee_iterable_iterator (instance));
+			//return new GeeEnumerator (gee_list_list_iterator (instance));
 		}
 
 		#endregion
@@ -148,6 +149,7 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 
 		[DllImport ("libgee")]
 		static extern IntPtr gee_iterable_iterator (IntPtr instance);
+		//static extern IntPtr gee_list_list_iterator (IntPtr instance);
 
 		[DllImport ("libgee")]
 		static extern int gee_list_index_of (IntPtr instance, IntPtr item);

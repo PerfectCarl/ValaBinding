@@ -38,6 +38,7 @@ using MonoDevelop.Core;
 
 // using MonoDevelop.ValaBinding.Parser.Afrodite;
 using MonoDevelop.ValaBinding.Parser;
+using MonoDevelop.Ide.Tasks;
 
 namespace MonoDevelop.ValaBinding.Parser
 {
@@ -108,12 +109,9 @@ namespace MonoDevelop.ValaBinding.Parser
 			} else {
 				LoggingService.LogDebug ("AddPackage: Adding package {0}", packagename);
 			}*/
-			
+
 			foreach (string path in Echo.Utils.GetPackagePaths (packagename)) {
 				LoggingService.LogDebug ("AddPackage: Queueing {0} for package {1}", path, packagename);
-				/*if (engine != null)
-					engine.QueueSourcefile (path, true, false);
-				*/
 				if (echoProject != null)
 					echoProject.AddExternalPackage (packagename);
 			}
@@ -163,7 +161,10 @@ namespace MonoDevelop.ValaBinding.Parser
 				echoProject.UpdateSync ();
 				projectUpdated = true; 
 			}
-			return echoProject.GetEnclosingSymbolAtPosition (fileFullPath, line, column);
+
+			var result = echoProject.GetEnclosingSymbolAtPosition (fileFullPath, line, column);
+			HandleParsingErrors (fileFullPath); 
+			return result;
 
 			//return null;
 		}
@@ -230,18 +231,45 @@ namespace MonoDevelop.ValaBinding.Parser
 
 		bool projectUpdated = false;
 
-		internal List<Echo.Symbol> GetRootSymbolsForFileEcho (string file)
+		void HandleParsingErrors (string file)
+		{
+			const string OWNER = "Vala.ParsingError";
+			foreach (Task task in TaskService.Errors) {
+				if (task.FileName == file && task.Owner.ToString () == OWNER) {
+					TaskService.Errors.Remove (task);
+				}
+			}
+
+			foreach (Echo.ParsingError err in echoProject.GetParsingErrors()) {
+				if (err.FileFullPath == file) {
+					var task = new Task (file, err.Message, err.Line, err.Column, err.Severity, TaskPriority.Normal, Project, OWNER);
+					TaskService.Errors.Add (task);
+				}
+			}
+
+		}
+
+		internal List<Echo.Symbol> GetRootSymbolsForFileEcho (string fileFullPath)
 		{
 			// HACK: be smarter, threaded thing
 			if (!projectUpdated) {
 				echoProject.UpdateSync ();
 				projectUpdated = true; 
 			}
-			var symbols = echoProject.GetSymbolsForFile (file);
+			var symbols = echoProject.GetSymbolsForFile (fileFullPath);
 			var result = new List<Echo.Symbol> ();
+			// FIXME OVERDOING Really necessary 
 			foreach (var symbol in symbols) {
 				result.Add (symbol);
 			}
+			HandleParsingErrors (fileFullPath);
+			/*
+			TaskService.Errors.Add (new Task (file.FilePath, err.ErrorText, err.Column, err.Line,
+				err.IsWarning? TaskSeverity.Warning : TaskSeverity.Error,
+				TaskPriority.Normal, file.Project.ParentSolution, file));
+*/
+
+			HandleParsingErrors (fileFullPath);
 			return result;
 		}
 
