@@ -78,8 +78,6 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 		/// </summary>
 		public SymbolType SymbolType {
 			get { 
-				//IntPtr datatype = echo_symbol_get_symbol_type (instance);
-				//return (IntPtr.Zero == datatype)? null: new SymbolType (echo_symbol_get_symbol_type (instance));
 				return (SymbolType)echo_symbol_get_symbol_type (instance);
 			}
 		}
@@ -100,6 +98,14 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 		/// </summary>
 		public string Name {
 			get{ return Marshal.PtrToStringAuto (echo_symbol_get_name (instance)); }
+		}
+
+		public string CompletionParentName {
+			get{ return Marshal.PtrToStringAuto (echo_symbol_get_completion_parent_name (instance)); }
+		}
+
+		public string Description {
+			get{ return Marshal.PtrToStringAuto (echo_symbol_get_description (instance)); }
 		}
 
 		public bool IsRoot { 
@@ -295,6 +301,8 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 			if (iconTable.ContainsKey (visibility))
 				table = iconTable [visibility];
 			table.TryGetValue (nodeType.ToLower (), out icon);
+			if (icon == null)
+				icon = Stock.Delegate;
 			return icon;
 		}
 
@@ -306,6 +314,12 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 
 		[DllImport ("libecho")]
 		static extern IntPtr echo_symbol_get_name (IntPtr instance);
+
+		[DllImport ("libecho")]
+		static extern IntPtr echo_symbol_get_description (IntPtr instance);
+
+		[DllImport ("libecho")]
+		static extern IntPtr echo_symbol_get_completion_parent_name (IntPtr instance);
 
 		[DllImport ("libecho")]
 		static extern int echo_symbol_get_symbol_type (IntPtr instance);

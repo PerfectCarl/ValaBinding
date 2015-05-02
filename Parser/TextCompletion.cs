@@ -20,13 +20,13 @@ namespace MonoDevelop.ValaBinding.Parser
 	{
 		//static readonly string[] containerTypes = new string[]{ "class", "struct", "interface" };
 
-		ProjectInformation projectInfo;
+		//ProjectInformation projectInfo;
 		//private CompletionEngine afroditeEngine;
-		private Echo.Project echoProject;
+		private readonly Echo.Project echoProject;
 
 		internal TextCompletion (ProjectInformation projectInfo, /*CompletionEngine afroditeEngine,*/Echo.Project echoProject)
 		{
-			this.projectInfo = projectInfo; 
+			//this.projectInfo = projectInfo; 
 			//this.afroditeEngine = afroditeEngine;
 			this.echoProject = echoProject;
 		}
@@ -111,20 +111,24 @@ namespace MonoDevelop.ValaBinding.Parser
 		
 			List<CompletionData> data = new List<CompletionData> ();
 			foreach (var symbol in symbols) {
-				data.Add (new CompletionData (symbol));
+				var item = new CompletionData (symbol);
+				data.Add (item);
 			}
-		
-			DispatchService.GuiDispatch (delegate {
-				results.IsChanging = true;
-				results.AddRange (data);
-				results.IsChanging = false;
-			});
+			//DispatchService.GuiDispatch (delegate {
+			results.IsChanging = true;
+			results.AddRange (data);
+			results.IsChanging = false;
+			//});
 		}
 
-		public void Complete (ValaCompletionDataList results, MonoDevelop.Core.FilePath filePath, /*string lineText, char completionChar,*/int line, int column)
+		public void Complete (ValaCompletionDataList results, MonoDevelop.Core.FilePath filePath, string lineText, char completionChar, int line, int column)
 		{
+			LoggingService.LogDebug ("COMPLETING: {0} {1} {2}", lineText, line, column);
 			//var result = new ValaCompletionDataList ();
 			var symbols = echoProject.complete (filePath, line, column);
+			foreach (var sym in symbols) {
+				LoggingService.LogDebug ("COMPLETE: " + sym.Name);
+			}
 			//return result;
 			AddResults (results, symbols);
 		}
@@ -137,7 +141,7 @@ namespace MonoDevelop.ValaBinding.Parser
 			/*results.Add ("visible1");
 			results.Add ("visible2");
 			results.Add ("visible3");*/
-
+			LoggingService.LogDebug ("GetSymbolsVisibleFrom: " + filename);
 			var data = new List<CompletionData> ();
 			// foreach (Afrodite.Symbol symbol in list) {
 			//				// FIXME CARL data.Add (new CompletionData (symbol));
@@ -238,6 +242,7 @@ namespace MonoDevelop.ValaBinding.Parser
 			AddResults ((IList<Echo.Symbol>)functions, results);
 			*/
 			//return results;
+			LoggingService.LogDebug ("GetConstructorsForType: " + className);
 			return echoProject.GetConstructorsForClass (fileFullPath, className, line, column);
 		}
 

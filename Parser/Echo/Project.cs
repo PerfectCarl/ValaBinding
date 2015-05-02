@@ -122,7 +122,7 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 
 		#region P/Invokes
 
-		IntPtr instance;
+		readonly IntPtr instance;
 
 		[DllImport ("libecho")]
 		static extern IntPtr echo_project_new (string name);

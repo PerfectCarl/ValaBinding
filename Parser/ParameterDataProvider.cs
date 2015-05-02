@@ -210,19 +210,33 @@ namespace MonoDevelop.ValaBinding
 	/// </summary>
 	internal class CompletionData : MonoDevelop.Ide.CodeCompletion.CompletionData
 	{
+		static Dictionary<string, CompletionCategory> categories = new Dictionary<string, CompletionCategory> ();
+
 		private string image;
 		private string text;
 		private string description;
 		private string completion_string;
 
-		public CompletionData (Symbol item)
+		public CompletionData (Symbol symbol)
 		{
-			this.text = item.Name;
-			this.completion_string = item.Name;
-			this.description = item.DisplayText;
-			this.image = item.Icon;
+			this.text = symbol.Name;
+			this.completion_string = symbol.Name;
+			this.description = symbol.DisplayText;
+			this.image = symbol.Icon;
 			DisplayFlags = DisplayFlags.None;
-			CompletionCategory = new ValaCompletionCategory (text, image);
+			var categoryName = ""; 
+			// Parent is null for completion symbol if (symbol.Parent != null)
+			categoryName = symbol.CompletionParentName;
+			if (!string.IsNullOrEmpty (categoryName)) {
+				CompletionCategory category;
+				categories.TryGetValue (categoryName, out category);
+				if (category == null) {
+					LoggingService.LogDebug ("Category : " + categoryName);
+					category = new ValaCompletionCategory (categoryName, "");
+					categories [categoryName] = category;
+				}
+				this.CompletionCategory = category;
+			}
 		}
 
 		public override IconId Icon {
@@ -309,6 +323,11 @@ namespace MonoDevelop.ValaBinding
 
 		public override int CompareTo (CompletionCategory other)
 		{
+			if (other == null)
+				return -1; 
+			// Object should be displayed at the bottom
+			if (this.DisplayText == "Object")
+				return 1;
 			return DisplayText.CompareTo (other.DisplayText);
 		}
 	}

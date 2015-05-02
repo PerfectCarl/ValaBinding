@@ -115,12 +115,16 @@ namespace MonoDevelop.ValaBinding
 			var loc = Editor.Document.OffsetToLocation (completionContext.TriggerOffset);
 			int line = loc.Line, column = loc.Column;
 			string lineText = Editor.GetLineText (line); 
+			if (column > lineText.Length) {
+				column = lineText.Length;
+			}
+			lineText = lineText.Substring (0, column - 1);
 
 			var result = new ValaCompletionDataList ();
 
-			ThreadPool.QueueUserWorkItem (delegate {
-				Completion.Complete (result, Document.FileName, /*lineText, completionChar, */line, column);
-			}); 
+			//ThreadPool.QueueUserWorkItem (delegate {
+			Completion.Complete (result, Document.FileName, lineText, completionChar, line, column);
+			//}); 
 			return result; 
 			/*switch (completionChar)
             {
