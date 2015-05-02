@@ -222,7 +222,7 @@ namespace MonoDevelop.ValaBinding
 			try {
 				// Build up new tree
 				var caretLocation = Document.Editor.Caret.Location;
-				foreach (var symbol in ProjectInfo.GetRootSymbolsForFileEcho (FileName.CanonicalPath)) {
+				foreach (var symbol in ProjectInfo.GetRootSymbolsForFile (FileName.CanonicalPath)) {
 					BuildTreeChildren (TreeIter.Zero, symbol, caretLocation.Column, caretLocation.Line);
 				}
 				treeview.ExpandAll ();

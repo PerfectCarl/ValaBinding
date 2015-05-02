@@ -36,13 +36,13 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 		public string TypeName {
 			get {
 				StringBuilder text = new StringBuilder ();
-
+				// Not wanted anymore
 				// prefix out/ref
-				if (IsOut) {
+				/*if (IsOut) {
 					text.Append ("out ");
 				} else if (IsRef) {
 					text.Append ("ref ");
-				}
+				}*/
 
 				text.Append (Marshal.PtrToStringAuto (echo_data_type_get_type_name (instance)));
 
@@ -57,8 +57,8 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 					}
 					text.Append (">");
 				}
-
-				if (IsArray) {
+				// Not needed as echo does the trick
+				/*if (IsArray) {
 					text.Append ("[]");
 				}
 				if (IsNullable) {
@@ -66,7 +66,7 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 				}
 				if (IsPointer) {
 					text.Append ("*");
-				}
+				}*/
 
 				return text.ToString ();
 			}

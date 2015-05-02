@@ -35,57 +35,53 @@ using MonoDevelop.Ide.TypeSystem;
 using MonoDevelop.Projects;
 using MonoDevelop.Core;
 using ICSharpCode.NRefactory.TypeSystem;
-using Symbol=MonoDevelop.ValaBinding.Parser.Echo.Symbol;
+using Symbol = MonoDevelop.ValaBinding.Parser.Echo.Symbol;
 
 namespace MonoDevelop.ValaBinding.Parser
 {
-    /// <summary>
-    /// Parser for Vala source and vapi files
-    /// </summary>
-    public class ValaDocumentParser : TypeSystemParser
-    {
-        public ParsedDocument Parse2(bool storeAst, string fileName, TextReader reader, Project project = null)
-        {
-            DefaultParsedDocument defaultParsedDocument = new DefaultParsedDocument(fileName);
-            defaultParsedDocument.Flags |= ParsedDocumentFlags.NonSerializable;
-            //ProjectInformation projectInformation = ProjectInformationManager.Instance.Get(project);
-            //string text = reader.ReadToEnd();
-            /*string[] array = text.Split(new string[]
+	/// <summary>
+	/// Parser for Vala source and vapi files
+	/// </summary>
+	public class ValaDocumentParser : TypeSystemParser
+	{
+		public ParsedDocument Parse2 (bool storeAst, string fileName, TextReader reader, Project project = null)
+		{
+			DefaultParsedDocument defaultParsedDocument = new DefaultParsedDocument (fileName);
+			defaultParsedDocument.Flags |= ParsedDocumentFlags.NonSerializable;
+			//ProjectInformation projectInformation = ProjectInformationManager.Instance.Get(project);
+			//string text = reader.ReadToEnd();
+			/*string[] array = text.Split(new string[]
 			{
 				Environment.NewLine
 			}, StringSplitOptions.None);
 */
 			return defaultParsedDocument;
-        }
-        public override ParsedDocument Parse(bool storeAst, string fileName, TextReader reader, Project project = null)
-        {
-            ParsedDocument result = new DefaultParsedDocument(fileName);
-            ProjectInformation projectInformation = ProjectInformationManager.Instance.Get(project);
-            ICollection<Symbol> classesForFile = projectInformation.Completion.GetClassesForFileEcho(fileName);
-            if (classesForFile == null || classesForFile.Count == 0)
-            {
-                return result;
-            }
-            foreach (Symbol current in classesForFile)
-            {
-                if (current != null)
-                {
-                    //List<IMember> list = new List<IMember>();
-                    //int val = current.SourceReferences[0].LastLine;
+		}
+
+		public override ParsedDocument Parse (bool storeAst, string fileName, TextReader reader, Project project = null)
+		{
+			ParsedDocument result = new DefaultParsedDocument (fileName);
+			ProjectInformation projectInformation = ProjectInformationManager.Instance.Get (project);
+			ICollection<Symbol> classesForFile = projectInformation.Completion.GetClassesForFile (fileName);
+			if (classesForFile == null || classesForFile.Count == 0) {
+				return result;
+			}
+			foreach (Symbol current in classesForFile) {
+				if (current != null) {
+					//List<IMember> list = new List<IMember>();
+					//int val = current.SourceReferences[0].LastLine;
 					int val = current.Declaration.LastLine;
            
-					foreach (Symbol current2 in current.Children)
-                    {
+					foreach (Symbol current2 in current.Children) {
 						//if (1 <= current2.SourceReferences.Count && !(current2.SourceReferences[0].File != current.SourceReferences[0].File))
-						if ( !(current2.Declaration.File != current.Declaration.File))
-                        {
-							val = Math.Max(val, current2.Declaration.LastLine + 1);
-                            LoggingService.LogWarning("ValaDocumentParser: " + current2.MemberType.ToLower());
-                        }
-                    }
-                }
-            }
-            return result;
-        }
-    }
+						if (!(current2.Declaration.File != current.Declaration.File)) {
+							val = Math.Max (val, current2.Declaration.LastLine + 1);
+							LoggingService.LogWarning ("ValaDocumentParser: " + current2.MemberType.ToLower ());
+						}
+					}
+				}
+			}
+			return result;
+		}
+	}
 }

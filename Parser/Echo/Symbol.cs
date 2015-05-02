@@ -190,15 +190,15 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 				StringBuilder text = new StringBuilder (Name);
 				List<DataType> parameters = Parameters;
 				if (0 < parameters.Count) {
-					text.AppendFormat (" ({0} {1}", parameters [0].TypeName, Parameters [0].Name);
+					text.AppendFormat (" ({0}", parameters [0].TypeName);
 					for (int i = 1; i < parameters.Count; i++) {
-						text.AppendFormat (", {0} {1}", parameters [i].TypeName, Parameters [i].Name);
+						text.AppendFormat (", {0}", parameters [i].TypeName);
 					}
 					text.AppendFormat (")");
 				}
-				if (null != ReturnType && !string.IsNullOrEmpty (ReturnType.TypeName)) {
+				/*if (null != ReturnType && !string.IsNullOrEmpty (ReturnType.TypeName)) {
 					text.AppendFormat (": {0}", ReturnType.TypeName);
-				}
+				}*/
 
 				return text.ToString ();
 			}

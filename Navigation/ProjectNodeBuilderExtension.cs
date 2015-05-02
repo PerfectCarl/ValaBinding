@@ -47,29 +47,30 @@ namespace MonoDevelop.ValaBinding.Navigation
 	public class ProjectNodeBuilderExtension : NodeBuilderExtension
 	{
 		public ClassPadEventHandler finishedBuildingTreeHandler;
-		
+
 		public override bool CanBuildNode (Type dataType)
 		{
 			return typeof(ValaProject).IsAssignableFrom (dataType);
 		}
-		
+
 		public override Type CommandHandlerType {
 			get { return typeof(ProjectNodeBuilderExtensionHandler); }
 		}
-		
+
 		protected override void Initialize ()
 		{
 			finishedBuildingTreeHandler = (ClassPadEventHandler)DispatchService.GuiDispatch (new ClassPadEventHandler (OnFinishedBuildingTree));
 		}
-		
+
 		public override void Dispose ()
 		{
 		}
-		
+
 		public static void CreatePadTree (object o)
 		{
 			ValaProject p = o as ValaProject;
-			if (o == null) return;
+			if (o == null)
+				return;
 			ProjectInformation pi = ProjectInformationManager.Instance.Get (p);
 			
 			try {
@@ -78,33 +79,36 @@ namespace MonoDevelop.ValaBinding.Navigation
 						pi.AddFile (f.FilePath);
 				}
 				foreach (ProjectPackage package in p.Packages) {
-					if(!package.IsProject){ pi.AddPackage (p.Name); }
+					if (!package.IsProject) {
+						pi.AddPackage (p.Name);
+					}
 				}
 			} catch (IOException) {
 				return;
 			}
 		}
 
-        public override void BuildNode(ITreeBuilder treeBuilder, object dataObject, NodeInfo nodeInfo)
-        {
-        }
+		public override void BuildNode (ITreeBuilder treeBuilder, object dataObject, NodeInfo nodeInfo)
+		{
+		}
 		// Used for ClassPad
 		public override void BuildChildNodes (ITreeBuilder builder, object dataObject)
 		{			
 			ValaProject p = dataObject as ValaProject;
-			if (p == null) return;
+			if (p == null)
+				return;
 			
 			// bool nestedNamespaces = builder.Options["NestedNamespaces"];
 			
 			ProjectInformation info = ProjectInformationManager.Instance.Get (p);
-			var added = new List<String> () ;
+			var added = new List<String> ();
 			// Namespaces
 			foreach (ProjectFile file in p.Files) {
-				foreach (var child in info.GetRootSymbolsForFileEcho (file.FilePath.FullPath)) {
-					var name = child.Name ;
-					if( added.IndexOf (name) == -1 /*&& child.Parent.Name == null*/ ) { 
+				foreach (var child in info.GetRootSymbolsForFile (file.FilePath.FullPath)) {
+					var name = child.Name;
+					if (added.IndexOf (name) == -1 /*&& child.Parent.Name == null*/) { 
 						builder.AddChild (child);
-						added.Add(name) ;
+						added.Add (name);
 					}
 				}
 			}
@@ -124,7 +128,8 @@ namespace MonoDevelop.ValaBinding.Navigation
 			foreach (ProjectFile file in p.Files) {
 				foreach (Symbol child in info.GetRootSymbolsForFile (file.FilePath.FullPath)) {
 					var name = child.Name ;
-					if( added.IndexOf (name) == -1 /*&& child.Parent.Name == null*/ /*) { 
+					if( added.IndexOf (name) == -1 /*&& child.Parent.Name == null*/
+		/*) { 
 			builder.AddChild (child);
 			added.Add(name) ;
 		}
@@ -135,7 +140,7 @@ namespace MonoDevelop.ValaBinding.Navigation
 		{
 			return true;
 		}
-		
+
 		private void OnFinishedBuildingTree (ClassPadEventArgs e)
 		{
 			ITreeBuilder builder = Context.GetTreeBuilder (e.Project);
@@ -143,7 +148,7 @@ namespace MonoDevelop.ValaBinding.Navigation
 				builder.UpdateChildren ();
 		}
 	}
-	
+
 	public class ProjectNodeBuilderExtensionHandler : NodeCommandHandler
 	{
 		[CommandHandler (ValaProjectCommands.UpdateClassPad)]

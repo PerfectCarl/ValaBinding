@@ -31,27 +31,7 @@ namespace MonoDevelop.ValaBinding.Parser
 			this.echoProject = echoProject;
 		}
 
-		//		/// <summary>
-		//		/// Get constructors for a given expression
-		//		/// </summary>
-		//
-		//		[Obsolete]
-		//		internal /*List<Afrodite.Symbol>*/ void GetConstructorsForExpression (string expression, string filename, int line, int column, ValaCompletionDataList results)
-		//		{
-		//			string typename = projectInfo.GetExpressionType (expression, filename, line, column);
-		//			/*return*/ GetConstructorsForType (typename, filename, line, column, results);
-		//		}// GetConstructorsForExpression
-		//
-		//		/// <summary>
-		//		/// Get a list of classes declared in a given file
-		//		/// </summary>
-		//		[Obsolete]
-		//		internal List<Afrodite.Symbol> GetClassesForFile (string file)
-		//		{
-		//			return projectInfo.GetSymbolsForFile (file, containerTypes);
-		//		}// GetClassesForFile
-
-		public List<Echo.Symbol> GetClassesForFileEcho (string file)
+		public List<Echo.Symbol> GetClassesForFile (string file)
 		{
 			//return projectInfo.GetSymbolsForFile (file, containerTypes);
 
@@ -220,36 +200,6 @@ namespace MonoDevelop.ValaBinding.Parser
 			//return results;
 			return echoProject.GetConstructorsForClass (fileFullPath, className, line, column);
 		}
-
-		/// <summary>
-		/// Gets the completion list for a given symbol at a given location
-		/// </summary>
-		//		[Obsolete]
-		//		internal /*List<Afrodite.Symbol>*/ void Complete (string symbol, string filename, int line, int column, ValaCompletionDataList results)
-		//		{
-		//			List<Afrodite.Symbol> nodes = new List<Afrodite.Symbol> ();
-		//			if (afroditeEngine == null) {
-		//				return /*nodes*/;
-		//			}
-		//
-		//			//if( afroditeEngine != null )
-		//			using (Afrodite.CodeDom parseTree = afroditeEngine.TryAcquireCodeDom ()) {
-		//				if (null != parseTree) {
-		//					LoggingService.LogDebug ("Complete: Looking up symbol at {0}:{1}:{2}", filename, line, column);
-		//					Afrodite.Symbol sym = parseTree.GetSymbolForNameAndPath (symbol, filename, line, column);
-		//					LoggingService.LogDebug ("Complete: Got {0}", (null == sym) ? "null" : sym.Name);
-		//					if (null != sym) {
-		//						nodes = sym.Children;
-		//						AddResults (nodes, results);
-		//					}
-		//				} else {
-		//					LoggingService.LogDebug ("Complete: Unable to acquire codedom");
-		//				}
-		//			}
-		//
-		//			//return nodes;
-		//		}
-		// Complete
 
 	}
 }

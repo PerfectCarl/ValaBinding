@@ -52,6 +52,11 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 			}
 		}
 
+		public override string ToString ()
+		{
+			return string.Format ("{0}:{1}:{2}: {4}:{3}", FileFullPath, Line, Column, Message, Severity);
+		}
+
 		#region P/Invokes
 
 		IntPtr instance;
