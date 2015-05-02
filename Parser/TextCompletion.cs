@@ -102,11 +102,51 @@ namespace MonoDevelop.ValaBinding.Parser
 		//		}
 		//// GetTypesVisibleFrom
 
+		private static void AddResults (ValaCompletionDataList results, List<Echo.Symbol> symbols)
+		{
+			if (null == symbols || null == results) {
+				//LoggingService.LogDebug ("AddResults: null list or results!");
+				return;
+			}
+		
+			List<CompletionData> data = new List<CompletionData> ();
+			foreach (var symbol in symbols) {
+				data.Add (new CompletionData (symbol));
+			}
+		
+			DispatchService.GuiDispatch (delegate {
+				results.IsChanging = true;
+				results.AddRange (data);
+				results.IsChanging = false;
+			});
+		}
+
+		public void Complete (ValaCompletionDataList results, MonoDevelop.Core.FilePath filePath, /*string lineText, char completionChar,*/int line, int column)
+		{
+			//var result = new ValaCompletionDataList ();
+			var symbols = echoProject.complete (filePath, line, column);
+			//return result;
+			AddResults (results, symbols);
+		}
+
 		/// <summary>
 		/// Get symbols visible from a given source location
 		/// </summary>
 		public void GetSymbolsVisibleFrom (string filename, int line, int column, ValaCompletionDataList results)
 		{
+			/*results.Add ("visible1");
+			results.Add ("visible2");
+			results.Add ("visible3");*/
+
+			var data = new List<CompletionData> ();
+			// foreach (Afrodite.Symbol symbol in list) {
+			//				// FIXME CARL data.Add (new CompletionData (symbol));
+			//			}
+			DispatchService.GuiDispatch (delegate {
+				results.IsChanging = true;
+				results.AddRange (data);
+				results.IsChanging = false;
+			});
 			// TODO
 			//GetTypesVisibleFrom (filename, line, column, results);
 			//Complete ("this", filename, line, column, results);
@@ -185,7 +225,7 @@ namespace MonoDevelop.ValaBinding.Parser
 		//		}
 		// GetConstructorsForType
 
-		public List<Echo.Symbol> GetConstructorsForTypeEcho (string className, string fileFullPath, int line, int column, ValaCompletionDataList results)
+		public List<Echo.Symbol> GetConstructorsForType (string className, string fileFullPath, int line, int column, ValaCompletionDataList results)
 		{
 			//List<Echo.Symbol> results = new List<Echo.Symbol> ();
 			/*foreach (Afrodite.Symbol node in CompleteType (typename, filename, line, column, null)) {

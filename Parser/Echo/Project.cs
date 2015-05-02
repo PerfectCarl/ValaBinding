@@ -69,7 +69,7 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 			return list;
 		}
 
-		internal List<Symbol> GetSymbolsForFile (string fileFullPath)
+		public List<Symbol> GetSymbolsForFile (string fileFullPath)
 		{
 			List<Symbol> list = new List<Symbol> ();
 			IntPtr items = echo_project_get_symbols_for_file (instance, fileFullPath);
@@ -87,9 +87,16 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 			return (IntPtr.Zero == item) ? null : new Symbol (item);
 		}
 
-		public CompletionReport complete (string fileFullPath, string lineText, char completionChar, int line, int column)
+		public List<Symbol>  complete (string fileFullPath, int line, int column)
 		{
-			return new CompletionReport ();
+			List<Symbol> list = new List<Symbol> ();
+			IntPtr items = echo_project_complete (instance, fileFullPath, line, column);
+
+			if (IntPtr.Zero != items) {
+				list = new GeeList (items).ToTypedList (item => new Symbol (item));
+			}
+
+			return list;
 		}
 
 		public bool TargetGlib232 {
@@ -152,6 +159,9 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 
 		[DllImport ("libecho")]
 		static extern IntPtr echo_project_get_parsing_errors (IntPtr instance) ;
+
+		[DllImport ("libecho")]
+		static extern IntPtr echo_project_complete (IntPtr instance, string file_full_path, int line, int column) ;
 
 		#endregion
 	}

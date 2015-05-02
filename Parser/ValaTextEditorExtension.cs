@@ -119,7 +119,7 @@ namespace MonoDevelop.ValaBinding
 			var result = new ValaCompletionDataList ();
 
 			ThreadPool.QueueUserWorkItem (delegate {
-				ProjectInfo.complete (result, Document.FileName, lineText, completionChar, line, column);
+				Completion.Complete (result, Document.FileName, /*lineText, completionChar, */line, column);
 			}); 
 			return result; 
 			/*switch (completionChar)
@@ -174,7 +174,7 @@ namespace MonoDevelop.ValaBinding
                     break;
             }
 			*/
-			return null;
+			//return null;
 		}
 
 		/*static string GetTrailingSymbol (string text)

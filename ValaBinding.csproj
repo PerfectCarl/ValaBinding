@@ -240,7 +240,6 @@
     <Compile Include="Parser\TextCompletion.cs" />
     <Compile Include="Parser\ValaTextEditorExtension.cs" />
     <Compile Include="Parser\ParameterDataProvider.cs" />
-    <Compile Include="Parser\Echo\CompletionReport.cs" />
     <Compile Include="Parser\Echo\GeeList.cs" />
     <Compile Include="Parser\Echo\GeeEnumerator.cs" />
     <Compile Include="Parser\Echo\ParsingError.cs" />

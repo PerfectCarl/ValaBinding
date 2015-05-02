@@ -104,13 +104,6 @@ namespace MonoDevelop.ValaBinding.Parser
 			}
 		}
 
-		public void complete (ValaCompletionDataList list, MonoDevelop.Core.FilePath filePath, string lineText, char completionChar, int line, int column)
-		{
-			//var result = new ValaCompletionDataList ();
-			var report = echoProject.complete (filePath, lineText, completionChar, line, column);
-			//return result;
-		}
-
 		internal Echo.Symbol GetEnclosingSymbolAtPosition (string fileFullPath, int line, int column)
 		{
 			/*if( engine != null )
@@ -164,7 +157,7 @@ namespace MonoDevelop.ValaBinding.Parser
 		{
 			ClearParsingErrors ();
 			foreach (Echo.ParsingError err in echoProject.GetParsingErrors()) {
-				LoggingService.LogDebug ("Parsing error " + err.ToString ());
+				// LoggingService.LogDebug ("Parsing error " + err.ToString ());
 				//if (err.FileFullPath == file) {
 				var task = new Task (err.FileFullPath, err.Message, err.Column, err.Line, err.Severity, TaskPriority.Normal, Project, OWNER);
 				TaskService.Errors.Add (task);
