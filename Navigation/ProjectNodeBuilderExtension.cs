@@ -104,13 +104,14 @@ namespace MonoDevelop.ValaBinding.Navigation
 			var added = new List<String> ();
 			// Namespaces
 			foreach (ProjectFile file in p.Files) {
-				foreach (var child in info.GetRootSymbolsForFile (file.FilePath.FullPath)) {
-					var name = child.Name;
-					if (added.IndexOf (name) == -1 /*&& child.Parent.Name == null*/) { 
-						builder.AddChild (child);
-						added.Add (name);
+				if (file.BuildAction == BuildAction.Compile)
+					foreach (var child in info.GetRootSymbolsForFile (file.FilePath.FullPath)) {
+						var name = child.Name;
+						if (added.IndexOf (name) == -1 /*&& child.Parent.Name == null*/) { 
+							builder.AddChild (child);
+							added.Add (name);
+						}
 					}
-				}
 			}
 		}
 

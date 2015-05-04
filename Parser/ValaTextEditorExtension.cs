@@ -45,6 +45,7 @@ using Mono.TextEditor;
 using MonoDevelop.Ide.TypeSystem;
 using MonoDevelop.ValaBinding.Parser.Echo;
 using MonoDevelop.Ide;
+using MonoDevelop.Core;
 
 namespace MonoDevelop.ValaBinding
 {
@@ -384,6 +385,8 @@ namespace MonoDevelop.ValaBinding
 		// Yoinked from C# binding
 		void UpdatePath (object sender, DocumentLocationEventArgs e)
 		{
+			if (ProjectInfo == null)
+				return;
 			// TODO:
 
 			/*var unit = Document.CompilationUnit;
@@ -397,50 +400,34 @@ namespace MonoDevelop.ValaBinding
 			//Ambience amb = GetAmbience ();
 			//IMember member = null;
 			//INode node = (INode)unit;
-			Symbol node = ProjectInfo.GetEnclosingSymbolAtPosition (FileName.FullPath, loc.Line, loc.Column);
-			/*
-			if (type != null && type.ClassType != ClassType.Delegate) {
-				member = type.GetMemberAt (loc.Line, loc.Column);
+			if (loc == null) {
+				LoggingService.LogDebug ("location null");
+			} else if (FileName == null) {
+				LoggingService.LogDebug ("Filename null");
+			} else {
+				Symbol node = ProjectInfo.GetEnclosingSymbolAtPosition (FileName.FullPath, loc.Line, loc.Column);
+
+				PathEntry entry;
+
+				while ((node != null) /*&& ((node is IBlockNode) || (node is DEnumValue))*/) {
+					// var icon = DIcons.GetNodeIcon(node as DNode);
+					Xwt.Drawing.Image icon = null; 
+					if (!string.IsNullOrEmpty (node.Icon))
+						icon = ImageService.GetIcon (node.Icon);
+					entry = new PathEntry (icon, 
+						node.DisplayText /*+ DParameterDataProvider.GetNodeParamString (node)*/);
+					entry.Position = EntryPosition.Left;
+					entry.Tag = node;
+					//do not include the module in the path bar
+					if ((node.Parent != null) /*&& !((node is DNode) && (node as DNode).IsAnonymous)*/)
+						result.Insert (0, entry);
+					node = node.Parent;
+				}
+
+				var prev = CurrentPath;
+				CurrentPath = result.ToArray ();
+				OnPathChanged (new DocumentPathChangedEventArgs (prev));
 			}
-
-			if (null != member) {
-				node = member;
-			} else if (null != type) {
-				node = type;
-			}*/
-
-			//List<PathEntry> result = new List<PathEntry>();
-			//INode node = currentblock;
-			PathEntry entry;
-
-			while ((node != null) /*&& ((node is IBlockNode) || (node is DEnumValue))*/) {
-				// var icon = DIcons.GetNodeIcon(node as DNode);
-				Xwt.Drawing.Image icon = null; 
-				if (!string.IsNullOrEmpty (node.Icon))
-					icon = ImageService.GetIcon (node.Icon);
-				entry = new PathEntry (icon, 
-					node.DisplayText /*+ DParameterDataProvider.GetNodeParamString (node)*/);
-				entry.Position = EntryPosition.Left;
-				entry.Tag = node;
-				//do not include the module in the path bar
-				if ((node.Parent != null) /*&& !((node is DNode) && (node as DNode).IsAnonymous)*/)
-					result.Insert (0, entry);
-				node = node.Parent;
-			}
-
-			/*if (!((currentblock is DMethod) || (currentblock is DEnumValue)))
-			{
-				PathEntry noSelection = new PathEntry(GettextCatalog.GetString("No Selection")) { Tag = new NoSelectionCustomNode(currentblock) };
-				result.Add(noSelection);
-			}*/
-
-			//entry = GetRegionEntry (Document.GetDDocument (), Document.Editor.Caret.Location);
-			//if (entry != null)
-			//	result.Add (entry);
-
-			var prev = CurrentPath;
-			CurrentPath = result.ToArray ();
-			OnPathChanged (new DocumentPathChangedEventArgs (prev));
 		}
 
 		public override void Initialize ()

@@ -66,6 +66,8 @@ namespace MonoDevelop.ValaBinding.Parser
 		/// </summary>
 		public void AddFile (string filename)
 		{
+			if (!filename.EndsWith (".vala") && !filename.EndsWith (".vapi"))
+				LoggingService.LogDebug ("AIE!");
 			if (echoProject != null)
 				echoProject.AddFile (filename);
 		}

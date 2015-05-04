@@ -46,6 +46,9 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 
 		public List<Symbol> GetAllSymbolsForFile (string fileFullPath, SymbolType type)
 		{
+			if (!fileFullPath.EndsWith (".vala") && !fileFullPath.EndsWith (".vapi"))
+				LoggingService.LogDebug ("Aouch");
+
 			List<Symbol> list = new List<Symbol> ();
 			IntPtr items = echo_project_get_all_symbols_for_file (instance, fileFullPath, type);
 
@@ -71,6 +74,8 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 
 		public List<Symbol> GetSymbolsForFile (string fileFullPath)
 		{
+			if (!fileFullPath.EndsWith (".vala") && !fileFullPath.EndsWith (".vapi"))
+				LoggingService.LogDebug ("Aouch");
 			List<Symbol> list = new List<Symbol> ();
 			IntPtr items = echo_project_get_symbols_for_file (instance, fileFullPath);
 

@@ -405,37 +405,8 @@ namespace MonoDevelop.ValaBinding
 
 			if (clickedOnOutlineItem || treestore == null)
 				return;
-			/*
-			var caretLocation = Document.Editor.Caret.Location;
-			var caretLocationD = new CodeLocation (caretLocation.Column, caretLocation.Line);
-
-			var currentblock = DResolver.SearchBlockAt (ast, caretLocationD);
-
-			INode selectedASTNode = null;
-
-			if (currentblock == null)
+			if (ProjectInfo == null)
 				return;
-
-			foreach (var n in currentblock)
-				if (caretLocationD >= n.Location && caretLocationD <= n.EndLocation) {
-					selectedASTNode = n;
-					break;
-				}
-
-			// Select parameter node if needed
-			if (selectedASTNode == null && currentblock is DMethod)
-				foreach (var n in (currentblock as DMethod).Parameters)
-					if (caretLocationD >= n.Location && caretLocationD <= n.EndLocation) {
-						selectedASTNode = n;
-						break;
-					}
-
-			if (selectedASTNode == null)
-				selectedASTNode = currentblock;
-
-			if (selectedASTNode == null)
-				return;
-*/
 			var caretLocation = Document.Editor.Caret.Location;
 			var selectedSymbol = ProjectInfo.GetEnclosingSymbolAtPosition (FileName.FullPath, caretLocation.Line, caretLocation.Column);
 			treestore.Foreach ((TreeModel model, TreePath path, TreeIter iter) => {
