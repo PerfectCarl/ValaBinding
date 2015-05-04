@@ -118,8 +118,8 @@ namespace MonoDevelop.ValaBinding
 			if (column > lineText.Length) {
 				column = lineText.Length;
 			}
-			lineText = lineText.Substring (0, column - 1);
-
+			// lineText = lineText.Substring (0, column - 1);
+			
 			var result = new ValaCompletionDataList ();
 
 			//ThreadPool.QueueUserWorkItem (delegate {

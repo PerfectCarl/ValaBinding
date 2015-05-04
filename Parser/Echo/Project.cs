@@ -87,10 +87,10 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 			return (IntPtr.Zero == item) ? null : new Symbol (item);
 		}
 
-		public List<Symbol>  complete (string fileFullPath, int line, int column)
+		public List<Symbol> Complete (string fileFullPath, int line, int column, string lineText)
 		{
 			List<Symbol> list = new List<Symbol> ();
-			IntPtr items = echo_project_complete (instance, fileFullPath, line, column);
+			IntPtr items = echo_project_complete (instance, fileFullPath, line, column, lineText);
 
 			if (IntPtr.Zero != items) {
 				list = new GeeList (items).ToTypedList (item => new Symbol (item));
@@ -161,7 +161,7 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 		static extern IntPtr echo_project_get_parsing_errors (IntPtr instance) ;
 
 		[DllImport ("libecho")]
-		static extern IntPtr echo_project_complete (IntPtr instance, string file_full_path, int line, int column) ;
+		static extern IntPtr echo_project_complete (IntPtr instance, string file_full_path, int line, int column, string line_text) ;
 
 		#endregion
 	}

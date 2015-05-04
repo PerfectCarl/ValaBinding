@@ -288,7 +288,7 @@ namespace MonoDevelop.ValaBinding.Parser
 		{
 			//LoggingService.LogDebug ("COMPLETING: {0} {1} {2}", lineText, line, column);
 			//var result = new ValaCompletionDataList ();
-			var symbols = echoProject.complete (filePath, line, column);
+			var symbols = echoProject.Complete (filePath, line, column, lineText);
 			/*foreach (var sym in symbols) {
 				LoggingService.LogDebug ("COMPLETE: " + sym.Name);
 			}*/
