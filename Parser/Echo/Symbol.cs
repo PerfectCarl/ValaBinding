@@ -87,8 +87,9 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 		/// </summary>
 		public DataType ReturnType {
 			get { 
-				//IntPtr datatype = afrodite_symbol_get_return_type (instance);
-				//return (IntPtr.Zero == datatype)? null: new DataType (afrodite_symbol_get_return_type (instance));
+				IntPtr ptr = echo_symbol_get_return_type (instance);
+				return (IntPtr.Zero == ptr) ? null : 
+					new DataType (ptr);
 				return null;
 			}
 		}
@@ -100,13 +101,14 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 			get{ return Marshal.PtrToStringAuto (echo_symbol_get_name (instance)); }
 		}
 
+		public string Description {
+			get{ return Marshal.PtrToStringAuto (echo_symbol_get_description (instance)); }
+		}
+
 		public string CompletionParentName {
 			get{ return Marshal.PtrToStringAuto (echo_symbol_get_completion_parent_name (instance)); }
 		}
 
-		public string Description {
-			get{ return Marshal.PtrToStringAuto (echo_symbol_get_description (instance)); }
-		}
 
 		public bool IsRoot { 
 			get { 
@@ -338,6 +340,9 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 
 		[DllImport ("libecho")]
 		static extern IntPtr echo_symbol_get_parameters (IntPtr instance);
+
+		[DllImport ("libecho")]
+		static extern IntPtr echo_symbol_get_return_type (IntPtr instance);
 
 		[DllImport ("libecho")]
 		static extern IntPtr echo_symbol_get_declaration (IntPtr instance);

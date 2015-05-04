@@ -12,9 +12,172 @@ using MonoDevelop.Ide;
 using MonoDevelop.Core;
 
 //using MonoDevelop.ValaBinding.Parser.Afrodite;
+using MonoDevelop.Ide.CodeCompletion;
+using ICSharpCode.NRefactory.Completion;
 
 namespace MonoDevelop.ValaBinding.Parser
 {
+
+
+	/// <summary>
+	/// Data for Vala completion
+	/// </summary>
+	internal class CompletionData : MonoDevelop.Ide.CodeCompletion.CompletionData
+	{
+		static Dictionary<string, CompletionCategory> categories = new Dictionary<string, CompletionCategory> ();
+
+		private string image;
+		private string text;
+		private string description;
+		private string completion_string;
+		private string summary;
+		private string return_type = "";
+
+		public CompletionData (Echo.Symbol symbol)
+		{
+			this.text = symbol.Name;
+			this.completion_string = symbol.Name;
+			this.description = symbol.DisplayText;
+			this.image = symbol.Icon;
+			this.summary = symbol.Description;
+			if (symbol.ReturnType != null)
+				this.return_type = symbol.ReturnType.TypeName;
+			// TODO: markup and obsolete
+			DisplayFlags = DisplayFlags.None;
+			var categoryName = ""; 
+			// Parent is null for completion symbol if (symbol.Parent != null)
+			categoryName = symbol.CompletionParentName;
+			if (!string.IsNullOrEmpty (categoryName)) {
+				CompletionCategory category;
+				categories.TryGetValue (categoryName, out category);
+				if (category == null) {
+					LoggingService.LogDebug ("Category : " + categoryName);
+					category = new ValaCompletionCategory (categoryName, "");
+					categories [categoryName] = category;
+				}
+				this.CompletionCategory = category;
+			}
+		}
+
+		public override IconId Icon {
+			get { return image; }
+		}
+
+		public override string DisplayText {
+			get { return text; }
+		}
+
+		public override string Description {
+			get { return description; }
+		}
+
+		public override string CompletionText {
+			get { return completion_string; }
+		}
+
+		/*public override string GetDisplayDescription (bool isSelected)
+		{
+			var result = base.GetDisplayDescription (isSelected);
+			return return_type; 
+		}*/
+
+		public override string GetRightSideDescription (bool isSelected)
+		{
+			// var result = base.GetRightSideDescription (isSelected);
+			return return_type; 
+		}
+
+		public override TooltipInformation CreateTooltipInformation (bool smartWrap)
+		{
+			var result = new TooltipInformation ();
+
+			result.SignatureMarkup = DisplayText;
+
+			result.SummaryMarkup = summary;
+			result.FooterMarkup = "Defined in Glib";
+
+			return result;
+		}
+
+	}
+
+	public class ValaCompletionDataList : CompletionDataList, IMutableCompletionDataList
+	{
+		public ValaCompletionDataList ()
+			: base ()
+		{
+			IsChanging = true;
+			Add (string.Empty);
+		}
+
+		internal virtual void AddRange (IEnumerable<CompletionData> vals)
+		{
+			foreach (CompletionData item in vals) {
+				Add (item);
+			}
+		}
+
+		#region IMutableCompletionDataList implementation
+
+		public event EventHandler Changed;
+		public event EventHandler Changing;
+
+
+		public bool IsChanging {
+			get { return isChanging; }
+			set {
+				isChanging = value;
+				if (value) {
+					OnChanging (this, null);
+				} else {
+					OnChanged (this, null);
+				}
+			}
+		}
+
+		private bool isChanging;
+
+		#endregion
+
+		protected virtual void OnChanging (object sender, EventArgs args)
+		{
+			if (null != Changing) {
+				Changing (sender, args);
+			}
+		}
+
+		protected virtual void OnChanged (object sender, EventArgs args)
+		{
+			if (null != Changed) {
+				Changed (sender, args);
+			}
+		}
+
+		public void Dispose ()
+		{
+		}
+	}
+	// ValaCompletionDataList
+
+	internal class ValaCompletionCategory : CompletionCategory
+	{
+		public ValaCompletionCategory (string text, string image)
+			: base (text, image)
+		{
+		}
+
+		public override int CompareTo (CompletionCategory other)
+		{
+			if (other == null)
+				return -1; 
+			// Object should be displayed at the bottom
+			if (this.DisplayText == "Object")
+				return 1;
+			return DisplayText.CompareTo (other.DisplayText);
+		}
+	}
+
+
 
 	public class TextCompletion
 	{
@@ -123,12 +286,12 @@ namespace MonoDevelop.ValaBinding.Parser
 
 		public void Complete (ValaCompletionDataList results, MonoDevelop.Core.FilePath filePath, string lineText, char completionChar, int line, int column)
 		{
-			LoggingService.LogDebug ("COMPLETING: {0} {1} {2}", lineText, line, column);
+			//LoggingService.LogDebug ("COMPLETING: {0} {1} {2}", lineText, line, column);
 			//var result = new ValaCompletionDataList ();
 			var symbols = echoProject.complete (filePath, line, column);
-			foreach (var sym in symbols) {
+			/*foreach (var sym in symbols) {
 				LoggingService.LogDebug ("COMPLETE: " + sym.Name);
-			}
+			}*/
 			//return result;
 			AddResults (results, symbols);
 		}
