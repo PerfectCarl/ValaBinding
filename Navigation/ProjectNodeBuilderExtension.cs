@@ -68,19 +68,19 @@ namespace MonoDevelop.ValaBinding.Navigation
 
 		public static void CreatePadTree (object o)
 		{
-			ValaProject p = o as ValaProject;
+			ValaProject project = o as ValaProject;
 			if (o == null)
 				return;
-			ProjectInformation pi = ProjectInformationManager.Instance.Get (p);
+			ProjectInformation projectInfo = ProjectInformationManager.Instance.Get (project);
 			
 			try {
-				foreach (ProjectFile f in p.Files) {
+				foreach (ProjectFile f in project.Files) {
 					if (f.BuildAction == BuildAction.Compile)
-						pi.AddFile (f.FilePath);
+						projectInfo.AddFile (f.FilePath);
 				}
-				foreach (ProjectPackage package in p.Packages) {
+				foreach (ProjectPackage package in project.Packages) {
 					if (!package.IsProject) {
-						pi.AddPackage (p.Name);
+						projectInfo.AddPackage (project.Name);
 					}
 				}
 			} catch (IOException) {
@@ -94,25 +94,31 @@ namespace MonoDevelop.ValaBinding.Navigation
 		// Used for ClassPad
 		public override void BuildChildNodes (ITreeBuilder builder, object dataObject)
 		{			
-			ValaProject p = dataObject as ValaProject;
-			if (p == null)
+			ValaProject project = dataObject as ValaProject;
+			if (project == null)
 				return;
 			
 			// bool nestedNamespaces = builder.Options["NestedNamespaces"];
 			
-			ProjectInformation info = ProjectInformationManager.Instance.Get (p);
-			var added = new List<String> ();
+			ProjectInformation info = ProjectInformationManager.Instance.Get (project);
+			//var added = new List<String> ();
 			// Namespaces
-			foreach (ProjectFile file in p.Files) {
+
+			foreach (var child in info.GetRootSymbols ()) {
+				builder.AddChild (child);
+			}
+			/*foreach (ProjectFile file in project.Files) {
 				if (file.BuildAction == BuildAction.Compile)
 					foreach (var child in info.GetRootSymbolsForFile (file.FilePath.FullPath)) {
 						var name = child.Name;
-						if (added.IndexOf (name) == -1 /*&& child.Parent.Name == null*/) { 
-							builder.AddChild (child);
-							added.Add (name);
-						}
-					}
-			}
+						//if (added.IndexOf (name) == -1 /*&& child.Parent.Name == null*/ // ) { 
+			// builder	: MonoDevelop.Ide.Gui.Components.ExtensibleTreeView.TreeBuilder
+			// builder.options : 
+			//			builder.AddChild (child);
+			//	added.Add (name);
+			//}
+			/*		}
+			}*/
 		}
 
 		/*

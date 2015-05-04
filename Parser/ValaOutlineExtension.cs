@@ -218,7 +218,8 @@ namespace MonoDevelop.ValaBinding
 
 			// Clear the tree
 			treestore.Clear ();
-
+			if (ProjectInfo == null)
+				return false;
 			try {
 				// Build up new tree
 				var caretLocation = Document.Editor.Caret.Location;

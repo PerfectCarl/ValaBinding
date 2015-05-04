@@ -72,6 +72,18 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 			return list;
 		}
 
+		public List<Symbol>  GetSymbols ()
+		{
+			List<Symbol> list = new List<Symbol> ();
+			IntPtr items = echo_project_get_symbols (instance);
+
+			if (IntPtr.Zero != items) {
+				list = new GeeList (items).ToTypedList (item => new Symbol (item));
+			}
+
+			return list;
+		}
+
 		public List<Symbol> GetSymbolsForFile (string fileFullPath)
 		{
 			if (!fileFullPath.EndsWith (".vala") && !fileFullPath.EndsWith (".vapi"))
@@ -143,6 +155,9 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 
 		[DllImport ("libecho")]
 		static extern IntPtr echo_project_get_symbols_for_file (IntPtr instance, string file_path);
+
+		[DllImport ("libecho")]
+		static extern IntPtr echo_project_get_symbols (IntPtr instance);
 
 		[DllImport ("libecho")]
 		static extern IntPtr echo_project_get_enclosing_symbol_at_position (IntPtr instance, string file_full_path, int line, int column);

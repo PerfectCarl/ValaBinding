@@ -42,28 +42,42 @@ namespace MonoDevelop.ValaBinding.Navigation
 		//// <value>
 		/// Sort order for nodes
 		/// </value>
-		private static string[] types = { "namespace", "class", "struct", "interface", "property", "method", "signal", "field", "constant", "enum", "other" };
-		
+		private static string[] types = {
+			"namespace",
+			"class",
+			"struct",
+			"interface",
+			"property",
+			"method",
+			"signal",
+			"field",
+			"constant",
+			"enum",
+			"other"
+		};
+
 		public override Type NodeDataType {
 			get { return typeof(Symbol); }
 		}
-		
+
 		public override Type CommandHandlerType {
 			get { return typeof(LanguageItemCommandHandler); }
 		}
-		
+
 		public override string GetNodeName (ITreeNavigator thisNode, object dataObject)
 		{
 			return ((Symbol)dataObject).Name;
 		}
 
-        public override void BuildNode(ITreeBuilder treeBuilder, object dataObject, NodeInfo nodeInfo)
-        {
-            Symbol c = (Symbol)dataObject;
-            nodeInfo.Label = c.DisplayText;
-            nodeInfo.Icon = Context.GetIcon(c.Icon);
-        }
-		
+		public override void BuildNode (ITreeBuilder treeBuilder, object dataObject, NodeInfo nodeInfo)
+		{
+			Symbol symbol = (Symbol)dataObject;
+			var displayText = symbol.DisplayText;
+			displayText = GLib.Markup.EscapeText (displayText);
+			nodeInfo.Label = displayText;
+			nodeInfo.Icon = Context.GetIcon (symbol.Icon);
+		}
+
 		public override void BuildChildNodes (ITreeBuilder treeBuilder, object dataObject)
 		{
 			// bool publicOnly = treeBuilder.Options["PublicApiOnly"];
@@ -71,7 +85,7 @@ namespace MonoDevelop.ValaBinding.Navigation
 
 			foreach (Symbol child in thisSymbol.Children) {
 				// We don't display code blocks like if/then/else in the ClassPad
-				if( child.MemberType != "Block" && child.MemberType != "Creation Method")
+				if (child.MemberType != "Block" && child.MemberType != "Creation Method")
 					treeBuilder.AddChild (child);
 			}
 		}
@@ -91,16 +105,16 @@ namespace MonoDevelop.ValaBinding.Navigation
 			}
 			return false;
 		}
-		
+
 		public override int CompareObjects (ITreeNavigator thisNode, ITreeNavigator otherNode)
 		{
 			if (null != thisNode && null != otherNode) {
 				Symbol thisCN = thisNode.DataItem as Symbol,
-				         otherCN = otherNode.DataItem as Symbol;
+				otherCN = otherNode.DataItem as Symbol;
 	
 				if (null != thisCN && null != otherCN) {
-					return Array.IndexOf<string>(types, thisCN.MemberType) - 
-					       Array.IndexOf<string>(types, otherCN.MemberType);
+					return Array.IndexOf<string> (types, thisCN.MemberType) -
+					Array.IndexOf<string> (types, otherCN.MemberType);
 				}
 			}
 

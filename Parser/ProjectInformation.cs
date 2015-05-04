@@ -121,7 +121,7 @@ namespace MonoDevelop.ValaBinding.Parser
 				}*/
 			if (!projectUpdated) {
 				echoProject.UpdateSync ();
-				HandleParsingErrors (fileFullPath); 
+				HandleParsingErrors (); 
 				projectUpdated = true; 
 			}
 
@@ -155,7 +155,7 @@ namespace MonoDevelop.ValaBinding.Parser
 
 		}
 
-		void HandleParsingErrors (string file)
+		void HandleParsingErrors ()
 		{
 			ClearParsingErrors ();
 			foreach (Echo.ParsingError err in echoProject.GetParsingErrors()) {
@@ -168,17 +168,33 @@ namespace MonoDevelop.ValaBinding.Parser
 
 		}
 
+		public List<Echo.Symbol> GetRootSymbols ()
+		{
+			// HACK: be smarter, threaded thing
+			if (!projectUpdated) {
+				echoProject.UpdateSync ();
+				HandleParsingErrors (); 
+				projectUpdated = true; 
+			}
+			var symbols = echoProject.GetSymbols ();
+			var result = new List<Echo.Symbol> ();
+			foreach (var symbol in symbols) {
+				result.Add (symbol);
+			}
+			return result;
+		}
+
 		internal List<Echo.Symbol> GetRootSymbolsForFile (string fileFullPath)
 		{
 			// HACK: be smarter, threaded thing
 			if (!projectUpdated) {
 				echoProject.UpdateSync ();
-				HandleParsingErrors (fileFullPath); 
+				HandleParsingErrors (); 
 				projectUpdated = true; 
 			}
 			var symbols = echoProject.GetSymbolsForFile (fileFullPath);
 			var result = new List<Echo.Symbol> ();
-			// FIXME OVERDOING Really necessary 
+			// FIXME OVERDOING Really necessary ?
 			foreach (var symbol in symbols) {
 				result.Add (symbol);
 			}

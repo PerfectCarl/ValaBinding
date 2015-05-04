@@ -46,7 +46,7 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 
 				text.Append (Marshal.PtrToStringAuto (echo_data_type_get_type_name (instance)));
 
-				if (IsGeneric) {
+				/*if (IsGeneric) {
 					text.Append ("<");
 					List<DataType> parameters = GenericTypes;
 					if (parameters != null && parameters.Count > 0) {
@@ -56,7 +56,7 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 						}
 					}
 					text.Append (">");
-				}
+				}*/
 				// Not needed as echo does the trick
 				/*if (IsArray) {
 					text.Append ("[]");
