@@ -37,7 +37,7 @@ namespace MonoDevelop.ValaBinding.Navigation
 	/// <summary>
 	/// Class pad node builder for all Vala language items
 	/// </summary>
-	public class LanguageItemNodeBuilder: TypeNodeBuilder
+	public class ClassPadItemNodeBuilder: TypeNodeBuilder
 	{
 		//// <value>
 		/// Sort order for nodes
@@ -85,7 +85,7 @@ namespace MonoDevelop.ValaBinding.Navigation
 
 			foreach (Symbol child in thisSymbol.Children) {
 				// We don't display code blocks like if/then/else in the ClassPad
-				if (child.MemberType != "Block" && child.MemberType != "Creation Method")
+				if (child.TypeDescription != "Block" && child.TypeDescription != "Creation Method")
 					treeBuilder.AddChild (child);
 			}
 		}
@@ -100,7 +100,7 @@ namespace MonoDevelop.ValaBinding.Navigation
 			// We check that the children are not simple code blocks that we 
 			// don't want to display in the ClassPad
 			foreach (var child in symbol.Children) {
-				if (child.MemberType != "Block" && child.MemberType != "Creation Method")
+				if (child.TypeDescription != "Block" && child.TypeDescription != "Creation Method")
 					return true;
 			}
 			return false;
@@ -113,8 +113,8 @@ namespace MonoDevelop.ValaBinding.Navigation
 				otherCN = otherNode.DataItem as Symbol;
 	
 				if (null != thisCN && null != otherCN) {
-					return Array.IndexOf<string> (types, thisCN.MemberType) -
-					Array.IndexOf<string> (types, otherCN.MemberType);
+					return Array.IndexOf<string> (types, thisCN.TypeDescription) -
+					Array.IndexOf<string> (types, otherCN.TypeDescription);
 				}
 			}
 

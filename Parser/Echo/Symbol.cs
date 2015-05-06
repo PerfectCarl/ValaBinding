@@ -154,7 +154,7 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 		/// <summary>
 		/// The symbol type (class, method, ...) of this symbol
 		/// </summary>
-		public string MemberType {
+		public string TypeDescription {
 			get{ return Utils.GetTypeDescription (SymbolType); }
 		}
 
@@ -183,11 +183,52 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 			}
 		}
 
+		public bool HasParameters {
+			get {
+				// TODO : add delegates
+				return (SymbolType == SymbolType.METHOD || SymbolType == SymbolType.SIGNAL);
+			}
+		}
+
+		public bool HasReturnTypes {
+			get {
+				// TODO : add constants
+				return (HasParameters || SymbolType == SymbolType.FIELD || SymbolType == SymbolType.PROPERTY);
+			}
+		}
+
 		/// <summary>
 		/// The icon to be used for this symbol
 		/// </summary>
 		public string Icon {
-			get{ return GetIconForType (MemberType, Accessibility); }
+			get{ return GetIconForType (TypeDescription, Accessibility); }
+		}
+
+		public string GetParameterDisplayText (bool includeNames)
+		{
+			StringBuilder text = new StringBuilder ();
+			List<DataType> parameters = Parameters;
+			if (0 < parameters.Count) {
+				if (includeNames)
+					text.AppendFormat (" ({0} {1}", parameters [0].TypeName, Parameters [0].Name);
+				else
+					text.AppendFormat (" ({0}", parameters [0].TypeName);
+				for (int i = 1; i < parameters.Count; i++) {
+					if (includeNames)
+						text.AppendFormat (", {0} {1}", parameters [i].TypeName, Parameters [i].Name);
+					else
+						text.AppendFormat (", {0}", parameters [i].TypeName);
+				}
+				text.AppendFormat (")");
+			}
+			if (parameters.Count == 0 && HasParameters)
+				text.AppendFormat (" ()");
+			if (HasReturnTypes) {
+				if (null != ReturnType && !string.IsNullOrEmpty (ReturnType.TypeName)) {
+					text.AppendFormat (": {0}", ReturnType.TypeName);
+				}
+			}
+			return text.ToString ();
 		}
 
 		/// <summary>

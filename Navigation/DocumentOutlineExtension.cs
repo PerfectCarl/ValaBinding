@@ -21,14 +21,14 @@ using MonoDevelop.ValaBinding.Parser.Echo;
 using MonoDevelop.ValaBinding.Parser;
 using MonoDevelop.Ide.Gui.Components;
 
-namespace MonoDevelop.ValaBinding
+namespace MonoDevelop.ValaBinding.Navigation
 {
 	/// <summary>
 	/// 'Overrides' MonoDevelop's own document outline.
 	/// In the class itself, a tree widget is generated.
 	/// The active document's D Syntax Tree will be scanned, whereas all its child items become added to the tree.
 	/// </summary>
-	public class ValaOutlineExtension : TextEditorExtension, IOutlinedDocument
+	public class DocumentOutlineExtension : TextEditorExtension, IOutlinedDocument
 	{
 		TreeModelSort sortedTreestore;
 		TreeStore treestore;
@@ -345,19 +345,6 @@ namespace MonoDevelop.ValaBinding
 			}*/
 		}
 
-		void OutlineTreeIconFunc (TreeViewColumn column, CellRenderer cell, TreeModel model, TreeIter iter)
-		{
-			var pixRenderer = (CellRendererPixbuf)cell;
-			var symbol = model.GetValue (iter, 0) as Symbol;
-			var id = symbol.Icon;
-			if (id != null) {
-				var img = ImageService.GetIcon (id);
-				if (img != null)
-					pixRenderer.Pixbuf = img.ToPixbuf (IconSize.Menu);
-			}
-
-		}
-
 		void JumpToDeclaration (bool focusEditor)
 		{
 			if (!outlineReady)
@@ -427,18 +414,42 @@ namespace MonoDevelop.ValaBinding
 			});
 		}
 
+		// Draw the icon of the item displayed in the document outline
+		void OutlineTreeIconFunc (TreeViewColumn column, CellRenderer cell, TreeModel model, TreeIter iter)
+		{
+			var pixRenderer = (CellRendererPixbuf)cell;
+			var symbol = model.GetValue (iter, 0) as Symbol;
+			var id = symbol.Icon;
+			if (id != null) {
+				var img = ImageService.GetIcon (id);
+				if (img != null)
+					pixRenderer.Pixbuf = img.ToPixbuf (IconSize.Menu);
+			}
+
+		}
+
+		// Returns
+		string GetDisplayText (Symbol symbol)
+		{
+			var result = "<i>" + symbol.Name + "</i>" + symbol.GetParameterDisplayText (false); 
+
+			return result; 
+		}
+
+		// Draw the text of the item displayed in the document outline
 		void OutlineTreeTextFunc (TreeViewColumn column, CellRenderer cell, TreeModel model, TreeIter iter)
 		{
 			var symbol = model.GetValue (iter, 0) as Symbol;
 			string label;
+			var renderer = (CellRendererText)cell;
 
-			label = symbol.DisplayText ?? string.Empty;
+			label = GetDisplayText (symbol) ?? string.Empty;
 			if (symbol.Accessibility != SymbolAccessibility.Public)
-				(cell as CellRendererText).Foreground = "#606060";
+				renderer.Foreground = "#606060";
 			else
-				(cell as CellRendererText).Foreground = "black";
-
-			(cell as CellRendererText).Text = label;
+				renderer.Foreground = "black";
+			renderer.Markup = label;
+			//renderer.Text = label;
 		}
 	}
 

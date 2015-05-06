@@ -44,7 +44,7 @@ using MonoDevelop.ValaBinding.Parser;
 
 namespace MonoDevelop.ValaBinding.Navigation
 {
-	public class ProjectNodeBuilderExtension : NodeBuilderExtension
+	public class ClassPadNodeBuilderExtension : NodeBuilderExtension
 	{
 		public ClassPadEventHandler finishedBuildingTreeHandler;
 
@@ -161,7 +161,7 @@ namespace MonoDevelop.ValaBinding.Navigation
 		[CommandHandler (ValaProjectCommands.UpdateClassPad)]
 		public void UpdateClassPad ()
 		{
-			ProjectNodeBuilderExtension.CreatePadTree (CurrentNode.DataItem);
+			ClassPadNodeBuilderExtension.CreatePadTree (CurrentNode.DataItem);
 		}
 	}
 }

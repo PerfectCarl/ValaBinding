@@ -95,8 +95,8 @@
 	</Extension>
 	
 	<Extension path = "/MonoDevelop/Ide/Pads/ClassPad">
-		<NodeBuilder id = "MonoDevelop.ValaBinding.Navigation.ProjectNodeBuilderExtension" class = "MonoDevelop.ValaBinding.Navigation.ProjectNodeBuilderExtension"/>
-		<NodeBuilder id = "MonoDevelop.ValaBinding.Navigation.LanguageItemNodeBuilder" class = "MonoDevelop.ValaBinding.Navigation.LanguageItemNodeBuilder"/>
+		<NodeBuilder id = "MonoDevelop.ValaBinding.Navigation.ClassPadNodeBuilderExtension" class = "MonoDevelop.ValaBinding.Navigation.ClassPadNodeBuilderExtension"/>
+		<NodeBuilder id = "MonoDevelop.ValaBinding.Navigation.ClassPadItemNodeBuilder" class = "MonoDevelop.ValaBinding.Navigation.ClassPadItemNodeBuilder"/>
 	</Extension>
 	
 	<Extension path = "/MonoDevelop/Ide/Commands">
@@ -126,7 +126,7 @@
 	<Extension path = "/MonoDevelop/Ide/TextEditorExtensions">
 		<Class fileExtensions = ".vala,.vapi" class = "MonoDevelop.ValaBinding.ValaTextEditorExtension" />
 		<!-- Document Outline Provider -->
-		<Class fileExtensions = ".vala,.vapi" class = "MonoDevelop.ValaBinding.ValaOutlineExtension" />
+		<Class fileExtensions = ".vala,.vapi" class = "MonoDevelop.ValaBinding.Navigation.DocumentOutlineExtension" />
 	</Extension>
 
 	<Extension path = "/MonoDevelop/ProjectModel/ProjectServiceExtensions">

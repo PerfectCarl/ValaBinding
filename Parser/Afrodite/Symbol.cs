@@ -32,7 +32,8 @@ using MonoDevelop.Ide.Gui;
 namespace MonoDevelop.ValaBinding.Parser.Afrodite
 {
 	// From afrodite.vapi
-	public enum SymbolAccessibility {
+	public enum SymbolAccessibility
+	{
 		Private = 0x1,
 		Internal = 0x2,
 		Protected = 0x4,
@@ -72,7 +73,7 @@ namespace MonoDevelop.ValaBinding.Parser.Afrodite
 		public DataType SymbolType {
 			get { 
 				IntPtr datatype = afrodite_symbol_get_symbol_type (instance);
-				return (IntPtr.Zero == datatype)? null: new DataType (afrodite_symbol_get_symbol_type (instance));
+				return (IntPtr.Zero == datatype) ? null : new DataType (afrodite_symbol_get_symbol_type (instance));
 			}
 		}
 
@@ -82,7 +83,7 @@ namespace MonoDevelop.ValaBinding.Parser.Afrodite
 		public DataType ReturnType {
 			get { 
 				IntPtr datatype = afrodite_symbol_get_return_type (instance);
-				return (IntPtr.Zero == datatype)? null: new DataType (afrodite_symbol_get_return_type (instance));
+				return (IntPtr.Zero == datatype) ? null : new DataType (afrodite_symbol_get_return_type (instance));
 			}
 		}
 
@@ -97,9 +98,10 @@ namespace MonoDevelop.ValaBinding.Parser.Afrodite
 			get { 
 				if (Parent == null)
 					return true;
-				return Parent.Name == null ; 
+				return Parent.Name == null; 
 			}
 		}
+
 		/// <summary>
 		/// The fully qualified name of this symbol
 		/// </summary>
@@ -113,7 +115,7 @@ namespace MonoDevelop.ValaBinding.Parser.Afrodite
 		public Symbol Parent {
 			get {
 				IntPtr parent = afrodite_symbol_get_parent (instance);
-				return (IntPtr.Zero == parent)? null: new Symbol (parent);
+				return (IntPtr.Zero == parent) ? null : new Symbol (parent);
 			}
 		}
 
@@ -156,7 +158,9 @@ namespace MonoDevelop.ValaBinding.Parser.Afrodite
 				IntPtr parameters = afrodite_symbol_get_parameters (instance);
 
 				if (IntPtr.Zero != parameters) {
-					list = new ValaList (parameters).ToTypedList (delegate (IntPtr item){ return new DataType (item); });
+					list = new ValaList (parameters).ToTypedList (delegate (IntPtr item) {
+						return new DataType (item);
+					});
 				}
 
 				return list;
@@ -170,6 +174,30 @@ namespace MonoDevelop.ValaBinding.Parser.Afrodite
 			get{ return GetIconForType (MemberType, Accessibility); }
 		}
 
+
+		public string GetParameterDisplayText (bool includeNames)
+		{
+			StringBuilder text = new StringBuilder ();
+			List<DataType> parameters = Parameters;
+			if (0 < parameters.Count) {
+				if (includeNames)
+					text.AppendFormat ("({0} {1}", parameters [0].TypeName, Parameters [0].Name);
+				else
+					text.AppendFormat ("({0}", parameters [0].TypeName);
+				for (int i = 1; i < parameters.Count; i++) {
+					if (includeNames)
+						text.AppendFormat (", {0} {1}", parameters [i].TypeName, Parameters [i].Name);
+					else
+						text.AppendFormat (", {0}", parameters [i].TypeName);
+				}
+				text.AppendFormat (")");
+			}
+			if (null != ReturnType && !string.IsNullOrEmpty (ReturnType.TypeName)) {
+				text.AppendFormat (": {0}", ReturnType.TypeName);
+			}
+			return text.ToString ();
+		}
+
 		/// <summary>
 		/// Descriptive text for this symbol
 		/// </summary>
@@ -178,9 +206,9 @@ namespace MonoDevelop.ValaBinding.Parser.Afrodite
 				StringBuilder text = new StringBuilder (Name);
 				List<DataType> parameters = Parameters;
 				if (0 < parameters.Count) {
-					text.AppendFormat ("({0} {1}", parameters[0].TypeName, Parameters[0].Name);
+					text.AppendFormat ("({0} {1}", parameters [0].TypeName, Parameters [0].Name);
 					for (int i = 1; i < parameters.Count; i++) {
-						text.AppendFormat (", {0} {1}", parameters[i].TypeName, Parameters[i].Name);
+						text.AppendFormat (", {0} {1}", parameters [i].TypeName, Parameters [i].Name);
 					}
 					text.AppendFormat (")");
 				}
@@ -264,7 +292,7 @@ namespace MonoDevelop.ValaBinding.Parser.Afrodite
 		public static string GetIconForType (string nodeType, SymbolAccessibility visibility)
 		{
 			string icon = null;
-			iconTable[visibility].TryGetValue (nodeType.ToLower (), out icon);
+			iconTable [visibility].TryGetValue (nodeType.ToLower (), out icon);
 			return icon;
 		}
 
@@ -274,37 +302,37 @@ namespace MonoDevelop.ValaBinding.Parser.Afrodite
 
 		IntPtr instance;
 
-		[DllImport("libafrodite")]
+		[DllImport ("libafrodite")]
 		static extern IntPtr afrodite_symbol_get_type_name (IntPtr instance);
 
-		[DllImport("libafrodite")]
+		[DllImport ("libafrodite")]
 		static extern IntPtr afrodite_symbol_get_display_name (IntPtr instance);
 
-		[DllImport("libafrodite")]
+		[DllImport ("libafrodite")]
 		static extern IntPtr afrodite_symbol_get_children (IntPtr instance);
 
-		[DllImport("libafrodite")]
+		[DllImport ("libafrodite")]
 		static extern IntPtr afrodite_symbol_get_parent (IntPtr instance);
 
-		[DllImport("libafrodite")]
+		[DllImport ("libafrodite")]
 		static extern IntPtr afrodite_symbol_get_fully_qualified_name (IntPtr instance);
 
-		[DllImport("libafrodite")]
+		[DllImport ("libafrodite")]
 		static extern IntPtr afrodite_symbol_get_source_references (IntPtr instance);
 
-		[DllImport("libafrodite")]
+		[DllImport ("libafrodite")]
 		static extern int afrodite_symbol_get_access (IntPtr instance);
 
-		[DllImport("libafrodite")]
+		[DllImport ("libafrodite")]
 		static extern IntPtr afrodite_symbol_get_parameters (IntPtr instance);
 
-		[DllImport("libafrodite")]
+		[DllImport ("libafrodite")]
 		static extern int afrodite_symbol_get_member_type (IntPtr instance);
 
-		[DllImport("libafrodite")]
+		[DllImport ("libafrodite")]
 		static extern IntPtr afrodite_symbol_get_symbol_type (IntPtr instance);
 
-		[DllImport("libafrodite")]
+		[DllImport ("libafrodite")]
 		static extern IntPtr afrodite_symbol_get_return_type (IntPtr instance);
 
 		#endregion

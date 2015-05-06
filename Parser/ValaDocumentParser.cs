@@ -76,7 +76,7 @@ namespace MonoDevelop.ValaBinding.Parser
 						//if (1 <= current2.SourceReferences.Count && !(current2.SourceReferences[0].File != current.SourceReferences[0].File))
 						if (!(current2.Declaration.File != current.Declaration.File)) {
 							val = Math.Max (val, current2.Declaration.LastLine + 1);
-							LoggingService.LogWarning ("ValaDocumentParser: " + current2.MemberType.ToLower ());
+							LoggingService.LogWarning ("ValaDocumentParser: " + current2.TypeDescription.ToLower ());
 						}
 					}
 				}

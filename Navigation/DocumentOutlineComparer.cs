@@ -8,7 +8,7 @@ using MonoDevelop.Core;
 using MonoDevelop.Ide.TypeSystem;
 using ICSharpCode.NRefactory.TypeSystem;
 
-namespace MonoDevelop.ValaBinding
+namespace MonoDevelop.ValaBinding.Navigation
 {
 	/// <remarks>
 	/// This implementation uses a primary sort key (int based on node's group) and
