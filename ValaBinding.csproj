@@ -105,9 +105,11 @@
     <None Include="Parser\Afrodite\CodeDomDumper.cs" />
     <None Include="TODO.md" />
     <None Include="Errors.md" />
+    <None Include="templates\CodeTemplates.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="ValaBinding.addin.xml" />
     <EmbeddedResource Include="templates\EmptyValaProject.xpt.xml">
       <LogicalName>EmptyValaProject.xpt.xml</LogicalName>
     </EmbeddedResource>
@@ -182,6 +184,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="templates\NewElementaryPlug.xft.xml">
       <LogicalName>NewElementaryPlug.xft.xml</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ValaBinding.addin.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

@@ -1,0 +1,198 @@
+﻿<ValaCodeTemplates version="1.0">
+	
+	<CodeTemplate version="2.0">
+		<Header>
+			<_Group>Vala</_Group>
+			<Version>1.0</Version>
+			<MimeType>text/x-vala</MimeType>
+			<Shortcut>print</Shortcut>
+			<_Description>Template for stdout.print</_Description>
+			<TemplateType>Expansion</TemplateType>
+		</Header>
+		<Code><![CDATA[stdout.print ("$end$\n");]]></Code>
+	</CodeTemplate>
+
+	<CodeTemplate version="2.0">
+		<Header>
+			<_Group>Vala</_Group>
+			<Version>1.0</Version>
+			<MimeType>text/x-vala</MimeType>
+			<Shortcut>#if</Shortcut>
+			<_Description>Template for #if</_Description>
+			<TemplateType>SurroundsWith,Expansion</TemplateType>
+		</Header>
+		<Variables>
+			<Variable name="expression" isIdentifier="true">
+				<Default>true</Default>
+				<_ToolTip>Preprocessor expression to evaluate</_ToolTip>
+			</Variable>
+		</Variables>
+		
+		<Code><![CDATA[#if $expression$
+$selected$$end$
+#endif]]></Code>
+	</CodeTemplate>
+
+	<CodeTemplate version="2.0">
+		<Header>
+			<_Group>Vala</_Group>
+			<Version>1.0</Version>
+			<MimeType>text/x-vala</MimeType>
+			<Shortcut>try</Shortcut>
+			<_Description>Template for try...catch</_Description>
+			<TemplateType>SurroundsWith,Expansion</TemplateType>
+		</Header>
+		<Code><![CDATA[try {
+	$selected$
+} catch (Error error) {
+	$end$
+}]]></Code>
+	</CodeTemplate>
+
+	<CodeTemplate version="2.0">
+		<Header>
+			<_Group>Vala</_Group>
+			<Version>1.0</Version>
+			<MimeType>text/x-vala</MimeType>
+			<Shortcut>tryf</Shortcut>
+			<_Description>Template for try...finally</_Description>
+			<TemplateType>SurroundsWith,Expansion</TemplateType>
+		</Header>
+		<Code><![CDATA[try {
+	$selected$
+} finally {
+	$end$
+}]]></Code>
+	</CodeTemplate>
+
+	<CodeTemplate version="2.0">
+		<Header>
+			<_Group>Vala</_Group>
+			<Version>1.0</Version>
+			<MimeType>text/x-vala</MimeType>
+			<Shortcut>#if</Shortcut>
+			<_Description>Template for #if</_Description>
+			<TemplateType>SurroundsWith,Expansion</TemplateType>
+		</Header>
+		<Variables>
+			<Variable name="expression" isIdentifier="true">
+				<Default>true</Default>
+				<_ToolTip>Preprocessor expression to evaluate</_ToolTip>
+			</Variable>
+		</Variables>
+		
+		<Code><![CDATA[#if $expression$
+$selected$$end$
+#endif]]></Code>
+	</CodeTemplate>
+
+	<CodeTemplate version="2.0">
+		<Header>
+			<_Group>Vala</_Group>
+			<Version>1.0</Version>
+			<MimeType>text/x-vala</MimeType>
+			<Shortcut>class</Shortcut>
+			<_Description>Template for class declaration</_Description>
+			<TemplateType>SurroundsWith,Expansion</TemplateType>
+		</Header>
+		<Variables>
+			<Variable name="name" isIdentifier="true">
+				<Default>MyClass</Default>
+				<_ToolTip>Class name</_ToolTip>
+			</Variable>
+		</Variables>
+		<Code><![CDATA[public class $name$
+{
+	$selected$$end$
+}]]></Code>
+
+	</CodeTemplate>
+	<CodeTemplate version="2.0">
+		<Header>
+			<_Group>Vala</_Group>
+			<Version>1.0</Version>
+			<MimeType>text/x-vala</MimeType>
+			<Shortcut>prop</Shortcut>
+			<_Description>Template for a short property</_Description>
+			<TemplateType>Expansion</TemplateType>
+		</Header>
+		<Variables>
+			<Variable name="type" isIdentifier="true">
+				<Default>Object</Default>
+				<_ToolTip>Return type of the property</_ToolTip>
+			</Variable>
+			<Variable name="name" isIdentifier="true">
+				<Default>my_prop</Default>
+				<_ToolTip>Property name</_ToolTip>
+			</Variable>
+		</Variables>
+		<Code><![CDATA[public $type$ $name$ {
+	get;
+	set;
+}]]></Code>
+	</CodeTemplate>
+	
+	<CodeTemplate version="2.0">
+		<Header>
+			<_Group>Vala</_Group>
+			<Version>1.0</Version>
+			<MimeType>text/x-vala</MimeType>
+			<Shortcut>propg</Shortcut>
+			<_Description>Template for a short property with private set.</_Description>
+			<TemplateType>Expansion</TemplateType>
+		</Header>
+		<Variables>
+			<Variable name="type" isIdentifier="true">
+				<Default>Object</Default>
+				<_ToolTip>Return type of the property</_ToolTip>
+			</Variable>
+			<Variable name="name" isIdentifier="true">
+				<Default>my_prop</Default>
+				<_ToolTip>Property name</_ToolTip>
+			</Variable>
+		</Variables>
+		<Code><![CDATA[public $type$ $name$  {
+	get;
+	private set;
+}]]></Code>
+	</CodeTemplate>
+
+	<CodeTemplate version="2.0">
+		<Header>
+			<_Group>Vala</_Group>
+			<Version>1.0</Version>
+			<MimeType>text/x-vala</MimeType>
+			<Shortcut>switch</Shortcut>
+			<_Description>Template for switch statement</_Description>
+			<TemplateType>Expansion</TemplateType>
+		</Header>
+		<Variables>
+			<Variable name="expression">
+				<Default>switch_on</Default>
+				<_ToolTip>Expression to switch on</_ToolTip>
+			</Variable>
+		</Variables>
+		<Code><![CDATA[switch ($expression$) {
+default:
+		assert_not_reached () ;
+break;
+}$end$]]></Code>
+	</CodeTemplate>
+
+
+	<CodeTemplate version="2.0">
+		<Header>
+			<_Group>Vala</_Group>
+			<Version>1.0</Version>
+			<MimeType>text/x-vala</MimeType>
+			<Shortcut>main</Shortcut>
+			<_Description>Template for int Main method.</_Description>
+			<TemplateType>Expansion</TemplateType>
+		</Header>
+		<Code><![CDATA[public static int Main (string[] args)
+{
+	$end$
+	return 0;
+}]]></Code>
+	</CodeTemplate>
+</ValaCodeTemplates>

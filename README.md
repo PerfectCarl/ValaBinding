@@ -3,12 +3,14 @@
 ValaBinding is a Vala language binding for MonoDevelop 5.7 and superior.
 
 # Features
-* Vala project support for executable projects, libraries, and unit test projects (using GTest).
+* Vala project support for executable projects, libraries
 * Reference other Vala libraries and projects from within the IDE.
 * Class browser.
 * Basic Makefile integration.
 * Breakpoints (via gdb)
 * Full vala package management
+* Code snippets
+* A wide range of templates for console, gtk3 and elementary apps
 * Using [echo](https://github.com/I-hate-farms/echo) for completion and code AST
 
 # TODO 

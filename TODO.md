@@ -6,7 +6,9 @@
   - [~] add documentation
 - Fix display errors 
 - Fix parameters errors
-- Snippets and empty projects 
+- [x] code snippets
+- [ ] more template projects 
+- [ ] more file templates (also fix icons) 
 
 ## General 
 [ ] Run in built-in console
