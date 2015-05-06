@@ -142,16 +142,21 @@
 		<DataType class = "MonoDevelop.ValaBinding.ValaCompiler"/>
 		<DataType class = "MonoDevelop.ValaBinding.ProjectPackage"/>
 	</Extension>
-	
+	<!---
+	Fixing the warnings: 
+	WARNING: The add-in 'MonoDevelop.ValaBinding,5.7' is trying to extend '/MonoDevelop/Autotools/MakefileHandlers', but there isn't any compatible add-in defining this extension point
+WARNING: The add-in 'MonoDevelop.ValaBinding,5.7' is trying to extend '/MonoDevelop/ProjectModel/DomParser', but there isn't any add-in defining this extension point
+WARNING: The add-in 'MonoDevelop.ValaBinding,5.7' is trying to extend '/MonoDevelop/ProjectModel/DomParser/ValaDocumentParser', but there isn't any add-in defining this extension point
+
 	<Extension path = "/MonoDevelop/Autotools/MakefileHandlers">
 		<Class class = "MonoDevelop.ValaBinding.MakefileHandler"/>
 	</Extension>
-	
+
 	<Extension path = "/MonoDevelop/ProjectModel/DomParser">
 		<Parser fileExtensions=".vala, .vapi" class = "MonoDevelop.ValaBinding.Parser.ValaDocumentParser"
 			id = "ValaDocumentParser" />
 	</Extension>
-
+	-->
 
 	<Extension path = "/MonoDevelop/Ide/CodeTemplates">
         <CodeTemplate file="templates/CodeTemplates.xml" />
