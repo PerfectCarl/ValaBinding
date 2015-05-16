@@ -52,7 +52,7 @@ namespace MonoDevelop.ValaBinding
 	public class ValaCompilationParameters : ICloneable
 	{
 		[ItemProperty ("WarningLevel")]
-		private WarningLevel warning_level = WarningLevel.Normal;
+		private WarningLevel warning_level = WarningLevel.None;
 		
 		[ItemProperty ("WarningsAsErrors")]
 		private bool warnings_as_errors = false;

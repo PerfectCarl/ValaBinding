@@ -365,6 +365,16 @@ System.InvalidOperationException: Console could not be created.
 			}
 		}
 
+		private List<String> referencedProjects = new List<string> ();
+
+		public List<String> ReferencedProjects {
+			get {
+				return referencedProjects;
+			}
+		}
+
+
+
 		[Browsable (false)]
 		[ItemProperty ("Packages")]
 		public ProjectPackageCollection Packages {
@@ -377,11 +387,10 @@ System.InvalidOperationException: Console could not be created.
 
 				foreach (ProjectPackage p in packages) {
 					if (p.IsProject) {
-						var outputDir = FileService.RelativeToAbsolutePath (configuration.SourceDirectory, configuration.OutputDirectory);
-						string file = Path.Combine (outputDir, p.File);
-						LoggingService.LogDebug ("Adding {0} for project package {1}", file, p.Name);
-						// p.GetProject().
-						pi.AddFile (file);
+						//var outputDir = FileService.RelativeToAbsolutePath (configuration.SourceDirectory, configuration.OutputDirectory);
+						//string file = Path.Combine (outputDir, p.File);
+						//LoggingService.LogDebug ("Adding {0} for project package {1}", file, p.Name);
+						ReferencedProjects.Add (p.Name);
 					} else {
 						pi.AddPackage (p.Name);
 					}

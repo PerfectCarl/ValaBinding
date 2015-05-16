@@ -39,6 +39,8 @@ using MonoDevelop.Core;
 // using MonoDevelop.ValaBinding.Parser.Afrodite;
 using MonoDevelop.ValaBinding.Parser;
 using MonoDevelop.Ide.Tasks;
+using MonoDevelop.Ide;
+using System.IO;
 
 namespace MonoDevelop.ValaBinding.Parser
 {
@@ -49,11 +51,11 @@ namespace MonoDevelop.ValaBinding.Parser
 	{
 		private Echo.Project echoProject;
 
-		public Project Project{ get; set; }
+		public ValaProject Project{ get; set; }
 
 		public TextCompletion Completion { get; private set ; }
 
-		public ProjectInformation (Project project)
+		public ProjectInformation (ValaProject project)
 		{
 			this.Project = project;
 			echoProject = new Echo.Project (project.Name);
@@ -121,11 +123,7 @@ namespace MonoDevelop.ValaBinding.Parser
 						LoggingService.LogDebug ("GetFunction: Unable to acquire codedom");
 					}
 				}*/
-			if (!projectUpdated) {
-				echoProject.UpdateSync ();
-				HandleParsingErrors (); 
-				projectUpdated = true; 
-			}
+			ParseProject ();
 
 			var result = echoProject.GetEnclosingSymbolAtPosition (fileFullPath, line, column);
 			//HandleParsingErrors (fileFullPath); 
@@ -140,44 +138,84 @@ namespace MonoDevelop.ValaBinding.Parser
 		static public void ClearParsingErrors ()
 		{
 
+
+			TaskService.Errors.BeginTaskUpdates ();
+			TaskService.Errors.ClearByOwner (OWNER);
+			TaskService.Errors.EndTaskUpdates ();
+			/*
 			//var enumerator = TaskService.Errors.
 			//var tasks = TaskService.Errors.GetOwnerTasks (OWNER);
 			var tasks = new List<Task> (); 
 			foreach (var task in TaskService.Errors.GetOwnerTasks (OWNER)) {
 				tasks.Add (task);
 			}
-
+			TaskService.Errors.BeginTaskUpdates ();
 			foreach (var task in tasks) {
 				//for (int i = TaskService.Errors.Count - 1; i >= 0; i--) {
 				//	var task = TaskService.Errors. [i];
 				//if (task.FileName == file && task.Owner.ToString () == OWNER) {
 				TaskService.Errors.Remove (task);
+
 				//}
 			}
+			TaskService.Errors.EndTaskUpdates ();*/
 
 		}
 
 		void HandleParsingErrors ()
 		{
-			ClearParsingErrors ();
-			foreach (Echo.ParsingError err in echoProject.GetParsingErrors()) {
-				// LoggingService.LogDebug ("Parsing error " + err.ToString ());
-				//if (err.FileFullPath == file) {
-				var task = new Task (err.FileFullPath, err.Message, err.Column, err.Line, err.Severity, TaskPriority.Normal, Project, OWNER);
-				TaskService.Errors.Add (task);
-				//}
+			try {
+				TaskService.Errors.BeginTaskUpdates ();
+				ClearParsingErrors ();
+				foreach (Echo.ParsingError err in echoProject.GetParsingErrors()) {
+					// LoggingService.LogDebug ("Parsing error " + err.ToString ());
+					//if (err.FileFullPath == file) {
+					var task = new Task (err.FileFullPath, err.Message, err.Column, err.Line, err.Severity, TaskPriority.Normal, Project, OWNER);
+					TaskService.Errors.Add (task);
+					//}
+				}
+			} finally {
+				TaskService.Errors.EndTaskUpdates ();
 			}
 
 		}
 
-		public List<Echo.Symbol> GetRootSymbols ()
+		private ValaProject GetProject (string projectName)
+		{
+			var projects = IdeApp.Workspace.GetAllProjects ();
+			foreach (var p in projects) {
+				if (p is ValaProject && p.Name == projectName) {
+					return p as ValaProject;
+				}
+			}
+			return null;
+		}
+
+		private void ParseProject ()
 		{
 			// HACK: be smarter, threaded thing
 			if (!projectUpdated) {
+				// Add all the vapi file for the referenced projects
+				foreach (String name in Project.ReferencedProjects) {
+					var proj = GetProject (name);
+					if (proj != null) {
+						var conf = (ValaProjectConfiguration)proj.DefaultConfiguration;
+						var vapiFilePath = conf.OutputDirectory + "/" + proj.Name + ".vapi";
+						LoggingService.LogDebug ("Adding {0} to {1}", vapiFilePath, Project.Name);
+						if (File.Exists (vapiFilePath)) {
+							//echoProject.AddExternalPackage (vapiFilePath);
+						}
+					}
+				}
 				echoProject.UpdateSync ();
 				HandleParsingErrors (); 
 				projectUpdated = true; 
 			}
+		}
+
+		public List<Echo.Symbol> GetRootSymbols ()
+		{
+			ParseProject ();
 			var symbols = echoProject.GetSymbols ();
 			var result = new List<Echo.Symbol> ();
 			foreach (var symbol in symbols) {
@@ -188,12 +226,7 @@ namespace MonoDevelop.ValaBinding.Parser
 
 		internal List<Echo.Symbol> GetRootSymbolsForFile (string fileFullPath)
 		{
-			// HACK: be smarter, threaded thing
-			if (!projectUpdated) {
-				echoProject.UpdateSync ();
-				HandleParsingErrors (); 
-				projectUpdated = true; 
-			}
+			ParseProject ();
 			var symbols = echoProject.GetSymbolsForFile (fileFullPath);
 			var result = new List<Echo.Symbol> ();
 			// FIXME OVERDOING Really necessary ?

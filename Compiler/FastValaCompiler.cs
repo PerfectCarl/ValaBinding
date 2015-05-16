@@ -47,6 +47,7 @@ namespace MonoDevelop.ValaBinding
 		ValaProjectConfiguration projectConfiguration;
 
 		string gccLibs = "";
+		string gccLinkedLibs = "";
 		string gccPkgConfig = "";
 
 		public ValaCompiler ()
@@ -182,13 +183,14 @@ namespace MonoDevelop.ValaBinding
 				gccArgs.Add ("\"-O" + cp.OptimizationLevel + "\"");
 
 			}
+			var textId = cp.GettextId; 
 
-			if (!String.IsNullOrEmpty (cp.GettextId)) {
+			if (String.IsNullOrEmpty (textId)) {
 				// -DGETTEXT_PACKAGE=\"sonata\"
-				gccArgs.Add ("-DGETTEXT_PACKAGE=\\\"" + cp.GettextId + "\\\"");
+				textId = project.Name; 
 			}
-			if (cp.LinkMathsLib)
-				gccArgs.Add ("-lm");
+			gccArgs.Add ("-DGETTEXT_PACKAGE=\\\"" + textId + "\\\"");
+
 			if (cp.TargetGlib232)
 				args.Add ("--target-glib=2.32");
 
@@ -244,24 +246,31 @@ namespace MonoDevelop.ValaBinding
 			StringBuilder libs = new StringBuilder ();
 			StringBuilder gccProjectlibs = new StringBuilder ();
 			StringBuilder gccPackagelibs = new StringBuilder ();
+			StringBuilder gccProjectLinkedlibs = new StringBuilder ();
 
 			foreach (ProjectPackage p in packages) {
 				if (p.IsProject) {
 					var proj = p.GetProject ();
-					var projectConfiguration = (ValaProjectConfiguration)proj.GetConfiguration (solutionConfiguration);
-					var outputDir = FileService.RelativeToAbsolutePath (projectConfiguration.SourceDirectory,
-						                projectConfiguration.OutputDirectory);
-					var outputNameWithoutExt = Path.GetFileNameWithoutExtension (projectConfiguration.Output);
+					var conf = (ValaProjectConfiguration)proj.GetConfiguration (solutionConfiguration);
+					var outputDir = FileService.RelativeToAbsolutePath (conf.SourceDirectory,
+						                conf.OutputDirectory);
+					var outputNameWithoutExt = Path.GetFileNameWithoutExtension (conf.Output);
 					var vapifile = Path.Combine (outputDir, outputNameWithoutExt + ".vapi");
 					libs.AppendFormat (" --Xcc=-I\"{0}\" --Xcc=-L\"{0}\" --Xcc=-l\"{1}\" \"{2}\" ",
 						outputDir, outputNameWithoutExt, vapifile);
-					gccProjectlibs.AppendFormat (" -I\"{0}\" -L\"{0}\" -l\"{1}\" \"{2}\" ",
-						outputDir, outputNameWithoutExt, vapifile);
+					//gccProjectlibs.AppendFormat (" -I\"{0}\" -L\"{0}\" -l\"{1}\"",
+					//	outputDir, outputNameWithoutExt);
+					gccProjectlibs.AppendFormat (" -I\"{0}\" -L\"{0}\"",
+						outputDir);
+					gccProjectLinkedlibs.AppendFormat ("-l\"{0}\"", outputNameWithoutExt);
+					
 				} else {
 					libs.AppendFormat (" --pkg \"{0}\" ", p.Name);
 					gccPackagelibs.Append (" " + p.Name);
 				}
 			}
+			gccLinkedLibs = gccProjectLinkedlibs.ToString ();
+
 			gccLibs = gccProjectlibs.ToString ();
 			gccPkgConfig = gccPackagelibs.ToString ();
             
@@ -492,6 +501,16 @@ namespace MonoDevelop.ValaBinding
 			return output;
 		}
 
+		bool HasErrors (CompilerErrorCollection errors)
+		{
+			foreach (var item in errors) {
+				var error = (CompilerError)item;
+				if (!error.IsWarning)
+					return true; 
+			}
+			return false;
+		}
+
 		// Handle:
 		//  - application
 		//  - libraries
@@ -543,7 +562,7 @@ namespace MonoDevelop.ValaBinding
 						compiledFileCount++;
 						ParseCompilerOutput (errorOutput, cr, projectFiles);
 
-						if (exitCode != 0 && cr.Errors.Count == 0) {
+						if (exitCode != 0 && !HasErrors (cr.Errors)) {
 							// error isn't recognized but cannot ignore it because exitCode != 0
 							var errMsg = "";
 							if (string.IsNullOrEmpty (errorOutput))
@@ -556,12 +575,11 @@ namespace MonoDevelop.ValaBinding
 				}
 			}
 
-			// *
-			// * Build only the recently modified files
 			// * 
-			// .o files are generated in obj/
-			if (globalExitCode == 0 && File.Exists (outputName)) {
-				if (compiledFileCount == 0) {
+			// *  Link all the .o files if needed
+			// * 
+			if (globalExitCode == 0) {
+				if (compiledFileCount == 0 && File.Exists (outputName)) {
 					monitor.Log.WriteLine ("Everything is up to date");
 				} else {
 					monitor.Log.WriteLine ("Linking .o files");
@@ -569,16 +587,23 @@ namespace MonoDevelop.ValaBinding
 					if (pkgargs == null)
 						pkgargs = ProcessPkgConfig (monitor, cr);
 					var linkArgs = string.Join (" ", gccArgs.ToArray ());
-					string linkingArgs = string.Format ("{0} {1} {2} {3} -o \"{4}\"",
-						                     linkArgs, gccLibs, filelist.ToString (), pkgargs, Path.GetFileName (outputName));
+
+					var linkMaths = ""; 
+					ValaCompilationParameters cp =
+						(ValaCompilationParameters)projectConfiguration.CompilationParameters;
+					if (cp.LinkMathsLib)
+						linkMaths = "-lm";
+					
+					string linkingArgs = string.Format ("{0} {1} {2} {3} {4} {5} -o \"{6}\"",
+						                     linkArgs, gccLibs, filelist.ToString (), pkgargs, linkMaths, gccLinkedLibs, Path.GetFileName (outputName));
 
 					string linkErrorOutput = string.Empty;
 					int linkExitCode = ExecuteCommand (gccCompilerCommand, linkingArgs, Path.GetDirectoryName (outputName), 
 						                   monitor, out linkErrorOutput);
 
-					ParseCompilerOutput (linkErrorOutput, cr, projectFiles);
+					ParseLinkerOutput (linkErrorOutput, cr);
 
-					if (linkExitCode != 0 && cr.Errors.Count == 0) {
+					if (linkExitCode != 0 && !HasErrors (cr.Errors)) {
 						// error isn't recognized but cannot ignore it because exitCode != 0
 						var errMsg = "";
 						if (string.IsNullOrEmpty (linkErrorOutput))
@@ -592,9 +617,7 @@ namespace MonoDevelop.ValaBinding
 			}
 			var compilationSuccess = globalExitCode == 0;
 
-			// * 
-			// *  Link all the .o files if needed
-			// * 
+
 
 			return compilationSuccess;
 		}
@@ -621,7 +644,7 @@ namespace MonoDevelop.ValaBinding
 			
 			ParseCompilerOutput (errorOutput, cr, projectFiles);
 
-			if (exitCode != 0 && cr.Errors.Count == 0) {
+			if (exitCode != 0 && !HasErrors (cr.Errors)) {
 				// error isn't recognized but cannot ignore it because exitCode != 0
 				var errMsg = "";
 				if (string.IsNullOrEmpty (errorOutput))
@@ -682,6 +705,7 @@ namespace MonoDevelop.ValaBinding
 			if (Directory.Exists (output))
 				Directory.Delete (output, true);
 
+			// CARL FIXME : make the app crash at the moment
 			ProjectInformation.ClearParsingErrors ();
 		}
 

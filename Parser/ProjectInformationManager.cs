@@ -44,7 +44,7 @@ namespace MonoDevelop.ValaBinding.Parser
 	{
 		private static ProjectInformationManager instance;
 		private List<ProjectInformation> projects = new List<ProjectInformation> ();
-		
+
 		private ProjectInformationManager ()
 		{
 		}
@@ -60,12 +60,12 @@ namespace MonoDevelop.ValaBinding.Parser
 				}
 			}
 			
-			ProjectInformation newinfo = new ProjectInformation (project);
+			ProjectInformation newinfo = new ProjectInformation ((ValaProject)project);
 			projects.Add (newinfo);
 			
 			return newinfo;
 		}
-		
+
 		public static ProjectInformationManager Instance {
 			get { 
 				if (instance == null)
