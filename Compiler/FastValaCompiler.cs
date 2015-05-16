@@ -383,8 +383,8 @@ namespace MonoDevelop.ValaBinding
 
 			try {
 				// See http://stackoverflow.com/q/29848761/740464
-				var paths = "/usr/lib/x86_64-linux-gnu/pkgconfig:/usr/local/pkgconfig";
-				//Runtime.ProcessService.EnvironmentVariableOverrides.Add("PKG_CONFIG_DEBUG_SPEW", "true") ;
+				const string paths = "/usr/lib/pkgconfig:/usr/share/pkgconfig:/usr/lib/x86_64-linux-gnu/pkgconfig:/usr/local/pkgconfig";
+				//Runtime.ProcessService.EnvironmentVariableOverrides.Add ("PKG_CONFIG_DEBUG_SPEW", "true");
 				Runtime.ProcessService.EnvironmentVariableOverrides ["PKG_CONFIG_PATH"] = paths;
 				ProcessWrapper p = Runtime.ProcessService.StartProcess (command, args, baseDirectory, swOuput, chainedError, null);
 
