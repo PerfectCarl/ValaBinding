@@ -21,8 +21,47 @@
 				PauseConsoleOutput = "True"
 				CompilerArgs = ""
 				LinkerArgs = ""
-				Packages = "glib-2.0|gobject-2.0|libpeas"
+				Packages = "glib-2.0|gobject-2.0|libpeas-1.0"
 				/>
+			<Files>
+				<File name = "MyPlugin.vala" AddStandardHeader ="True"><![CDATA[
+
+namespace MyApp.Plugins {
+
+    public class MyPlugin : Peas.ExtensionBase, Peas.Activatable {
+
+    	public Object object { owned get; construct; }
+
+        public void activate () {
+            message ("Activating MyPlugin");
+            // Place your code here
+        }
+
+        public void deactivate () {
+        }
+
+        public void update_state () {
+        }
+    }
+}
+
+[ModuleInit]
+public void peas_register_types (TypeModule module) {
+    var objmodule = module as Peas.ObjectModule;
+    objmodule.register_extension_type (typeof (Peas.Activatable),
+            typeof ( MyApp.Plugins.MyPlugin));
+}
+]]></File>
+				<File name = "MyPlugin.plugin" AddStandardHeader ="False"><![CDATA[[Plugin]
+Module=${ProjectName}
+IAge=2
+Name=${ProjectName}'s name
+Description=${ProjectName}'s name
+Authors=${AuthorName}
+Copyright=Copyright © 2015 ${AuthorName}
+Website=http://www.website.com/application
+]]></File>
+			</Files>			
 		</Project>
 	</Combine>
 </Template>
