@@ -32,6 +32,8 @@ namespace MonoDevelop.ValaBinding.Parser
 		private string completion_string;
 		private string summary;
 		private string return_type = "";
+		private string signature = "";
+		private string categoryName = "";
 
 		public CompletionData (Echo.Symbol symbol)
 		{
@@ -40,13 +42,14 @@ namespace MonoDevelop.ValaBinding.Parser
 			this.description = symbol.DisplayText;
 			this.image = symbol.Icon;
 			this.summary = symbol.Description;
+			this.signature = GetSignature (symbol);
 			if (symbol.ReturnType != null)
 				this.return_type = symbol.ReturnType.TypeName;
 			// TODO: markup and obsolete
-			DisplayFlags = DisplayFlags.None;
-			var categoryName = ""; 
+			DisplayFlags = DisplayFlags.None /*& DisplayFlags.DescriptionHasMarkup*/;
+
 			// Parent is null for completion symbol if (symbol.Parent != null)
-			categoryName = symbol.CompletionParentName;
+			this.categoryName = symbol.CompletionParentName;
 			if (!string.IsNullOrEmpty (categoryName)) {
 				CompletionCategory category;
 				categories.TryGetValue (categoryName, out category);
@@ -57,6 +60,13 @@ namespace MonoDevelop.ValaBinding.Parser
 				}
 				this.CompletionCategory = category;
 			}
+		}
+
+		string GetSignature (Echo.Symbol symbol)
+		{
+			var result = "<b>" + symbol.Name + "</b>" + symbol.GetParameterDisplayText (true); 
+
+			return result; 
 		}
 
 		public override IconId Icon {
@@ -90,11 +100,10 @@ namespace MonoDevelop.ValaBinding.Parser
 		public override TooltipInformation CreateTooltipInformation (bool smartWrap)
 		{
 			var result = new TooltipInformation ();
+			result.SignatureMarkup = signature;
 
-			result.SignatureMarkup = DisplayText;
-
-			result.SummaryMarkup = summary;
-			result.FooterMarkup = "Defined in Glib";
+			result.SummaryMarkup = string.Format ("<span face='normal' size='small'>{0}</span>", summary);
+			result.FooterMarkup = "<span face='normal' size='small'>Defined in Glib</span>";
 
 			return result;
 		}

@@ -19,6 +19,14 @@
 			extensions = "*.vala,*.vapi" />
 	</Extension>
 
+	<Extension path="/MonoDevelop/Ide/ProjectTemplateCategories">
+		<Category id="other" name="Vala" icon="md-platform-other">
+			<Category id="vala" name="Vala">
+				<Category id="general" name="General" mappedCategories="Vala" />
+			</Category>
+		</Category>
+	</Extension>
+
 	<Extension path = "/MonoDevelop/Ide/FileTemplates">
 		<FileTemplate id = "EmptyValaSourceFile" resource = "EmptyValaSourceFile.xft.xml"/>
 		<FileTemplate id = "NewValaClass" resource = "NewValaClass.xft.xml"/>
@@ -124,7 +132,7 @@
 	</Extension>
 
 	<Extension path = "/MonoDevelop/Ide/TextEditorExtensions">
-		<Class fileExtensions = ".vala,.vapi" class = "MonoDevelop.ValaBinding.ValaTextEditorExtension" />
+		<Class fileExtensions = ".vala,.vapi" class = "MonoDevelop.ValaBinding.ValaCompletionTextEditorExtension" />
 		<!-- Document Outline Provider -->
 		<Class fileExtensions = ".vala,.vapi" class = "MonoDevelop.ValaBinding.Navigation.DocumentOutlineExtension" />
 	</Extension>

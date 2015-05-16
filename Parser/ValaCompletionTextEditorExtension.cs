@@ -49,7 +49,7 @@ using MonoDevelop.Core;
 
 namespace MonoDevelop.ValaBinding
 {
-	public class ValaTextEditorExtension : CompletionTextEditorExtension, IPathedDocument
+	public class ValaCompletionTextEditorExtension : CompletionTextEditorExtension, IPathedDocument
 	{
 		// Allowed chars to be next to an identifier
 		private static char[] allowedChars = new char[] { ' ', '\t', '\r', '\n', 
@@ -76,6 +76,17 @@ namespace MonoDevelop.ValaBinding
 		}
 
 		protected Mono.TextEditor.TextEditorData textEditorData { get; set; }
+
+		public override void Initialize ()
+		{
+			base.Initialize ();
+			textEditorData = Document.Editor;
+			UpdatePath (null, null);
+			textEditorData.Caret.PositionChanged += UpdatePath;
+			Document.DocumentParsed += delegate {
+				UpdatePath (null, null);
+			};
+		}
 
 		public override bool KeyPress (Gdk.Key key, char keyChar, Gdk.ModifierType modifier)
 		{
@@ -110,76 +121,91 @@ namespace MonoDevelop.ValaBinding
 		/// </summary>
 		private static Regex initializationRegex = new Regex (@"(((?<typename>\w[\w\d\.<>]*)\s+)?(?<variable>\w[\w\d]*)\s*=\s*)?new\s*(?<constructor>\w[\w\d\.<>]*)?", RegexOptions.Compiled);
 
+		public override ICompletionDataList CodeCompletionCommand (
+			CodeCompletionContext completionContext)
+		{
+			if (null == (Document.Project as ValaProject)) {
+				return null;
+			}
+
+			/*int pos = completionContext.TriggerOffset;
+			int triggerWordLength = completionContext.TriggerWordLength;
+
+			ICompletionDataList list = HandleCodeCompletion (completionContext, Editor.GetCharAt (pos), ref triggerWordLength);
+			if (null == list) {
+				list = GlobalComplete (completionContext);
+			}
+			return list; */
+		
+			int i = 0;
+			return HandleCodeCompletion (completionContext, '\0', ref i);
+
+		}
+
 		public override ICompletionDataList HandleCodeCompletion (CodeCompletionContext completionContext, char completionChar, ref int triggerWordLength)
 		{
 			//ProjectInformation parser = ProjectInfo;
 			var loc = Editor.Document.OffsetToLocation (completionContext.TriggerOffset);
 			int line = loc.Line, column = loc.Column;
-			string lineText = Editor.GetLineText (line); 
-			if (column > lineText.Length) {
-				column = lineText.Length;
+			string originalLine = Editor.GetLineText (line); 
+			if (column > originalLine.Length) {
+				column = originalLine.Length;
 			}
 			// lineText = lineText.Substring (0, column - 1);
 			
 			var result = new ValaCompletionDataList ();
 
 			//ThreadPool.QueueUserWorkItem (delegate {
-			Completion.Complete (result, Document.FileName, lineText, completionChar, line, column);
 			//}); 
-			return result; 
-			/*switch (completionChar)
-            {
-                case '.': // foo.[complete]
-                    lineText = Editor.GetLineText(line);
-                    if (column > lineText.Length) { column = lineText.Length; }
-                    lineText = lineText.Substring(0, column - 1);
+			//return result; 
+			//var character = originalLine.Substring (column - 2, 1);
+			if (completionChar == '\0')
+				completionChar = document.Editor.GetCharAt (completionContext.TriggerOffset - 1);
+			switch (completionChar) {
+			case '.': // foo.[complete]
+				Completion.Complete (result, Document.FileName, 
+					originalLine, completionChar, line, column - 1);
+				//return result;
+				break;
+			case '\t':
+			case ' ':
+				var lineText = originalLine;
+				if (0 == lineText.Length) {
+					return null;
+				}
+				if (column > lineText.Length) {
+					column = lineText.Length;
+				}
+				lineText = lineText.Substring (0, column - 1).Trim ();
 
-                    string itemName = GetTrailingSymbol(lineText);
+				if (lineText.EndsWith ("new")) {
+					Completion.Complete (result, Document.FileName, originalLine, completionChar, line, column);
+					//return result;    
+					//return CompleteConstructor(lineText, line, column);
+				} else if (lineText.EndsWith ("is")) {
+					/*ValaCompletionDataList list = new ValaCompletionDataList ();
+					ThreadPool.QueueUserWorkItem (delegate {
+						Completion.GetTypesVisibleFrom (Document.FileName, line, column, list);
+					});*/
+					Completion.Complete (result, Document.FileName, originalLine, completionChar, line, column);
+					//return result; 
+				} /*else if (0 < lineText.Length) {
+					char lastNonWS = lineText [lineText.Length - 1];
+					if (0 <= Array.IndexOf (operators, lastNonWS) ||
+					    (1 == lineText.Length && 0 > Array.IndexOf (allowedChars, lastNonWS))) {
+						return GlobalComplete (completionContext);
+					}
+				}*/
 
-                    if (string.IsNullOrEmpty(itemName))
-                        return null;
+				break;
+			/*default:
+				if (0 <= Array.IndexOf (operators, completionChar)) {
+					return GlobalComplete (completionContext);
+				}
+				break;*/
+			}
 
-                    return GetMembersOfItem(itemName, line, column);
-                case '\t':
-                case ' ':
-                    lineText = Editor.GetLineText(line);
-                    if (0 == lineText.Length) { return null; }
-                    if (column > lineText.Length) { column = lineText.Length; }
-                    lineText = lineText.Substring(0, column - 1).Trim();
-
-                    if (lineText.EndsWith("new"))
-                    {
-                        return CompleteConstructor(lineText, line, column);
-                    }
-                    else if (lineText.EndsWith("is"))
-                    {
-                        ValaCompletionDataList list = new ValaCompletionDataList();
-                        ThreadPool.QueueUserWorkItem(delegate
-                        {
-                            Completion.GetTypesVisibleFrom(Document.FileName, line, column, list);
-                        });
-                        return list;
-                    }
-                    else if (0 < lineText.Length)
-                    {
-                        char lastNonWS = lineText[lineText.Length - 1];
-                        if (0 <= Array.IndexOf(operators, lastNonWS) ||
-                              (1 == lineText.Length && 0 > Array.IndexOf(allowedChars, lastNonWS)))
-                        {
-                            return GlobalComplete(completionContext);
-                        }
-                    }
-
-                    break;
-                default:
-                    if (0 <= Array.IndexOf(operators, completionChar))
-                    {
-                        return GlobalComplete(completionContext);
-                    }
-                    break;
-            }
-			*/
-			//return null;
+			return result.Count != 0 ? result : null;
 		}
 
 		/*static string GetTrailingSymbol (string text)
@@ -222,23 +248,6 @@ namespace MonoDevelop.ValaBinding
 		}*/
 		// CompleteConstructor
 
-		public override ICompletionDataList CodeCompletionCommand (
-			CodeCompletionContext completionContext)
-		{
-			if (null == (Document.Project as ValaProject)) {
-				return null;
-			}
-
-			int pos = completionContext.TriggerOffset;
-			int triggerWordLength = completionContext.TriggerWordLength;
-
-			ICompletionDataList list = HandleCodeCompletion (completionContext, Editor.GetCharAt (pos), ref triggerWordLength);
-			if (null == list) {
-				list = GlobalComplete (completionContext);
-			}
-			return list;
-		}
-
 		/// <summary>
 		/// Get the members of a symbol
 		/// </summary>
@@ -259,7 +268,7 @@ namespace MonoDevelop.ValaBinding
 		/// <summary>
 		/// Complete all symbols visible from a given location
 		/// </summary>
-		private ValaCompletionDataList GlobalComplete (CodeCompletionContext context)
+		/*private ValaCompletionDataList GlobalComplete (CodeCompletionContext context)
 		{
 			//ProjectInformation info = ProjectInfo;
 			if (null == ProjectInfo) {
@@ -268,11 +277,12 @@ namespace MonoDevelop.ValaBinding
 
 			ValaCompletionDataList list = new ValaCompletionDataList ();
 			var loc = Editor.Document.OffsetToLocation (context.TriggerOffset);
-			ThreadPool.QueueUserWorkItem (delegate {
+			/*ThreadPool.QueueUserWorkItem (delegate {
 				ProjectInfo.Completion.GetSymbolsVisibleFrom (Document.FileName, loc.Line + 1, loc.Column + 1, list);
-			});
-			return list;
-		}
+			});*/
+
+		/* return list;
+		} */
 
 		public override MonoDevelop.Ide.CodeCompletion.ParameterDataProvider HandleParameterCompletion (
 			CodeCompletionContext completionContext, char completionChar)
@@ -380,7 +390,7 @@ namespace MonoDevelop.ValaBinding
 			}
 		}
 
-		#endregion
+
 
 		// Yoinked from C# binding
 		void UpdatePath (object sender, DocumentLocationEventArgs e)
@@ -430,15 +440,7 @@ namespace MonoDevelop.ValaBinding
 			}
 		}
 
-		public override void Initialize ()
-		{
-			base.Initialize ();
-			textEditorData = Document.Editor;
-			UpdatePath (null, null);
-			textEditorData.Caret.PositionChanged += UpdatePath;
-			Document.DocumentParsed += delegate {
-				UpdatePath (null, null);
-			};
-		}
+		#endregion
+
 	}
 }

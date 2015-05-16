@@ -241,7 +241,6 @@
     <Compile Include="Parser\Echo\Project.cs" />
     <Compile Include="Parser\Echo\SourceReference.cs" />
     <Compile Include="Parser\TextCompletion.cs" />
-    <Compile Include="Parser\ValaTextEditorExtension.cs" />
     <Compile Include="Parser\ParameterDataProvider.cs" />
     <Compile Include="Parser\Echo\GeeList.cs" />
     <Compile Include="Parser\Echo\GeeEnumerator.cs" />
@@ -249,6 +248,7 @@
     <Compile Include="Navigation\ClassPadItemNodeBuilder.cs" />
     <Compile Include="Navigation\ClassPadNodeBuilderExtension.cs" />
     <Compile Include="Navigation\DocumentOutlineExtension.cs" />
+    <Compile Include="Parser\ValaCompletionTextEditorExtension.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

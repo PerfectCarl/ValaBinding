@@ -431,7 +431,7 @@ namespace MonoDevelop.ValaBinding.Navigation
 		// Returns
 		string GetDisplayText (Symbol symbol)
 		{
-			var result = "<i>" + symbol.Name + "</i>" + symbol.GetParameterDisplayText (false); 
+			var result = "<b>" + symbol.Name + "</b>" + symbol.GetParameterDisplayText (false); 
 
 			return result; 
 		}

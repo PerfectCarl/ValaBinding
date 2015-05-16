@@ -11,8 +11,9 @@
 - [ ] more file templates (also fix icons) 
 
 ## General 
-[ ] Run in built-in console
-[ ] Finish package management
+- [ ] Run in built-in console
+- [ ] Finish package management
+- [ ] make ClassPad recursive
 
 ## Build 
 [ ] handle new compilation options 
