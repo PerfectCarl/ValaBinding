@@ -67,7 +67,9 @@ namespace MonoDevelop.ValaBinding.Parser
 		public void AddFile (string filename)
 		{
 			if (!filename.EndsWith (".vala") && !filename.EndsWith (".vapi"))
-				LoggingService.LogDebug ("AIE!");
+				// FIXME: depending mdproj files are added here !
+				// Open sonata.sln for an example
+				LoggingService.LogDebug ("Not adding non vala file to echo project: " + filename);
 			if (echoProject != null)
 				echoProject.AddFile (filename);
 		}

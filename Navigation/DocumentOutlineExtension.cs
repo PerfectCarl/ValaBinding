@@ -431,7 +431,7 @@ namespace MonoDevelop.ValaBinding.Navigation
 		// Returns
 		string GetDisplayText (Symbol symbol)
 		{
-			var result = "<b>" + symbol.Name + "</b>" + symbol.GetParameterDisplayText (false); 
+			var result = "<b>" + GLib.Markup.EscapeText (symbol.Name) + "</b>" + GLib.Markup.EscapeText (symbol.GetParameterDisplayText (false)); 
 
 			return result; 
 		}
