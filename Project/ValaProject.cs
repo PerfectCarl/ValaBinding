@@ -380,6 +380,7 @@ System.InvalidOperationException: Console could not be created.
 						var outputDir = FileService.RelativeToAbsolutePath (configuration.SourceDirectory, configuration.OutputDirectory);
 						string file = Path.Combine (outputDir, p.File);
 						LoggingService.LogDebug ("Adding {0} for project package {1}", file, p.Name);
+						// p.GetProject().
 						pi.AddFile (file);
 					} else {
 						pi.AddPackage (p.Name);

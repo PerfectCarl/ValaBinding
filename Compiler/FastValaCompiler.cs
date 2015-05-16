@@ -161,28 +161,36 @@ namespace MonoDevelop.ValaBinding
 				break;
 			}
 
-			// Valac will get these sooner or later			
-			//			switch (cp.WarningLevel)
-			//			{
-			//			case WarningLevel.None:
-			//				args.Append ("-w ");
-			//				break;
-			//			case WarningLevel.Normal:
-			//				// nothing
-			//				break;
-			//			case WarningLevel.All:
-			//				args.Append ("-Wall ");
-			//				break;
-			//			}
-			//			
-			//			if (cp.WarningsAsErrors)
-			//				args.Append ("-Werror ");
-			//			
+
+			switch (cp.WarningLevel) {
+			case WarningLevel.None:
+				gccArgs.Add ("-w ");
+				break;
+			case WarningLevel.Normal:
+				// nothing
+				break;
+			case WarningLevel.All:
+				gccArgs.Add ("-Wall ");
+				break;
+			}
+						
+			if (cp.WarningsAsErrors)
+				gccArgs.Add ("-Werror ");
+			
 			if (0 < cp.OptimizationLevel) {
 				args.Add ("--Xcc=\"-O" + cp.OptimizationLevel + "\"");
 				gccArgs.Add ("\"-O" + cp.OptimizationLevel + "\"");
 
 			}
+
+			if (!String.IsNullOrEmpty (cp.GettextId)) {
+				// -DGETTEXT_PACKAGE=\"sonata\"
+				gccArgs.Add ("-DGETTEXT_PACKAGE=\\\"" + cp.GettextId + "\\\"");
+			}
+			if (cp.LinkMathsLib)
+				gccArgs.Add ("-lm");
+			if (cp.TargetGlib232)
+				args.Add ("--target-glib=2.32");
 
 			// global extra compiler arguments
 			string globalExtraCompilerArgs = PropertyService.Get ("ValaBinding.ExtraCompilerOptions", "");
