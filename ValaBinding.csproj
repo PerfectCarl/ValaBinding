@@ -179,14 +179,26 @@
     <EmbeddedResource Include="templates\NewValaErrorDomain.xft.xml">
       <LogicalName>NewValaErrorDomain.xft.xml</LogicalName>
     </EmbeddedResource>
-    <EmbeddedResource Include="templates\NewGtkDialog.xft.xml">
-      <LogicalName>NewGtkDialog.xft.xml</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="templates\NewElementaryPlug.xft.xml">
-      <LogicalName>NewElementaryPlug.xft.xml</LogicalName>
-    </EmbeddedResource>
     <EmbeddedResource Include="ValaBinding.addin.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="templates\GtkProject.xpt.xml">
+      <LogicalName>GtkProject.xpt.xml</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="templates\ElementaryPlugProject.xpt.xml">
+      <LogicalName>ElementaryPlugProject.xpt.xml</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="templates\ElementaryAppProject.xpt.xml">
+      <LogicalName>ElementaryAppProject.xpt.xml</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="templates\PeasPluginProject.xpt.xml">
+      <LogicalName>PeasPluginProject.xpt.xml</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="icons\elementary-project-app-overlay-32.png">
+      <LogicalName>elementary-project-app-overlay-32.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="icons\elementary-project-plug-overlay-32.png">
+      <LogicalName>elementary-project-plug-overlay-32.png</LogicalName>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

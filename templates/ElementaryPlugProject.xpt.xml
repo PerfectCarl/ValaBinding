@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<Template
+	originator   = "Carl P."
+    created      = "03/05/2015"
+    lastModified = "03/05/2015">
+	
+	<!-- Template Header -->
+	<TemplateConfiguration>
+		<_Name>elementary plug for Switchboard</_Name>
+		<_Category>Elementary</_Category>
+		<Icon>md-project|md-elementary-project-plug-overlay</Icon>
+		<LanguageName>Vala</LanguageName>
+		<_Description>Creates an empty plug for elementary Switchboard.</_Description>
+	</TemplateConfiguration>
+	
+	<!-- Template Content -->
+	<Combine name = "${ProjectName}" directory = ".">
+		<Project name = "${ProjectName}" directory = "." type = "Vala">
+			<Options
+				Target = "Bin"
+				PauseConsoleOutput = "True"
+				CompilerArgs = ""
+				LinkerArgs = ""
+				Packages = "glib-2.0|gobject-2.0"
+				/>
+		</Project>
+	</Combine>
+</Template>

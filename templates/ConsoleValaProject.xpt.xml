@@ -8,7 +8,7 @@
 	<TemplateConfiguration>
 		<_Name>Console Project</_Name>
 		<_Category>Vala</_Category>
-		<Icon>md-project-console|res:vala-icon-32.png</Icon>
+		<Icon>md-project-console</Icon>
 		<LanguageName>Vala</LanguageName>
 		<_Description>Creates a simple hello world Vala project.</_Description>
 	</TemplateConfiguration>

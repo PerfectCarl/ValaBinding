@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<Template
+	originator   = "Carl P."
+    created      = "03/05/2015"
+    lastModified = "03/05/2015">
+	
+	<!-- Template Header -->
+	<TemplateConfiguration>
+		<_Name>A plugin for libpeas</_Name>
+		<_Category>Gtk</_Category>
+		<Icon>md-project-library</Icon>
+		<LanguageName>Vala</LanguageName>
+		<_Description>Creates a plugin using the libpeas libary.</_Description>
+	</TemplateConfiguration>
+	
+	<!-- Template Content -->
+	<Combine name = "${ProjectName}" directory = ".">
+		<Project name = "${ProjectName}" directory = "." type = "Vala">
+			<Options
+				Target = "Bin"
+				PauseConsoleOutput = "True"
+				CompilerArgs = ""
+				LinkerArgs = ""
+				Packages = "glib-2.0|gobject-2.0|libpeas"
+				/>
+		</Project>
+	</Combine>
+</Template>

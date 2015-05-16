@@ -9,6 +9,9 @@
 		<StockIcon stockid = "md-protected-union" resource = "Icons.16x16.ProtectedUnion" size="Menu"/>
 		<StockIcon stockid = "md-private-union" resource = "Icons.16x16.PrivateUnion" size="Menu"/>
 		<StockIcon stockid = "md-vala-file" resource = "text-x-vala.16x16.png" size="Menu"/>
+		<StockIcon stockid = "md-elementary-project-plug" resource = "elementary-project-plug.png" size="Menu"/>
+		<StockIcon stockid = "md-elementary-project-app-overlay" resource = "elementary-project-app-overlay-32.png" size="Menu"/>
+		<StockIcon stockid = "md-elementary-project-plug-overlay" resource = "elementary-project-plug-overlay-32.png" size="Menu"/>
 	</Extension>
 
 	<Extension path = "/MonoDevelop/Ide/FileFilters">
@@ -23,6 +26,8 @@
 		<Category id="other" name="Vala" icon="md-platform-other">
 			<Category id="vala" name="Vala">
 				<Category id="general" name="General" mappedCategories="Vala" />
+				<Category id="gtk" name="Gtk" mappedCategories="Gtk" />
+				<Category id="elementary" name="elementary" mappedCategories="Elementary" />
 			</Category>
 		</Category>
 	</Extension>
@@ -34,16 +39,18 @@
 		<FileTemplate id = "NewValaStruct" resource = "NewValaStruct.xft.xml"/>
 		<FileTemplate id = "NewValaSingleton" resource = "NewValaSingleton.xft.xml"/>
 		<FileTemplate id = "NewValaErrorDomain" resource = "NewValaErrorDomain.xft.xml"/>
-		<FileTemplate id = "NewGtkDialog" resource = "NewGtkDialog.xft.xml"/>
-		<FileTemplate id = "NewElementaryPlug" resource = "NewElementaryPlug.xft.xml"/>
 	</Extension>
 
 	<Extension path = "/MonoDevelop/Ide/ProjectTemplates">
 		<ProjectTemplate id = "EmptyValaProject" resource = "EmptyValaProject.xpt.xml"/>
 		<ProjectTemplate id = "ConsoleValaProject" resource = "ConsoleValaProject.xpt.xml"/>
 		<ProjectTemplate id = "SharedLibraryValaProject" resource = "SharedLibraryValaProject.xpt.xml"/>
-		<ProjectTemplate id = "ValaTestFixture" resource = "ValaTestFixture.xpt.xml"/>
-	</Extension>
+		<ProjectTemplate id = "ValaTestFixture" resource = "ValaTestFixture.xpt.xml" />
+		<ProjectTemplate id = "GtkProject" resource = "GtkProject.xpt.xml" />
+		<ProjectTemplate id = "ElementaryAppProject" resource = "ElementaryAppProject.xpt.xml" />
+		<ProjectTemplate id = "ElementaryPlugProject" resource = "ElementaryPlugProject.xpt.xml" />
+		<ProjectTemplate id = "PeasPluginProject" resource = "PeasPluginProject.xpt.xml" />
+	</Extension>	
 	
 	<Extension path = "/MonoDevelop/Core/MimeTypes">
 		<MimeType id="text/x-vala" _description="Vala source code" icon="md-file-source" isText="true">
