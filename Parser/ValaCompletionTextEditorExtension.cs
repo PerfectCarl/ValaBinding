@@ -425,7 +425,7 @@ namespace MonoDevelop.ValaBinding
 					if (!string.IsNullOrEmpty (node.Icon))
 						icon = ImageService.GetIcon (node.Icon);
 					entry = new PathEntry (icon, 
-						node.DisplayText /*+ DParameterDataProvider.GetNodeParamString (node)*/);
+						GLib.Markup.EscapeText (node.DisplayText) /*+ DParameterDataProvider.GetNodeParamString (node)*/);
 					entry.Position = EntryPosition.Left;
 					entry.Tag = node;
 					//do not include the module in the path bar
