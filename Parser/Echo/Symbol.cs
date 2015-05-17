@@ -30,14 +30,19 @@ namespace MonoDevelop.ValaBinding.Parser.Echo
 		NAMESPACE = 0x2,
 		CLASS = 0x4,
 		CONSTRUCTOR = 0x8,
-		DESTRUCTOR = 0xF,
+		DESTRUCTOR = 0x10,
 		ENUM = 0x20,
 		INTERFACE = 0x40,
 		METHOD = 0x80,
 		STRUCT = 0x100,
 		PROPERTY = 0x200,
 		FIELD = 0x400,
-		SIGNAL = 0x800
+		SIGNAL = 0x800,
+		ERRORDOMAIN = 0x1000,
+		CONSTANT = 0x2000,
+		DELEGATE = 0x4000,
+		PARAMETER = 0x8000,
+		VARIABLE = 0x10000
 	}
 
 	/// <summary>

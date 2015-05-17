@@ -62,7 +62,13 @@
 	<Extension path = "/MonoDevelop/ProjectModel/ProjectBindings">
 		<ProjectBinding id = "ValaProject" class = "MonoDevelop.ValaBinding.ValaProjectBinding"/>
 	</Extension>
-	
+
+		<!-- Syntax Highlighting and Formatting -->
+
+	<Extension path = "/MonoDevelop/SourceEditor2/SyntaxModes">
+		<Templates resource="ValaSyntaxHighlightingMode.xml" />
+	</Extension>
+
 	<Extension path = "/MonoDevelop/ProjectModel/LanguageBindings">
 		<LanguageBinding
 			id = "Vala"

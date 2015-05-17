@@ -200,6 +200,10 @@
     <EmbeddedResource Include="icons\elementary-project-plug-overlay-32.png">
       <LogicalName>elementary-project-plug-overlay-32.png</LogicalName>
     </EmbeddedResource>
+    <EmbeddedResource Include="ValaSyntaxHighlightingMode.xml">
+      <SubType>Designer</SubType>
+      <LogicalName>ValaSyntaxHighlightingMode.xml</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Project\ValaCompilationParameters.cs" />

@@ -85,8 +85,8 @@ namespace MonoDevelop.ValaBinding.Navigation
 
 			foreach (Symbol child in thisSymbol.Children) {
 				// We don't display code blocks like if/then/else in the ClassPad
-				if (child.TypeDescription != "Block" && child.TypeDescription != "Creation Method")
-					treeBuilder.AddChild (child);
+				//if (child.TypeDescription != "Block" && child.TypeDescription != "Creation Method")
+				treeBuilder.AddChild (child);
 			}
 		}
 
@@ -99,10 +99,10 @@ namespace MonoDevelop.ValaBinding.Navigation
 				return false; 
 			// We check that the children are not simple code blocks that we 
 			// don't want to display in the ClassPad
-			foreach (var child in symbol.Children) {
+			/*foreach (var child in symbol.Children) {
 				if (child.TypeDescription != "Block" && child.TypeDescription != "Creation Method")
 					return true;
-			}
+			}*/
 			return false;
 		}
 

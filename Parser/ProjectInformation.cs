@@ -102,7 +102,7 @@ namespace MonoDevelop.ValaBinding.Parser
 			} else {
 				LoggingService.LogDebug ("AddPackage: Adding package {0}", packagename);
 			}*/
-
+			// FIXME: do that completely in echo
 			foreach (string path in Echo.Utils.GetPackagePaths (packagename)) {
 				LoggingService.LogDebug ("AddPackage: Queueing {0} for package {1}", path, packagename);
 				if (echoProject != null)
@@ -191,24 +191,29 @@ namespace MonoDevelop.ValaBinding.Parser
 			return null;
 		}
 
+		private void doParseProject ()
+		{
+			// Add all the vapi file for the referenced projects
+			foreach (String name in Project.ReferencedProjects) {
+				var proj = GetProject (name);
+				if (proj != null) {
+					var conf = (ValaProjectConfiguration)proj.DefaultConfiguration;
+					var vapiFilePath = conf.OutputDirectory + "/" + proj.Name + ".vapi";
+					LoggingService.LogDebug ("Adding {0} to {1}", vapiFilePath, Project.Name);
+					if (File.Exists (vapiFilePath)) {
+						echoProject.AddExternalPackage (vapiFilePath);
+					}
+				}
+			}
+			echoProject.UpdateSync ();
+			HandleParsingErrors (); 
+		}
+
 		private void ParseProject ()
 		{
 			// HACK: be smarter, threaded thing
 			if (!projectUpdated) {
-				// Add all the vapi file for the referenced projects
-				foreach (String name in Project.ReferencedProjects) {
-					var proj = GetProject (name);
-					if (proj != null) {
-						var conf = (ValaProjectConfiguration)proj.DefaultConfiguration;
-						var vapiFilePath = conf.OutputDirectory + "/" + proj.Name + ".vapi";
-						LoggingService.LogDebug ("Adding {0} to {1}", vapiFilePath, Project.Name);
-						if (File.Exists (vapiFilePath)) {
-							//echoProject.AddExternalPackage (vapiFilePath);
-						}
-					}
-				}
-				echoProject.UpdateSync ();
-				HandleParsingErrors (); 
+				doParseProject ();
 				projectUpdated = true; 
 			}
 		}

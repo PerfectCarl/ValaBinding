@@ -14,6 +14,7 @@ using MonoDevelop.Core;
 //using MonoDevelop.ValaBinding.Parser.Afrodite;
 using MonoDevelop.Ide.CodeCompletion;
 using ICSharpCode.NRefactory.Completion;
+using GLib;
 
 namespace MonoDevelop.ValaBinding.Parser
 {
@@ -37,11 +38,11 @@ namespace MonoDevelop.ValaBinding.Parser
 
 		public CompletionData (Echo.Symbol symbol)
 		{
-			this.text = symbol.Name;
-			this.completion_string = symbol.Name;
-			this.description = symbol.DisplayText;
+			this.text = Markup.EscapeText (symbol.Name);
+			this.completion_string = text;
+			this.description = Markup.EscapeText (symbol.DisplayText);
 			this.image = symbol.Icon;
-			this.summary = symbol.Description;
+			this.summary = Markup.EscapeText (symbol.Description);
 			this.signature = GetSignature (symbol);
 			if (symbol.ReturnType != null)
 				this.return_type = symbol.ReturnType.TypeName;
@@ -64,7 +65,7 @@ namespace MonoDevelop.ValaBinding.Parser
 
 		string GetSignature (Echo.Symbol symbol)
 		{
-			var result = "<b>" + symbol.Name + "</b>" + symbol.GetParameterDisplayText (true); 
+			var result = "<b>" + Markup.EscapeText (symbol.Name) + "</b>" + Markup.EscapeText (symbol.GetParameterDisplayText (true)); 
 
 			return result; 
 		}
