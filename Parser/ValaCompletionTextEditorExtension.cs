@@ -75,6 +75,12 @@ namespace MonoDevelop.ValaBinding
 			}
 		}
 
+		public override string CompletionLanguage {
+			get {
+				return "Vala";
+			}
+		}
+
 		protected Mono.TextEditor.TextEditorData textEditorData { get; set; }
 
 		public override void Initialize ()

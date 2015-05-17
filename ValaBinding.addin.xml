@@ -182,4 +182,8 @@ WARNING: The add-in 'MonoDevelop.ValaBinding,5.7' is trying to extend '/MonoDeve
 	<Extension path = "/MonoDevelop/Ide/CodeTemplates">
         <CodeTemplate file="templates/CodeTemplates.xml" />
     </Extension>
+
+    <Extension path = "/MonoDevelop/Ide/CompletionCharacters">
+		<Complete language="Vala" commitOnSpace="False" commitChars="{}[]().,:;+-*/%&amp;|^!~=&lt;&gt;?@#'&quot;\"/>
+	</Extension>
 </ExtensionModel>

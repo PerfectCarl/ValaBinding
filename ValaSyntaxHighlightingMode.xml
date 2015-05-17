@@ -89,7 +89,6 @@
 	<Keywords color = "Keyword(Operator)">
 		<Word>as</Word>
 		<Word>is</Word>
-		<Word>in</Word>
 		<Word>new</Word>
 		<Word>delete</Word>
 		<Word>sizeof</Word>
@@ -135,7 +134,6 @@
 		<Word>get</Word>
 		<Word>set</Word>
 		<Word>construct</Word>
-		<Word>default</Word>
 		<Word>value</Word>
 	</Keywords>
 
@@ -154,7 +152,6 @@
 		<Word>static</Word>
 		<Word>async</Word>
 		<Word>inline</Word>
-		<Word>new</Word>
 
 		<Word>public</Word>
 		<Word>private</Word>
@@ -182,7 +179,6 @@
 		<Word>owned</Word>
 	</Keywords>
 
-	 uint16 int32 uint32 int64 uint64 unichar
 	<Keywords color="Keyword(Type)">
 
 		<Word>bool</Word>
