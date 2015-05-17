@@ -6,6 +6,11 @@
 	<Property name="StringQuote">"</Property>
 	<Property name="StringQuote">'</Property>
 
+	<EolSpan tagColor = "Preprocessor" rule="text.preprocessor">#if</EolSpan>
+	<EolSpan tagColor = "Preprocessor" rule="text.preprocessor">#else</EolSpan>
+	<EolSpan tagColor = "Preprocessor" rule="text.preprocessor">#elif</EolSpan>
+	<EolSpan tagColor = "Preprocessor" rule="text.preprocessor">#endif</EolSpan>
+
 	<!-- Comment & String spans -->
 
 	<EolSpan color = "Comment(Doc)" rule="Comment" tagColor="Comment(DocTag)">///</EolSpan>
@@ -82,8 +87,12 @@
 	</Keywords>
 
 	<Keywords color = "Keyword(Operator)">
+		<Word>as</Word>
 		<Word>is</Word>
+		<Word>in</Word>
 		<Word>new</Word>
+		<Word>delete</Word>
+		<Word>sizeof</Word>
 		<Word>typeof</Word>
 	</Keywords>
 
@@ -100,12 +109,12 @@
 		<Word>for</Word>
 		<Word>foreach</Word>
 		<Word>while</Word>
+		<Word>in</Word>
 	</Keywords>
 
 	<Keywords color = "Keyword(Jump)">
 		<Word>break</Word>
 		<Word>continue</Word>
-		<Word>goto</Word>
 		<Word>return</Word>
 	</Keywords>
 
@@ -122,86 +131,94 @@
 		<Word>null</Word>
 	</Keywords>
 
+	<Keywords color = "Keyword(Property)">
+		<Word>get</Word>
+		<Word>set</Word>
+		<Word>construct</Word>
+		<Word>default</Word>
+		<Word>value</Word>
+	</Keywords>
+
 	<Keywords color = "Keyword(Modifiers)">
-		<Word>abstract</Word>
+
+		<Word>weak</Word>
 		<Word>const</Word>
-		<Word>export</Word>
-		<Word>extern</Word>
-		<Word>final</Word>
-		<Word>deprecated</Word>
-		<Word>immutable</Word>
-		<Word>invariant</Word>
-		<Word>nothrow</Word>
-		<Word>lazy</Word>
+		<Word>unowned</Word>
+		<Word>dynamic</Word>
+
+		<Word>abstract</Word>
+		<Word>virtual</Word>
 		<Word>override</Word>
-		<Word>package</Word>
+		<Word>signal</Word>
+		<Word>extern</Word>
+		<Word>static</Word>
+		<Word>async</Word>
+		<Word>inline</Word>
+		<Word>new</Word>
+
+		<Word>public</Word>
 		<Word>private</Word>
 		<Word>protected</Word>
-		<Word>public</Word>
-		<Word>pure</Word>
-		<Word>scope</Word>
-		<Word>shared</Word>
-		<Word>static</Word>
-		<Word>synchronized</Word>
-		<Word>volatile</Word>
-		<Word>__gshared</Word>
+		<Word>internal</Word>
 
-		<Word>mixin</Word>
 	</Keywords>
 
 	<Keywords color = "Keyword(Other)">
-		<Word>alias</Word>
-		<Word>align</Word>
-		<Word>asm</Word>
+		<Word>lock </Word>
+
+		<Word>requires</Word>
+		<Word>ensures</Word>
+
 		<Word>assert</Word>
+
 		<Word>debug</Word>
-		<Word>delete</Word>
-		<Word>macro</Word>
-		<Word>pragma</Word>
-		<Word>typedef</Word>
-		<Word>unittest</Word>
-		<Word>version</Word>
-		<Word>with</Word>
-		<Word>__FILE__</Word>
-		<Word>__LINE__</Word>
-		<Word>__thread</Word>
-		<Word>__traits</Word>
-		<Word>__vector</Word>
+		<Word>message</Word>
+		<Word>critical</Word>
+		<Word>info</Word>
+
+		<Word>var</Word>
+		<Word>yield</Word>
+		<Word>global</Word>
+		<Word>owned</Word>
 	</Keywords>
 
+	 uint16 int32 uint32 int64 uint64 unichar
 	<Keywords color="Keyword(Type)">
-		<Word>auto</Word>
+
 		<Word>bool</Word>
-		<Word>byte</Word>
-		<Word>cdouble</Word>
-		<Word>cent</Word>
-		<Word>cfloat</Word>
 		<Word>char</Word>
-		<Word>creal</Word>
-		<Word>dchar</Word>
-		<Word>double</Word>
-		<Word>float</Word>
-		<Word>idouble</Word>
-		<Word>ifloat</Word>
-		<Word>int</Word>
-		<Word>ireal</Word>
-		<Word>long</Word>
-		<Word>real</Word>
+		<Word>uchar</Word>
 		<Word>short</Word>
-		<Word>ubyte</Word>
-		<Word>ucent</Word>
-		<Word>uint</Word>
-		<Word>ulong</Word>
 		<Word>ushort</Word>
-		<Word>wchar</Word>
+		<Word>int</Word>
+		<Word>uint</Word>
+		<Word>long</Word>
+		<Word>ulong</Word>
+		<Word>size_t</Word>
+		<Word>ssize_t</Word>
+		<Word>int8</Word>
+		<Word>uint8</Word>
+		<Word>int16</Word>
+		<Word>uint16</Word>
+		<Word>int32</Word>
+		<Word>uint32</Word>
+		<Word>int64</Word>
+		<Word>unichar</Word>
+		<Word>float</Word>
+		<Word>double</Word>
 
 		<!-- Not real keywords -->
 		<Word>Object</Word>
 		<Word>string</Word>
-		<Word>wstring</Word>
-		<Word>dstring</Word>
-		<Word>__ctfe</Word>
-		<Word>size_t</Word>
+		<Word>List</Word>
+		<Word>ArrayList</Word>
+		<Word>HashMap</Word>
+		<Word>AbstractMap</Word>
+		<Word>Map</Word>
+		<Word>Set</Word>
+		<Word>Iterator</Word>
+		<Word>Collection</Word>
+		<Word>Comparable</Word>
 	</Keywords>
 
 	<Keywords color = "Keyword(Void)">
@@ -210,7 +227,7 @@
 
 	<Keywords color = "Keyword(Namespace)">
 		<Word>using</Word>
-		<Word>module</Word>
+		<Word>namespace</Word>
 	</Keywords>
 
 	<Keywords color = "Keyword(Declaration)">
@@ -218,19 +235,13 @@
 		<Word>enum</Word>
 		<Word>interface</Word>
 		<Word>struct</Word>
-		<Word>template</Word>
-		<Word>union</Word>
-
 		<Word>delegate</Word>
-		<Word>function</Word>
+		<Word>errordomain</Word>
 	</Keywords>
 
 	<Keywords color = "Keyword(Parameter)">
-		<Word>in</Word>
-		<Word>inout</Word>
 		<Word>ref</Word>
 		<Word>out</Word>
-		<Word>body</Word>
 	</Keywords>
 	
 	
